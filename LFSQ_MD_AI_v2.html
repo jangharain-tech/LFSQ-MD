@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LFSQ MD팀 AI 업무 효율화</title>
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Nanum Gothic', sans-serif;
+  background: #f2f4f5;
+  color: #1a1a1a;
+  font-size: 13px;
+}
+
+/* ── TOP BAR ── */
+.top-bar {
+  background: #fff;
+  border-bottom: 2px solid #2a2a2a;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.top-title { font-size: 16px; font-weight: 800; color: #111; letter-spacing: -0.3px; }
+.top-sub { font-size: 12px; color: #888; margin-top: 2px; }
+.add-btn {
+  background: #1e7a6e;
+  color: #fff;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Nanum Gothic', sans-serif;
+  transition: background .15s;
+  letter-spacing: -0.2px;
+}
+.add-btn:hover { background: #155f56; }
+
+/* ── SHEET WRAP ── */
+.sheet-wrap {
+  overflow-x: auto;
+  padding: 20px 24px 60px;
+}
+
+/* ── TABLE ── */
+table {
+  border-collapse: collapse;
+  min-width: 1400px;
+  width: 100%;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  overflow: hidden;
+}
+thead th {
+  background: #2a2a2a;
+  border: 1px solid #3a3a3a;
+  padding: 10px 12px;
+  text-align: center;
+  font-weight: 800;
+  font-size: 12px;
+  color: #fff;
+  white-space: nowrap;
+  letter-spacing: 0.3px;
+}
+thead th.col-tf     { width: 80px; }
+thead th.col-task   { width: 155px; min-width: 130px; }
+thead th.col-req    { width: 300px; min-width: 240px; }
+thead th.col-persp  { width: 190px; min-width: 170px; }
+thead th.col-pipe   { width: 250px; min-width: 210px; }
+thead th.col-link   { width: 210px; min-width: 170px; }
+thead th.col-files  { width: 210px; min-width: 170px; }
+thead th.col-status { width: 105px; }
+
+tbody tr { border-bottom: 1px solid #e8e8e8; vertical-align: top; transition: background .1s; }
+tbody tr:hover td { background: #f8f9fa; }
+tbody td {
+  border: 1px solid #e0e0e0;
+  padding: 10px 12px;
+  vertical-align: top;
+}
+
+/* ── TF COLUMN ── */
+td.tf-cell {
+  vertical-align: middle;
+  text-align: center;
+}
+.tf-box {
+  width: 36px; height: 36px;
+  border: 1.5px solid #bbb;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 800; color: #bbb;
+  transition: all .15s; background: #fff;
+  font-family: 'Nanum Gothic', sans-serif;
+}
+.tf-box:hover { border-color: #555; color: #555; }
+.tf-box.on { background: #1e7a6e; border-color: #1e7a6e; color: #fff; }
+
+tr.tf-on td { background: #f0faf9; }
+
+td.task-name {
+  font-weight: 800;
+  font-size: 13px;
+  color: #111;
+  background: #f7f7f7;
+  vertical-align: middle;
+  letter-spacing: -0.2px;
+}
+
+/* ── REQUIREMENTS ── */
+.req-list { display: flex; flex-direction: column; gap: 5px; }
+.req-item { display: flex; align-items: flex-start; gap: 7px; }
+.req-cb {
+  width: 15px; height: 15px; flex-shrink: 0;
+  border: 1.5px solid #bbb; border-radius: 3px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  margin-top: 1px;
+  transition: all .12s; background: #fff;
+}
+.req-cb:hover { border-color: #555; }
+.req-cb.checked { background: #333; border-color: #333; }
+.req-cb.checked::after { content: '✓'; color: #fff; font-size: 9px; font-weight: 700; line-height: 1; }
+.req-text { font-size: 12px; color: #444; line-height: 1.55; cursor: pointer; }
+.req-text:hover { color: #111; }
+.req-text.done { text-decoration: line-through; color: #bbb; }
+.req-text[contenteditable="true"] {
+  outline: none;
+  border-bottom: 1px dashed #aaa;
+  background: #fffde7;
+  border-radius: 2px;
+  padding: 0 2px;
+}
+.small-add-btn {
+  background: none;
+  border: 1px dashed #ccc; border-radius: 10px;
+  padding: 3px 10px; font-size: 11px; color: #aaa;
+  cursor: pointer; margin-top: 5px; transition: all .12s;
+  font-family: 'Nanum Gothic', sans-serif;
+}
+.small-add-btn:hover { border-color: #1e7a6e; color: #1e7a6e; }
+
+/* ── PERSPECTIVE (효율화) — select dropdown ── */
+.persp-select {
+  width: 100%; padding: 7px 10px;
+  border: 1px solid #ddd; border-radius: 5px;
+  font-size: 12px; font-family: 'Nanum Gothic', sans-serif;
+  color: #333; background: #fff; cursor: pointer; outline: none;
+  transition: border-color .12s;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+}
+.persp-select:focus { border-color: #1e7a6e; }
+.persp-select.selected {
+  border-color: #1e7a6e;
+  background-color: #f0faf9;
+  color: #155f56;
+  font-weight: 700;
+}
+
+/* ── PIPELINE ── */
+.pipe-group { display: flex; flex-wrap: wrap; gap: 5px 8px; }
+.pipe-item {
+  display: flex; align-items: center; gap: 4px;
+  cursor: pointer; user-select: none;
+  padding: 4px 8px; border-radius: 12px;
+  border: 1.5px solid #ddd;
+  transition: all .15s;
+  background: #f7f7f7;
+}
+.pipe-item:hover { border-color: #aaa; background: #f0f0f0; }
+.pipe-item.active {
+  border-color: #1e7a6e;
+  background: #e6f7f5;
+}
+.pipe-label {
+  font-size: 11px;
+  color: #bbb;
+  font-weight: 700;
+  transition: color .15s;
+}
+.pipe-item.active .pipe-label {
+  color: #1a5f55;
+}
+
+/* ── LINKS ── */
+.link-list { display: flex; flex-direction: column; gap: 5px; }
+.link-row {
+  display: flex; align-items: center; gap: 5px;
+  background: #f7f7f7; border: 1px solid #e0e0e0;
+  border-radius: 5px; padding: 4px 8px;
+}
+.link-inp {
+  flex: 1; background: none; border: none; outline: none;
+  font-size: 11px; color: #333;
+  font-family: 'Nanum Gothic', sans-serif; min-width: 0;
+}
+.link-inp::placeholder { color: #ccc; }
+.link-open {
+  background: none; border: none; cursor: pointer;
+  font-size: 11px; color: #1e7a6e; white-space: nowrap;
+  flex-shrink: 0; transition: color .1s;
+  font-family: 'Nanum Gothic', sans-serif;
+}
+.link-open:hover { color: #111; }
+.link-del {
+  background: none; border: none; cursor: pointer;
+  font-size: 12px; color: #ccc; transition: color .1s; flex-shrink: 0;
+}
+.link-del:hover { color: #c00; }
+
+/* ── FILE ZONE ── */
+.file-zone {
+  border: 1px dashed #ccc; border-radius: 5px;
+  padding: 8px; cursor: pointer; position: relative;
+  transition: all .15s; text-align: center;
+  color: #bbb; font-size: 11px; line-height: 1.7;
+  background: #f9f9f9;
+}
+.file-zone:hover { border-color: #1e7a6e; color: #1e7a6e; background: #f0faf9; }
+.file-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.file-list-inner { margin-top: 6px; display: flex; flex-direction: column; gap: 3px; }
+.file-item {
+  display: flex; align-items: center; gap: 5px;
+  background: #f4f4f4; border-radius: 4px; padding: 4px 7px;
+}
+.file-name { flex: 1; font-size: 11px; color: #555; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.file-link { font-size: 11px; color: #1e7a6e; text-decoration: none; flex-shrink: 0; font-family: 'Nanum Gothic', sans-serif; }
+.file-link:hover { color: #111; text-decoration: underline; }
+.file-del { background: none; border: none; cursor: pointer; font-size: 12px; color: #ccc; transition: color .1s; }
+.file-del:hover { color: #c00; }
+
+/* ── STATUS SELECT ── */
+.status-sel {
+  width: 100%; padding: 6px 8px;
+  border: 1px solid #ddd; border-radius: 5px;
+  font-size: 12px; font-family: 'Nanum Gothic', sans-serif;
+  color: #444; background: #fff; cursor: pointer; outline: none;
+  transition: border-color .12s;
+}
+.status-sel:focus { border-color: #1e7a6e; }
+.del-row-btn {
+  background: none; border: none; cursor: pointer;
+  font-size: 12px; color: #ddd; display: block;
+  margin: 6px auto 0; transition: color .1s;
+}
+.del-row-btn:hover { color: #c00; }
+
+/* ── ADD FORM ── */
+.add-row-form {
+  background: #fff; border: 1px solid #ddd;
+  border-radius: 8px; padding: 16px 20px;
+  margin: 12px 0 0;
+  display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap;
+}
+.add-field { display: flex; flex-direction: column; gap: 4px; }
+.add-field label { font-size: 11px; color: #999; font-weight: 700; }
+.add-input {
+  border: 1px solid #ddd; border-radius: 5px;
+  padding: 7px 10px; font-size: 13px;
+  font-family: 'Nanum Gothic', sans-serif;
+  color: #333; outline: none; transition: border-color .12s; background: #fff;
+}
+.add-input:focus { border-color: #1e7a6e; }
+.cancel-btn {
+  background: none; border: 1px solid #ddd; padding: 8px 16px;
+  border-radius: 20px; cursor: pointer; font-size: 13px;
+  font-family: 'Nanum Gothic', sans-serif; color: #999; transition: all .12s;
+}
+.cancel-btn:hover { border-color: #aaa; color: #555; }
+
+::-webkit-scrollbar { height: 6px; width: 6px; }
+::-webkit-scrollbar-track { background: #eee; }
+::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div>
+    <div class="top-title">LFSQ MD팀 · AI 업무 효율화</div>
+    <div class="top-sub">각 셀을 직접 편집 · TF 요청된 항목이 자동으로 상단에 정렬됩니다</div>
+  </div>
+  <button class="add-btn" onclick="showAdd()">+ 과제 추가</button>
+</div>
+
+<div class="sheet-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th class="col-tf">TF 요청</th>
+        <th class="col-task">과제</th>
+        <th class="col-req">필요사항</th>
+        <th class="col-persp">효율화</th>
+        <th class="col-pipe">PIPE LINE</th>
+        <th class="col-link">현재 운영 참조</th>
+        <th class="col-files">참고자료</th>
+        <th class="col-status">진행현황</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+
+  <div id="add-form" style="display:none">
+    <div class="add-row-form">
+      <div class="add-field">
+        <label>과제명 *</label>
+        <input id="f-title" class="add-input" style="width:200px" placeholder="예: 자동 발주 시스템">
+      </div>
+      <div class="add-field">
+        <label>첫 번째 필요사항</label>
+        <input id="f-req" class="add-input" style="width:300px" placeholder="필요사항 (나중에 추가도 가능해요)">
+      </div>
+      <button class="add-btn" onclick="confirmAdd()">추가하기</button>
+      <button class="cancel-btn" onclick="hideAdd()">취소</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const PIPES = ['BM','ONLINE','OFFLINE','ON/OFF','LOGIS','MKT','CX'];
+const STATUSES = ['검토','진행','논의','보류'];
+const PERSP_OPTS = [
+  { k: '', l: '— 선택 —' },
+  { k: 'company',  l: '전사관점' },
+  { k: 'team',     l: '팀 관점' },
+  { k: 'personal', l: '개인 관점' }
+];
+
+let tasks = [
+  { id:1, title:'DASH Board 구축',
+    requirements:['출시계획 / Allocation 시트 / 입고현황 / 물량계획 가시화','ㄴ 주요팝업요약 / 캘린더','ㄴ Raw데이터 직접 수정 및 엑셀 업/다운로드 필요'],
+    reqChecks:[],
+    perspective:'company',
+    tf:true,
+    pipeline:['BM','ONLINE','OFFLINE','ON/OFF','LOGIS','MKT','CX'],
+    links:['https://docs.google.com/spreadsheets/d/1aSeKoMEBjDTkAJTQUg6IRUEDawDTppq1TnCuVwGYN-8/edit?gid=1177430519#gid=1177430519'],
+    files:[], status:'검토' },
+  { id:2, title:'판매 데이터 기반 수요 예측',
+    requirements:['(수요) 판매 데이터 분석 편의성 → 수요예측에 활용','(재발주) 소진예상 재고 리오더 알림'],
+    reqChecks:[],
+    perspective:'company',
+    tf:false, pipeline:['BM','ON/OFF'],
+    links:[], files:[], status:'검토' },
+  { id:3, title:'단순 시스템 업무 편의',
+    requirements:['자재코드 등록 양식 효율화','정보고시(데이터센터) 등록 양식 효율화'],
+    reqChecks:[],
+    perspective:'team',
+    tf:true, pipeline:[],
+    links:[], files:[], status:'검토' },
+  { id:4, title:'기획 / 영업',
+    requirements:['프로젝트 기획안 (ex: 기획보고, 킥오프, 등)'],
+    reqChecks:[],
+    perspective:'personal',
+    tf:false, pipeline:[],
+    links:[], files:[], status:'검토' }
+];
+
+function sortedTasks() {
+  return [...tasks].sort((a,b) => (b.tf ? 1:0) - (a.tf ? 1:0));
+}
+
+function render() {
+  document.getElementById('tbody').innerHTML = sortedTasks().map(rowHtml).join('');
+  tasks.forEach(t => attachDrop(t.id));
+  save();
+}
+
+function rowHtml(t) {
+  /* ── 필요사항 (inline-editable) ── */
+  const reqs = (t.requirements||[]).map((r,ri) => {
+    const ck = (t.reqChecks||[]).includes(ri);
+    return `<div class="req-item">
+      <div class="req-cb${ck?' checked':''}" onclick="toggleReq(${t.id},${ri},this)"></div>
+      <span class="req-text${ck?' done':''}" contenteditable="true"
+        onblur="updateReqText(${t.id},${ri},this)"
+        onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"
+      >${esc(r)}</span>
+    </div>`;
+  }).join('');
+
+  /* ── 효율화 select ── */
+  const perspOpts = PERSP_OPTS.map(p =>
+    `<option value="${p.k}"${t.perspective===p.k?' selected':''}>${p.l}</option>`
+  ).join('');
+  const perspHasVal = t.perspective && t.perspective !== '';
+
+  /* ── PIPELINE pills ── */
+  const pipes = PIPES.map(p => {
+    const active = t.pipeline.includes(p);
+    return `<div class="pipe-item${active?' active':''}" onclick="togglePipe(${t.id},'${p}',this)">
+      <span class="pipe-label">${p}</span>
+    </div>`;
+  }).join('');
+
+  const links = (t.links||[]).map((l,li) => linkRowHtml(t.id,l,li)).join('');
+  const fileItems = (t.files||[]).map((f,fi) => fileItemHtml(t.id,f,fi)).join('');
+  const opts = STATUSES.map(s=>`<option${s===t.status?' selected':''}>${s}</option>`).join('');
+
+  return `<tr id="row-${t.id}"${t.tf?' class="tf-on"':''}>
+    <td class="tf-cell">
+      <div class="tf-box${t.tf?' on':''}" id="tf-${t.id}" onclick="toggleTF(${t.id},this)">${t.tf?'O':'X'}</div>
+    </td>
+    <td class="task-name">${esc(t.title)}</td>
+    <td>
+      <div class="req-list" id="reqs-${t.id}">${reqs}</div>
+      <button class="small-add-btn" onclick="addReq(${t.id})">+ 항목 추가</button>
+    </td>
+    <td>
+      <select class="persp-select${perspHasVal?' selected':''}"
+        onchange="updatePersp(${t.id},this)">
+        ${perspOpts}
+      </select>
+    </td>
+    <td><div class="pipe-group" id="pipes-${t.id}">${pipes}</div></td>
+    <td>
+      <div class="link-list" id="links-${t.id}">${links}</div>
+      <button class="small-add-btn" onclick="addLink(${t.id})">+ 링크 추가</button>
+    </td>
+    <td>
+      <div class="file-zone" id="fzone-${t.id}">
+        <input type="file" multiple onchange="handleFiles(${t.id},this.files)">
+        📎 업로드
+      </div>
+      <div class="file-list-inner" id="files-${t.id}">${fileItems}</div>
+    </td>
+    <td>
+      <select class="status-sel" onchange="updateStatus(${t.id},this.value)">${opts}</select>
+      <button class="del-row-btn" onclick="delTask(${t.id})" title="삭제">🗑</button>
+    </td>
+  </tr>`;
+}
+
+function linkRowHtml(tid, url, li) {
+  return `<div class="link-row" id="lr-${tid}-${li}">
+    <input class="link-inp" value="${esc(url)}" placeholder="https://..." onchange="updateLink(${tid},${li},this.value)">
+    ${url ? `<button class="link-open" onclick="window.open('${esc(url)}','_blank')">열기↗</button>` : ''}
+    <button class="link-del" onclick="delLink(${tid},${li})">✕</button>
+  </div>`;
+}
+
+function fileItemHtml(tid, f, fi) {
+  const isHtml = /\.html?$/i.test(f.name||'');
+  return `<div class="file-item" id="fi-${tid}-${fi}">
+    <span class="file-name" title="${esc(f.name)}">${isHtml?'🌐':'📄'} ${esc(f.name)}</span>
+    ${f.url ? `<a class="file-link" href="${f.url}" target="_blank">${isHtml?'열기↗':'보기↗'}</a>` : ''}
+    <button class="file-del" onclick="delFile(${tid},${fi})">✕</button>
+  </div>`;
+}
+
+function attachDrop(tid) {
+  const dz = document.getElementById(`fzone-${tid}`);
+  if (!dz) return;
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.style.borderColor='#1e7a6e'; });
+  dz.addEventListener('dragleave', () => dz.style.borderColor='');
+  dz.addEventListener('drop', e => { e.preventDefault(); dz.style.borderColor=''; handleFiles(tid, e.dataTransfer.files); });
+}
+
+function toggleReq(tid, ri, el) {
+  const t = tasks.find(x=>x.id===tid);
+  const i = t.reqChecks.indexOf(ri);
+  if (i===-1) t.reqChecks.push(ri); else t.reqChecks.splice(i,1);
+  el.classList.toggle('checked');
+  el.nextElementSibling.classList.toggle('done');
+  save();
+}
+
+function updateReqText(tid, ri, el) {
+  const t = tasks.find(x=>x.id===tid);
+  const newText = el.innerText.trim();
+  if (newText) {
+    t.requirements[ri] = newText;
+    save();
+  } else {
+    el.innerText = t.requirements[ri]; // revert if empty
+  }
+}
+
+function addReq(tid) {
+  const txt = prompt('필요사항을 입력하세요:');
+  if (!txt||!txt.trim()) return;
+  const t = tasks.find(x=>x.id===tid);
+  const ri = t.requirements.length;
+  t.requirements.push(txt.trim());
+  const cont = document.getElementById(`reqs-${tid}`);
+  const d = document.createElement('div');
+  d.innerHTML = `<div class="req-item">
+    <div class="req-cb" onclick="toggleReq(${tid},${ri},this)"></div>
+    <span class="req-text" contenteditable="true"
+      onblur="updateReqText(${tid},${ri},this)"
+      onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"
+    >${esc(txt.trim())}</span>
+  </div>`;
+  cont.appendChild(d.firstElementChild);
+  save();
+}
+
+function updatePersp(tid, sel) {
+  const t = tasks.find(x=>x.id===tid);
+  t.perspective = sel.value;
+  sel.classList.toggle('selected', sel.value !== '');
+  save();
+}
+
+function toggleTF(tid, el) {
+  const t = tasks.find(x=>x.id===tid);
+  t.tf = !t.tf;
+  save();
+  render();
+}
+
+function togglePipe(tid, p, el) {
+  const t = tasks.find(x=>x.id===tid);
+  const i = t.pipeline.indexOf(p);
+  if (i===-1) t.pipeline.push(p); else t.pipeline.splice(i,1);
+  el.classList.toggle('active', t.pipeline.includes(p));
+  save();
+}
+
+function addLink(tid) {
+  const t = tasks.find(x=>x.id===tid);
+  const li = t.links.length;
+  t.links.push('');
+  const cont = document.getElementById(`links-${tid}`);
+  const d = document.createElement('div');
+  d.innerHTML = linkRowHtml(tid, '', li);
+  cont.appendChild(d.firstElementChild);
+  save();
+}
+
+function updateLink(tid, li, val) {
+  const t = tasks.find(x=>x.id===tid);
+  t.links[li] = val;
+  const row = document.getElementById(`lr-${tid}-${li}`);
+  if (row) {
+    let ob = row.querySelector('.link-open');
+    if (val && !ob) {
+      const b = document.createElement('button');
+      b.className = 'link-open'; b.textContent = '열기↗';
+      b.onclick = () => window.open(val,'_blank');
+      row.insertBefore(b, row.querySelector('.link-del'));
+    } else if (val && ob) { ob.onclick = () => window.open(val,'_blank'); }
+    else if (!val && ob) { ob.remove(); }
+  }
+  save();
+}
+
+function delLink(tid, li) {
+  const t = tasks.find(x=>x.id===tid);
+  t.links.splice(li,1);
+  document.getElementById(`lr-${tid}-${li}`)?.remove();
+  save();
+}
+
+function handleFiles(tid, fileList) {
+  const t = tasks.find(x=>x.id===tid);
+  Array.from(fileList).forEach(f => {
+    const url = URL.createObjectURL(f);
+    const fi = t.files.length;
+    t.files.push({ name:f.name, url, type:f.type });
+    const cont = document.getElementById(`files-${tid}`);
+    const d = document.createElement('div');
+    d.innerHTML = fileItemHtml(tid, t.files[fi], fi);
+    cont.appendChild(d.firstElementChild);
+  });
+}
+
+function delFile(tid, fi) {
+  const t = tasks.find(x=>x.id===tid);
+  t.files.splice(fi,1);
+  document.getElementById(`fi-${tid}-${fi}`)?.remove();
+}
+
+function updateStatus(tid, val) {
+  tasks.find(x=>x.id===tid).status = val;
+  save();
+}
+
+function delTask(tid) {
+  if (!confirm('이 과제를 삭제할까요?')) return;
+  tasks = tasks.filter(x=>x.id!==tid);
+  render();
+}
+
+function showAdd() { document.getElementById('add-form').style.display='block'; document.getElementById('f-title').focus(); }
+function hideAdd() { document.getElementById('add-form').style.display='none'; }
+
+function confirmAdd() {
+  const title = document.getElementById('f-title').value.trim();
+  if (!title) { alert('과제명을 입력해주세요!'); return; }
+  const req = document.getElementById('f-req').value.trim();
+  const newId = tasks.length ? Math.max(...tasks.map(x=>x.id))+1 : 1;
+  tasks.push({ id:newId, title, requirements:req?[req]:[], reqChecks:[], perspective:'', tf:false, pipeline:[], links:[], files:[], status:'검토' });
+  document.getElementById('f-title').value='';
+  document.getElementById('f-req').value='';
+  hideAdd();
+  render();
+  setTimeout(() => document.getElementById(`row-${newId}`)?.scrollIntoView({behavior:'smooth',block:'center'}), 100);
+}
+
+function save() {
+  try { localStorage.setItem('lfsq_tasks', JSON.stringify(tasks.map(t=>({...t, files:t.files.map(f=>({name:f.name,type:f.type}))})))); } catch(e){}
+}
+function load() {
+  try {
+    const r = localStorage.getItem('lfsq_tasks');
+    if (r) {
+      const parsed = JSON.parse(r).map(t => {
+        // migrate old perspective object to string
+        let persp = t.perspective;
+        if (typeof persp === 'object' && persp !== null) {
+          persp = Object.keys(persp).find(k => persp[k]) || '';
+        }
+        return {...t, perspective: persp, files:(t.files||[]).map(f=>({...f,url:null}))};
+      });
+      tasks = parsed;
+    }
+  } catch(e){}
+}
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+load();
+render();
+</script>
+</body>
+</html>
