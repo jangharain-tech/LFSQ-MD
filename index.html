@@ -479,8 +479,7 @@ td.task-name:focus { outline: none; background: #e8f4fd; }
 
 <script>
 // =============================================
-// 🔥 Firebase 설정 — 여기를 수정하세요!
-// Firebase Console → 프로젝트 설정 → 웹 앱 → SDK 구성
+// 🔥 Firebase 설정
 // =============================================
 const firebaseConfig = {
   apiKey: "AIzaSyBwIfEoO8IWObPJ7iYocWMZ7efDDeCt46w",
@@ -492,22 +491,38 @@ const firebaseConfig = {
   appId: "1:869210794054:web:e65fc58d5882a49f154247"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-// =============================================
-
+// ✅ compat 방식만 사용
 firebase.initializeApp(firebaseConfig);
+
 const auth = firebase.auth();
-const db   = firebase.database();
+const db = firebase.database();
 const provider = new firebase.auth.GoogleAuthProvider();
+
+// 선택사항: 계정 선택창 강제로 띄우기
+provider.setCustomParameters({
+  prompt: 'select_account'
+});
 
 let currentUser = null;
 let saveTimeout = null;
 
 // ── 구글 로그인 ──
 function signInWithGoogle() {
-  auth.signInWithPopup(provider).catch(e => alert('로그인 실패: ' + e.message));
+  auth.signInWithPopup(provider).catch(e => {
+    console.error('Google 로그인 에러:', e);
+
+    if (e.code === 'auth/unauthorized-domain') {
+      alert('이 도메인이 Firebase 승인된 도메인에 등록되지 않았습니다. Firebase Console → Authentication → Settings → Authorized domains 에서 현재 사이트 도메인을 추가해주세요.');
+    } else if (e.code === 'auth/popup-blocked') {
+      alert('브라우저가 로그인 팝업을 차단했습니다. 팝업 차단을 해제한 뒤 다시 시도해주세요.');
+    } else if (e.code === 'auth/popup-closed-by-user') {
+      alert('로그인 창이 중간에 닫혔습니다. 다시 시도해주세요.');
+    } else {
+      alert('로그인 실패: ' + e.message);
+    }
+  });
 }
+
 function signOut() {
   auth.signOut();
 }
@@ -527,6 +542,7 @@ auth.onAuthStateChanged(user => {
     stopListening();
   }
 });
+</script>
 
 // ── 실시간 데이터 수신 ──
 let dbListener = null;
