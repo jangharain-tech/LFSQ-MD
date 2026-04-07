@@ -483,14 +483,17 @@ td.task-name:focus { outline: none; background: #e8f4fd; }
 // Firebase Console → 프로젝트 설정 → 웹 앱 → SDK 구성
 // =============================================
 const firebaseConfig = {
-  apiKey: "여기에-API-KEY를-입력하세요",
-  authDomain: "여기에-프로젝트-ID.firebaseapp.com",
-  databaseURL: "https://lfsq-md-default-rtdb.asia-southeast1.firebaseapp.com",  // 스크린샷에서 확인한 URL
-  projectId: "여기에-프로젝트-ID",
-  storageBucket: "여기에-프로젝트-ID.appspot.com",
-  messagingSenderId: "여기에-SENDER-ID",
-  appId: "여기에-APP-ID"
+  apiKey: "AIzaSyBwIfEoO8IWObPJ7iYocWMZ7efDDeCt46w",
+  authDomain: "lfsq-md.firebaseapp.com",
+  databaseURL: "https://lfsq-md-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "lfsq-md",
+  storageBucket: "lfsq-md.firebasestorage.app",
+  messagingSenderId: "869210794054",
+  appId: "1:869210794054:web:e65fc58d5882a49f154247"
 };
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
 // =============================================
 
 firebase.initializeApp(firebaseConfig);
