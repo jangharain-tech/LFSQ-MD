@@ -16,46 +16,47 @@ body { font-family: 'Pretendard', sans-serif; background: #f5f6fa; color: #1a1a2
 .top-mascot { height: 52px; width: 52px; object-fit: cover; border-radius: 50%; background: #eee; border: 1px solid #ddd; }
 .top-title { font-size: 15px; font-weight: 700; color: #111; }
 
-/* 접속자 프로필 */
 .presence-list { display: flex; align-items: center; margin-right: 15px; }
 .presence-avatar { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #fff; margin-left: -8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 
 /* ── TABLE ── */
 .sheet-wrap { padding: 20px 24px; overflow-x: auto; }
-table { border-collapse: separate; border-spacing: 0; min-width: 1400px; width: 100%; background: #fff; border-radius: 14px; overflow: hidden; box-shadow: 0 2px 16px rgba(0,0,0,.06); }
+table { border-collapse: separate; border-spacing: 0; min-width: 1450px; width: 100%; background: #fff; border-radius: 14px; overflow: hidden; box-shadow: 0 2px 16px rgba(0,0,0,.06); }
 thead th { background: #2a2a2a; padding: 12px 14px; text-align: left; font-weight: 700; font-size: 11px; color: #fff; text-transform: uppercase; }
 tbody td { padding: 12px 14px; vertical-align: top; border-bottom: 1px solid #f3f3f8; transition: all 0.3s; }
 
-/* 진행 완료 시 스타일 (회색 처리) */
+/* 완료 행 스타일 */
 tr.status-done { background: #f9f9f9; color: #aaa; opacity: 0.7; }
-tr.status-done .task-name { color: #aaa; }
 
-/* 효율화 텍스트 토글 스타일 */
-.persp-toggle { cursor: pointer; font-weight: 700; color: #2a2a2a; font-size: 13px; display: inline-block; padding: 4px 8px; border-radius: 4px; transition: background 0.2s; }
-.persp-toggle:hover { background: #eee; }
+/* 필요사항 체크박스 및 삭제 스타일 */
+.req-item { display: flex; align-items: center; gap: 8px; group: hover; padding: 2px 0; }
+.req-cb { width: 16px; height: 16px; border: 2px solid #c8cce0; border-radius: 4px; cursor: pointer; flex-shrink: 0; }
+.req-cb.checked { background: #2a2a2a; border-color: #2a2a2a; position: relative; }
+.req-cb.checked::after { content: '✓'; color: #fff; font-size: 10px; position: absolute; left: 2px; top: -1px; }
+.req-text { flex: 1; cursor: text; outline: none; }
+.req-text.done { text-decoration: line-through; color: #bbb; }
+.req-del { opacity: 0; cursor: pointer; color: #ff4d4f; font-size: 12px; transition: 0.2s; }
+.req-item:hover .req-del { opacity: 1; }
+
+/* 효율화 토글 */
+.persp-toggle { cursor: pointer; font-weight: 700; color: #2a2a2a; font-size: 13px; display: inline-block; padding: 4px 8px; border-radius: 4px; }
 .persp-toggle.empty { font-weight: 400; color: #ccc; }
 
-/* PIPE LINE (ON/OFF 삭제됨) */
+/* 파이프라인 */
 .pipe-group { display: flex; flex-wrap: wrap; gap: 5px; }
 .pipe-item { padding: 4px 10px; border-radius: 20px; border: 1.5px solid #e8e8f0; font-size: 11px; cursor: pointer; color: #ccc; font-weight: 700; }
 .pipe-item.active { background: #2a2a2a; color: #fff; border-color: #2a2a2a; }
 
-/* 운영참조 링크 */
-.link-anchor { color: #3b7dd8; text-decoration: none; font-weight: 600; cursor: pointer; word-break: break-all; }
-.link-anchor:hover { text-decoration: underline; }
-
-/* 파일 업로드 */
+/* 링크 및 파일 */
+.link-anchor { color: #3b7dd8; text-decoration: none; font-weight: 600; font-size: 11px; }
 .file-upload-btn { display: inline-block; padding: 4px 8px; background: #f0f0f5; border-radius: 6px; cursor: pointer; font-size: 11px; border: 1px solid #ddd; }
-.file-list { margin-top: 5px; font-size: 11px; }
-.file-item { display: flex; align-items: center; gap: 5px; margin-bottom: 2px; }
 
 /* TF 버튼 */
 .tf-btn { width: 80px; height: 26px; border: 1.5px solid #e8e8f0; border-radius: 8px; cursor: pointer; font-size: 10px; font-weight: 700; color: #ccc; background: #fafafa; display: flex; align-items: center; justify-content: center; margin-bottom: 4px; }
 .tf-btn.tf-active { background: #2a2a2a; color: #fff; border-color: #2a2a2a; }
 .tf-btn.team-active { background: #3b7dd8; color: #fff; border-color: #3b7dd8; }
 
-#auth-overlay { position: fixed; inset: 0; z-index: 9999; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-#auth-overlay.hidden { display: none; }
+#add-form { display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#fff; padding:30px; border-radius:14px; box-shadow:0 10px 30px rgba(0,0,0,0.2); z-index:1000; }
 </style>
 </head>
 <body>
@@ -84,20 +85,20 @@ tr.status-done .task-name { color: #aaa; }
     <thead>
       <tr>
         <th style="width:100px">TF 구분</th>
-        <th style="width:200px">과제</th>
+        <th style="width:180px">과제</th>
         <th>필요사항</th>
-        <th style="width:120px">효율화</th>
-        <th style="width:250px">PIPE LINE</th>
-        <th style="width:200px">운영참조</th>
-        <th style="width:180px">참고자료</th>
-        <th style="width:120px">진행</th>
+        <th style="width:110px">효율화</th>
+        <th style="width:230px">PIPE LINE</th>
+        <th style="width:180px">운영참조</th>
+        <th style="width:150px">참고자료</th>
+        <th style="width:100px">진행</th>
       </tr>
     </thead>
     <tbody id="tbody"></tbody>
   </table>
 </div>
 
-<div id="add-form" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#fff; padding:30px; border-radius:14px; box-shadow:0 10px 30px rgba(0,0,0,0.2); z-index:1000;">
+<div id="add-form">
   <h3>새 과제 추가</h3><br>
   <input id="f-title" placeholder="과제명" style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #ddd; border-radius:8px;">
   <button onclick="confirmAdd()" style="width:100%; padding:10px; background:#2a2a2a; color:#fff; border:none; border-radius:8px;">추가하기</button>
@@ -109,7 +110,6 @@ tr.status-done .task-name { color: #aaa; }
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 
 <script>
-// Firebase 설정 (사용자 정보 입력 필요)
 const firebaseConfig = {
   apiKey: "AIzaSyBwIfEoO8IWObPJ7iYocWMZ7efDDeCt46w",
   authDomain: "lfsq-md.firebaseapp.com",
@@ -125,9 +125,7 @@ const auth = firebase.auth();
 const db = firebase.database();
 
 let tasks = [];
-let currentUser = null;
 
-// 구글 로그인
 function signInWithGoogle() {
   const provider = new firebase.auth.GoogleAuthProvider();
   auth.signInWithPopup(provider);
@@ -135,7 +133,6 @@ function signInWithGoogle() {
 
 auth.onAuthStateChanged(user => {
   if (user) {
-    currentUser = user;
     document.getElementById('auth-overlay').classList.add('hidden');
     db.ref('presence/' + user.uid).set({ name: user.displayName, photo: user.photoURL });
     db.ref('presence/' + user.uid).onDisconnect().remove();
@@ -143,7 +140,6 @@ auth.onAuthStateChanged(user => {
   }
 });
 
-// 데이터 동기화 및 렌더링
 function startSync() {
   db.ref('lfsq_tasks').on('value', snap => {
     const data = snap.val();
@@ -160,7 +156,6 @@ function startSync() {
 }
 
 function renderUI() {
-  // 정렬: 완료되지 않은 것 우선 + TF 우선, 완료된 것은 맨 아래로
   const sorted = [...tasks].sort((a, b) => {
     if (a.status === '완료' && b.status !== '완료') return 1;
     if (a.status !== '완료' && b.status === '완료') return -1;
@@ -170,9 +165,6 @@ function renderUI() {
 
   const html = sorted.map(t => {
     const isDone = t.status === '완료';
-    const perspMap = { 'company': '전사관점', 'team': '팀 관점', 'personal': '개인 관점', '': '— 선택 —' };
-    
-    // PIPE LINE (ON/OFF 제외)
     const pipes = ['BM', 'ONLINE', 'OFFLINE', 'LOGIS', 'MKT', 'CX'].map(p => {
       const active = (t.pipeline || []).includes(p);
       return `<div class="pipe-item ${active ? 'active' : ''}" onclick="togglePipe(${t.id}, '${p}')">${p}</div>`;
@@ -186,38 +178,40 @@ function renderUI() {
             <div class="tf-btn ${t.tfMode === 'team' ? 'team-active' : ''}" onclick="updateField(${t.id}, 'tfMode', 'team')">팀 자체구축</div>
           </div>
         </td>
-        <td class="task-name" contenteditable="true" onblur="updateTitle(${t.id}, this)">${t.title}</td>
+        <td contenteditable="true" onblur="updateField(${t.id}, 'title', this.innerText)">${t.title}</td>
         <td>
-            ${(t.requirements || []).map((r, i) => `
+            <div id="req-container-${t.id}">
+            ${(t.requirements || []).map((r, i) => {
+                const checked = (t.reqChecks || []).includes(i);
+                return `
                 <div class="req-item">
-                    <div class="req-cb ${(t.reqChecks || []).includes(i) ? 'checked' : ''}" onclick="toggleReq(${t.id}, ${i})"></div>
-                    <span class="req-text ${(t.reqChecks || []).includes(i) ? 'done' : ''}">${r}</span>
-                </div>
-            `).join('')}
-            <button onclick="addReq(${t.id})" style="font-size:10px; cursor:pointer; background:none; border:none; color:#3b7dd8;">+ 추가</button>
+                    <div class="req-cb ${checked ? 'checked' : ''}" onclick="toggleReq(${t.id}, ${i})"></div>
+                    <span class="req-text ${checked ? 'done' : ''}" contenteditable="true" onblur="editReq(${t.id}, ${i}, this.innerText)">${r}</span>
+                    <span class="req-del" onclick="deleteReq(${t.id}, ${i})">✕</span>
+                </div>`;
+            }).join('')}
+            </div>
+            <button onclick="addReq(${t.id})" style="font-size:10px; cursor:pointer; color:#3b7dd8; border:none; background:none; margin-top:5px;">+ 항목 추가</button>
         </td>
         <td>
           <span class="persp-toggle ${!t.perspective ? 'empty' : ''}" onclick="togglePersp(${t.id}, '${t.perspective}')">
-            ${perspMap[t.perspective || '']}
+            ${t.perspective === 'company' ? '전사관점' : t.perspective === 'team' ? '팀 관점' : t.perspective === 'personal' ? '개인 관점' : '— 선택 —'}
           </span>
         </td>
         <td><div class="pipe-group">${pipes}</div></td>
         <td>
           <input style="width:100%; border:none; background:transparent; font-size:11px;" value="${t.links || ''}" onchange="updateField(${t.id}, 'links', this.value)" placeholder="링크 입력">
-          ${t.links ? `<br><a class="link-anchor" href="${t.links}" target="_blank">사이트 이동 ↗</a>` : ''}
+          ${t.links ? `<a class="link-anchor" href="${t.links}" target="_blank">이동 ↗</a>` : ''}
         </td>
         <td>
-          <label class="file-upload-btn">
-            <input type="file" style="display:none" onchange="uploadFile(${t.id}, this.files[0])"> 📎 업로드
-          </label>
-          <div class="file-list">
-            ${(t.files || []).map(f => `<div class="file-item">📄 ${f.name}</div>`).join('')}
-          </div>
+          <label class="file-upload-btn"><input type="file" style="display:none" onchange="uploadFile(${t.id}, this.files[0])">📎 업로드</label>
+          <div style="font-size:10px; color:#aaa; margin-top:4px;">${(t.files || []).length}개 파일</div>
         </td>
         <td>
-          <select onchange="updateField(${t.id}, 'status', this.value)" style="border:1px solid #ddd; border-radius:4px;">
+          <select onchange="updateField(${t.id}, 'status', this.value)">
             ${['검토', '진행', '완료'].map(s => `<option value="${s}" ${t.status === s ? 'selected' : ''}>${s}</option>`).join('')}
           </select>
+          <button onclick="deleteTask(${t.id})" style="border:none; background:none; cursor:pointer; margin-left:5px;">🗑</button>
         </td>
       </tr>
     `;
@@ -225,84 +219,87 @@ function renderUI() {
   document.getElementById('tbody').innerHTML = html;
 }
 
-// 필드 업데이트 공통 함수
+/* 데이터 수정 함수들 */
 function updateField(id, field, val) {
   db.ref(`lfsq_tasks/task_${id}/${field}`).set(val);
 }
 
-function updateTitle(id, el) {
-  updateField(id, 'title', el.innerText);
-}
-
-// 효율화(관점) 순환 토글
 function togglePersp(id, current) {
-  const sequence = ['', 'company', 'team', 'personal'];
-  let nextIdx = (sequence.indexOf(current || '') + 1) % sequence.length;
-  updateField(id, 'perspective', sequence[nextIdx]);
+  const seq = ['', 'company', 'team', 'personal'];
+  const next = seq[(seq.indexOf(current || '') + 1) % seq.length];
+  updateField(id, 'perspective', next);
 }
 
-// 파이프라인 토글
 function togglePipe(id, p) {
   const t = tasks.find(x => x.id === id);
   let arr = t.pipeline || [];
-  if (arr.includes(p)) arr = arr.filter(item => item !== p);
-  else arr.push(p);
+  arr = arr.includes(p) ? arr.filter(i => i !== p) : [...arr, p];
   updateField(id, 'pipeline', arr);
 }
 
-// 체크박스 토글
+/* 필요사항(Requirements) 상세 제어 */
 function toggleReq(id, idx) {
   const t = tasks.find(x => x.id === id);
   let arr = t.reqChecks || [];
-  if (arr.includes(idx)) arr = arr.filter(i => i !== idx);
-  else arr.push(idx);
+  arr = arr.includes(idx) ? arr.filter(i => i !== idx) : [...arr, idx];
   updateField(id, 'reqChecks', arr);
 }
 
 function addReq(id) {
-  const val = prompt("필요사항을 입력하세요");
+  const val = prompt("새로운 필요사항 항목을 입력하세요.");
   if (!val) return;
   const t = tasks.find(x => x.id === id);
-  let arr = t.requirements || [];
-  arr.push(val);
+  const arr = t.requirements || [];
+  updateField(id, 'requirements', [...arr, val]);
+}
+
+function editReq(id, idx, text) {
+  const t = tasks.find(x => x.id === id);
+  const arr = [...t.requirements];
+  arr[idx] = text;
   updateField(id, 'requirements', arr);
 }
 
-// 파일 업로드 (Base64 방식 - DB 저장용)
+function deleteReq(id, idx) {
+  if(!confirm("이 항목을 삭제할까요?")) return;
+  const t = tasks.find(x => x.id === id);
+  const arr = t.requirements.filter((_, i) => i !== idx);
+  // 체크박스 인덱스도 조정
+  let checks = t.reqChecks || [];
+  checks = checks.filter(i => i !== idx).map(i => i > idx ? i - 1 : i);
+  db.ref(`lfsq_tasks/task_${id}`).update({ requirements: arr, reqChecks: checks });
+}
+
 function uploadFile(id, file) {
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = function(e) {
+  reader.onload = e => {
     const t = tasks.find(x => x.id === id);
-    let arr = t.files || [];
-    arr.push({ name: file.name, data: e.target.result });
-    updateField(id, 'files', arr);
+    const arr = t.files || [];
+    updateField(id, 'files', [...arr, { name: file.name, data: e.target.result }]);
   };
   reader.readAsDataURL(file);
 }
 
-// 마스코트 업로드
 function uploadMascot(file) {
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = function(e) {
-    db.ref('settings/mascot').set(e.target.result);
-  };
+  reader.onload = e => db.ref('settings/mascot').set(e.target.result);
   reader.readAsDataURL(file);
 }
-
-function showAdd() { document.getElementById('add-form').style.display = 'block'; }
-function hideAdd() { document.getElementById('add-form').style.display = 'none'; }
 
 function confirmAdd() {
   const title = document.getElementById('f-title').value;
   if (!title) return;
   const id = Date.now();
-  const newTask = { id: id, title: title, status: '검토', pipeline: [], requirements: [], perspective: '' };
-  db.ref('lfsq_tasks/task_' + id).set(newTask);
+  db.ref('lfsq_tasks/task_' + id).set({ id, title, status: '검토', pipeline: [], requirements: [], perspective: '' });
   document.getElementById('f-title').value = "";
   hideAdd();
 }
+
+function deleteTask(id) { if(confirm("과제를 삭제하시겠습니까?")) db.ref('lfsq_tasks/task_' + id).remove(); }
+function showAdd() { document.getElementById('add-form').style.display = 'block'; }
+function hideAdd() { document.getElementById('add-form').style.display = 'none'; }
 </script>
 </body>
 </html>
