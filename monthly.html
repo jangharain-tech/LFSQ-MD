@@ -7,301 +7,68 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --mint: #3ECFCF;
-    --mint-light: #7EEAEA;
-    --mint-dark: #1AABAB;
-    --black: #111214;
-    --gray-dark: #1E2124;
-    --gray-mid: #2D3035;
-    --white: #F5FAFA;
-    --text-muted: #8899AA;
+    --mint: #3ECFCF; --mint-light: #7EEAEA; --mint-dark: #1AABAB;
+    --black: #111214; --gray-dark: #1E2124; --gray-mid: #2D3035;
+    --white: #F5FAFA; --text-muted: #8899AA;
   }
-
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { width: 100%; height: 100%; overflow: hidden; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: var(--black); color: var(--white); font-family: 'Noto Sans KR', sans-serif; }
 
-  body {
-    background: var(--black);
-    color: var(--white);
-    font-family: 'Noto Sans KR', 'Space Grotesk', sans-serif;
-  }
-
-  /* ── TOP NAV ── */
+  /* 네비게이션 */
   nav.topnav {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 500;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 7px 48px;
-    background: rgba(17,18,20,0.85);
-    backdrop-filter: blur(16px);
+    position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 7px 48px; background: rgba(17,18,20,0.85); backdrop-filter: blur(16px);
     border-bottom: 1px solid rgba(62,207,207,0.12);
   }
-  .nav-logo {
-    font-family: 'Space Grotesk', sans-serif;
-    font-weight: 600;
-    font-size: 12px;
-    letter-spacing: 0.18em;
-    color: #ffffff;
-    text-transform: uppercase;
-  }
+  .nav-logo { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 12px; letter-spacing: 0.18em; color: #ffffff; text-transform: uppercase; }
   .nav-links { display: flex; gap: 32px; list-style: none; }
-  .nav-links a {
-    font-size: 13px;
-    letter-spacing: 0.08em;
-    color: var(--text-muted);
-    text-decoration: none;
-    transition: color 0.2s;
-  }
+  .nav-links a { font-size: 13px; color: var(--text-muted); text-decoration: none; cursor: pointer; transition: color 0.2s; }
   .nav-links a:hover { color: var(--mint); }
 
-  /* ── DOT NAV ── */
-  .dot-nav {
-    position: fixed;
-    right: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 500;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-  .dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: rgba(62,207,207,0.25);
-    border: 1px solid rgba(62,207,207,0.45);
-    cursor: pointer;
-    transition: background 0.3s, transform 0.3s;
-  }
+  /* 도트 네비 */
+  .dot-nav { position: fixed; right: 20px; top: 50%; transform: translateY(-50%); z-index: 500; display: flex; flex-direction: column; gap: 8px; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(62,207,207,0.25); border: 1px solid rgba(62,207,207,0.45); cursor: pointer; transition: 0.3s; }
   .dot.active { background: var(--mint); transform: scale(1.5); }
 
-  /* ── SLIDE STACK ── */
-  .slides-wrap {
-    position: fixed;
-    inset: 0;
-    overflow: hidden;
-    z-index: 1;
-  }
-  .slides-inner {
-    width: 100%;
-    transition: transform 0.85s cubic-bezier(0.77, 0, 0.18, 1);
-    will-change: transform;
-  }
-  section {
-    width: 100%;
-    height: 100vh;
-    position: relative;
-    overflow: hidden;
-  }
+  /* 슬라이드 구조 */
+  .slides-wrap { position: fixed; inset: 0; overflow: hidden; z-index: 1; }
+  .slides-inner { width: 100%; transition: transform 0.85s cubic-bezier(0.77, 0, 0.18, 1); will-change: transform; }
+  section { width: 100%; height: 100vh; position: relative; overflow: hidden; }
 
-  /* ── SLIDE 1 ── */
+  /* 슬라이드 1: HERO */
   #slide1 { background: var(--black); display: flex; align-items: center; }
-  .hero-bg {
-    position: absolute; inset: 0;
-    background-size: cover; background-position: center;
-    opacity: 0.55; filter: grayscale(10%);
-  }
-  .hero-overlay {
-    position: absolute; inset: 0;
-    background: linear-gradient(135deg, rgba(17,18,20,0.92) 0%, rgba(17,18,20,0.65) 50%, rgba(62,207,207,0.08) 100%);
-  }
-  .hero-content {
-    position: relative; z-index: 2;
-    padding: 0 64px; max-width: 900px; width: 100%;
-    animation: fadeUp 0.9s ease both;
-  }
-  .hero-eyebrow {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 12px; font-weight: 500; letter-spacing: 0.35em;
-    color: var(--mint); text-transform: uppercase; margin-bottom: 28px;
-    display: flex; align-items: center; gap: 12px;
-  }
-  .hero-eyebrow::before { content:''; display:inline-block; width:32px; height:1px; background:var(--mint); }
-  .hero-title {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: clamp(52px, 8vw, 100px); font-weight: 700;
-    line-height: 0.95; letter-spacing: -0.03em; color: var(--white);
-  }
+  .hero-bg { position: absolute; inset: 0; background: url('https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=2069') center/cover; opacity: 0.55; }
+  .hero-overlay { position: absolute; inset: 0; background: linear-gradient(135deg, rgba(17,18,20,0.92) 0%, rgba(17,18,20,0.65) 50%, rgba(62,207,207,0.08) 100%); }
+  .hero-content { position: relative; z-index: 2; padding: 0 64px; max-width: 900px; animation: fadeUp 0.9s ease both; }
+  .hero-title { font-family: 'Space Grotesk', sans-serif; font-size: clamp(52px, 8vw, 100px); line-height: 0.95; font-weight: 700; }
   .hero-title span { color: var(--mint); display: block; }
-  .hero-sub { font-size: 14px; font-weight: 300; color: var(--text-muted); letter-spacing: 0.04em; margin-top: 24px; }
-  .hero-date {
-    margin-top: 28px; display: inline-block;
-    font-family: 'Space Grotesk', sans-serif; font-size: 13px; letter-spacing: 0.2em;
-    color: #000; background: var(--mint); border: none; padding: 8px 20px; border-radius: 100px;
-  }
 
-  /* ── SLIDE 2 ── */
-  #slide2 {
-    background: #0e0f11;
-    display: flex; flex-direction: column;
-    padding: 0;
-  }
-
-  /* Top header bar */
-  .agenda-header {
-    display: flex; align-items: flex-end; justify-content: space-between;
-    padding: 14px 36px;
-    border-bottom: 1px solid #252628;
-    flex-shrink: 0;
-    margin-top: 38px; /* push below fixed nav */
-  }
-  .agenda-supertitle {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 15px; font-weight: 700; letter-spacing: 0.22em;
-    color: var(--mint); text-transform: uppercase;
-  }
-  .agenda-title { display: none; }
-  .agenda-subtitle {
-    font-family: 'Noto Sans KR', sans-serif;
-    font-size: 11px; font-weight: 400; letter-spacing: 0.05em;
-    color: #555; margin-top: 5px;
-  }
-  .agenda-date {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 12px; letter-spacing: 0.18em;
-    color: #555; text-transform: uppercase;
-  }
-
-  /* GRID */
-  .agenda-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
-    flex: 1; min-height: 0;
-    max-height: calc(100vh - 160px);
-  }
-
-  .agenda-card {
-    position: relative;
-    background: #111315;
-    border-right: 1px solid #252628;
-    border-bottom: 1px solid #252628;
-    padding: 22px 24px 20px;
-    cursor: pointer;
-    display: flex; flex-direction: column; justify-content: space-between;
-    overflow: hidden; min-height: 0;
-    transition: background 0.25s, border-color 0.3s;
-    animation: fadeUp 0.5s ease both;
-    border-top: 2px solid transparent; /* URL 저장 시 강조용 */
+  /* 슬라이드 2: AGENDA */
+  #slide2 { background: #0e0f11; display: flex; flex-direction: column; padding: 0; }
+  .agenda-header { display: flex; align-items: flex-end; justify-content: space-between; padding: 14px 36px; border-bottom: 1px solid #252628; margin-top: 50px; }
+  .agenda-supertitle { font-family: 'Space Grotesk', sans-serif; color: var(--mint); font-weight: 700; letter-spacing: 0.22em; }
+  
+  .agenda-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr; flex: 1; }
+  .agenda-card { 
+    position: relative; background: #111315; border-right: 1px solid #252628; border-bottom: 1px solid #252628; 
+    padding: 30px; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; transition: 0.25s;
+    border-top: 3px solid transparent; /* 링크 설정 시 민트색으로 변함 */
   }
   .agenda-card:hover { background: #252a2f; }
+  .card-number { font-family: 'Space Grotesk', sans-serif; font-size: 50px; font-weight: 800; color: rgba(62,207,207,0.2); }
+  .card-label { font-size: 32px; font-weight: 800; color: #f0f4f4; text-transform: uppercase; }
+  .card-desc { font-size: 13px; color: #6a7280; margin-top: 10px; }
 
-  .agenda-card::after {
-    content:''; position:absolute; left:0; bottom:0; right:0; height:2px;
-    background: linear-gradient(90deg, var(--mint), var(--mint-light));
-    opacity:0; transition:opacity 0.25s;
-  }
-  .agenda-card:hover::after { opacity:1; }
+  /* 설정 패널 */
+  .config-toggle { position: absolute; top: 15px; right: 15px; background: rgba(62,207,207,0.1); border: 1px solid rgba(62,207,207,0.3); border-radius: 4px; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--mint); z-index: 10; opacity: 0.5; transition: 0.2s; }
+  .agenda-card:hover .config-toggle { opacity: 1; }
+  .config-panel { display: none; position: absolute; top: 45px; right: 15px; background: #1a1c1f; border: 1px solid var(--mint); border-radius: 8px; padding: 15px; width: 220px; z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+  .config-panel.open { display: block; }
+  .config-panel input { width: 100%; padding: 8px; margin-bottom: 10px; background: #000; border: 1px solid #444; color: #fff; border-radius: 4px; font-size: 12px; }
+  .config-panel button { width: 100%; padding: 8px; background: var(--mint); border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
 
-  .agenda-card::before {
-    content:''; position:absolute; left:22px; top:22px;
-    width:5px; height:5px; border-radius:50%;
-    background: var(--mint); opacity:0.18;
-    transition: opacity 0.25s, transform 0.25s;
-  }
-  .agenda-card:hover::before { opacity:0.9; transform: scale(1.3); }
-
-  .card-review   { grid-column:1; grid-row:1; }
-  .card-planning { grid-column:2; grid-row:1; }
-  .card-buying   { grid-column:3; grid-row:1; border-right:none; }
-  .card-ip       { grid-column:1; grid-row:2; border-bottom:none; }
-  .card-brand    { grid-column:2; grid-row:2; border-bottom:none; }
-
-  .card-number {
-    display: block;
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: clamp(36px, 4.5vw, 60px);
-    font-weight: 800;
-    color: rgba(62,207,207,0.35);
-    line-height: 1; margin-bottom: 0;
-    letter-spacing: -0.04em;
-    transition: color 0.25s;
-  }
-  .agenda-card:hover .card-number { color: rgba(62,207,207,0.75); }
-
-  .card-tag {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 10px; font-weight: 600; letter-spacing: 0.2em;
-    color: var(--mint); text-transform: uppercase; margin-bottom: 7px;
-    opacity: 0.75;
-  }
-
-  .card-label {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: clamp(24px, 3vw, 38px);
-    font-weight: 800;
-    color: #f0f4f4;
-    letter-spacing: -0.02em;
-    line-height: 1.05;
-    text-transform: uppercase;
-  }
-
-  .card-desc {
-    font-size: 11.5px; color: #6a7280; line-height: 1.55; margin-top: 8px;
-    font-family: 'Noto Sans KR', sans-serif; font-weight: 400;
-  }
-
-  .card-arrow {
-    display: flex; align-items: center; gap: 6px;
-    font-size: 10px; font-family: 'Space Grotesk', sans-serif;
-    letter-spacing: 0.14em; color: var(--mint); text-transform: uppercase;
-    opacity: 0; transform: translateX(-6px);
-    transition: opacity 0.2s, transform 0.2s;
-    margin-top: 10px;
-  }
-  .agenda-card:hover .card-arrow { opacity: 1; transform: translateX(0); }
-
-  .config-toggle {
-    position:absolute; top:12px; right:12px;
-    background:rgba(62,207,207,0.06); border:1px solid rgba(62,207,207,0.18);
-    border-radius:6px; width:24px; height:24px;
-    display:flex; align-items:center; justify-content:center;
-    cursor:pointer; opacity:0; transition:opacity 0.2s; z-index:10;
-    color:var(--mint); font-size:12px;
-  }
-  .agenda-card:hover .config-toggle { opacity:1; }
-  .config-panel {
-    display:none; position:absolute; top:42px; right:12px;
-    background:#0d0e10; border:1px solid rgba(62,207,207,0.25);
-    border-radius:8px; padding:12px; width:220px; z-index:20;
-    box-shadow:0 8px 24px rgba(0,0,0,0.7);
-  }
-  .config-panel.open { display:block; }
-  .config-panel label { display:block; font-size:10px; letter-spacing:0.1em; color:var(--mint); margin-bottom:5px; text-transform:uppercase; }
-  .config-panel input {
-    width:100%; background:#1a1c1f; border:1px solid rgba(62,207,207,0.2);
-    border-radius:5px; padding:6px 9px; font-size:12px; color:var(--white);
-    outline:none; transition:border-color 0.2s; font-family:inherit;
-  }
-  .config-panel input:focus { border-color:var(--mint); }
-  .config-save {
-    margin-top:7px; width:100%; padding:6px;
-    background:var(--mint-dark); border:none; border-radius:5px;
-    color:#000; font-size:12px; font-weight:700;
-    cursor:pointer; font-family:inherit; letter-spacing:0.05em; transition:background 0.2s;
-  }
-  .config-save:hover { background:var(--mint); }
-
-  @keyframes fadeUp {
-    from { opacity:0; transform:translateY(20px); }
-    to   { opacity:1; transform:translateY(0); }
-  }
-
-  @media (max-width:768px) {
-    nav.topnav { padding:14px 20px; }
-    .nav-links { display:none; }
-    .hero-content { padding:0 24px; }
-    #slide2 { padding:70px 16px 16px; gap:14px; }
-    .agenda-grid { grid-template-columns:1fr 1fr; grid-template-rows:repeat(4,1fr); }
-    .card-review  {grid-column:1/3;grid-row:1}
-    .card-planning{grid-column:1;grid-row:2}
-    .card-buying  {grid-column:2;grid-row:2}
-    .card-ip      {grid-column:1;grid-row:3}
-    .card-brand   {grid-column:2;grid-row:3}
-  }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 </head>
 <body>
@@ -309,8 +76,8 @@
 <nav class="topnav">
   <div class="nav-logo">LFSQ MD</div>
   <ul class="nav-links">
-    <li><a href="#" onclick="goTo(0);return false;">Home</a></li>
-    <li><a href="#" onclick="goTo(1);return false;">Agenda</a></li>
+    <li><a onclick="goTo(0)">Home</a></li>
+    <li><a onclick="goTo(1)">Agenda</a></li>
   </ul>
 </nav>
 
@@ -323,193 +90,149 @@
   <div class="slides-inner" id="slidesInner">
 
     <section id="slide1">
-      <div class="hero-bg" style="background-image:url('https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=2069')"></div>
+      <div class="hero-bg"></div>
       <div class="hero-overlay"></div>
       <div class="hero-content">
         <div class="hero-eyebrow">LINEFRIENDS SQUARE</div>
         <h1 class="hero-title">LFSQ MD<span>Monthly Meet</span></h1>
-        <p class="hero-sub">Product · Project · Planning</p>
-        <div class="hero-date">2026 · 04</div>
+        <div style="margin-top:30px; background:var(--mint); color:#000; display:inline-block; padding:8px 20px; border-radius:100px; font-weight:bold;">2026 · 04</div>
       </div>
     </section>
 
     <section id="slide2">
       <div class="agenda-header">
-        <div>
-          <div class="agenda-supertitle">MD Monthly Agenda</div>
-          <div class="agenda-subtitle">IP &amp; Part별 이슈공유</div>
-        </div>
-        <div class="agenda-date">2026 · 04</div>
+        <div class="agenda-supertitle">MD Monthly Agenda</div>
+        <div style="color:#555">2026 · 04</div>
       </div>
-
       <div class="agenda-grid">
-        <div class="agenda-card card-review" id="card-review" onclick="handleCardClick('review')">
-          <div class="config-toggle" onclick="toggleConfig(event,'review')">⚙</div>
-          <div class="config-panel" id="config-review"><label>URL 설정</label><input type="url" id="url-review" placeholder="https://..."><button class="config-save" onclick="saveLink(event,'review')">저장</button></div>
-          <div class="card-number">01</div>
-          <div style="margin-top:auto;">
-            <div class="card-tag">Overview</div>
-            <div class="card-label">Review</div>
-            <div class="card-desc">전월 성과 리뷰 및 IP별 점검</div>
-          </div>
-          <div class="card-arrow">바로가기</div>
+        <div class="agenda-card" id="card-review" onclick="handleCardClick('review')">
+            <div class="config-toggle" onclick="toggleConfig(event,'review')">⚙</div>
+            <div class="config-panel" id="config-review"><label>URL 설정</label><input type="url" id="url-review" placeholder="https://..."><button onclick="saveLink(event,'review')">저장</button></div>
+            <div class="card-number">01</div>
+            <div><div class="card-label">Review</div><div class="card-desc">전월 성과 리뷰 및 IP별 점검</div></div>
         </div>
-
-        <div class="agenda-card card-planning" id="card-planning" onclick="handleCardClick('planning')">
-          <div class="config-toggle" onclick="toggleConfig(event,'planning')">⚙</div>
-          <div class="config-panel" id="config-planning"><label>URL 설정</label><input type="url" id="url-planning" placeholder="https://..."><button class="config-save" onclick="saveLink(event,'planning')">저장</button></div>
-          <div class="card-number">02</div>
-          <div style="margin-top:auto;">
-            <div class="card-tag">Next Month</div>
-            <div class="card-label">Planning</div>
-            <div class="card-desc">IP/Project 출시계획 및 물량</div>
-          </div>
-          <div class="card-arrow">바로가기</div>
+        <div class="agenda-card" id="card-planning" onclick="handleCardClick('planning')">
+            <div class="config-toggle" onclick="toggleConfig(event,'planning')">⚙</div>
+            <div class="config-panel" id="config-planning"><label>URL 설정</label><input type="url" id="url-planning" placeholder="https://..."><button onclick="saveLink(event,'planning')">저장</button></div>
+            <div class="card-number">02</div>
+            <div><div class="card-label">Planning</div><div class="card-desc">IP/Project 출시계획 및 물량</div></div>
         </div>
-
-        <div class="agenda-card card-buying" id="card-buying" onclick="handleCardClick('buying')">
-          <div class="config-toggle" onclick="toggleConfig(event,'buying')">⚙</div>
-          <div class="config-panel" id="config-buying"><label>URL 설정</label><input type="url" id="url-buying" placeholder="https://..."><button class="config-save" onclick="saveLink(event,'buying')">저장</button></div>
-          <div class="card-number">03</div>
-          <div style="margin-top:auto;">
-            <div class="card-tag">Procurement</div>
-            <div class="card-label">Buying</div>
-            <div class="card-desc">바잉 현황 공유 및 협의</div>
-          </div>
-          <div class="card-arrow">바로가기</div>
+        <div class="agenda-card" id="card-buying" onclick="handleCardClick('buying')">
+            <div class="config-toggle" onclick="toggleConfig(event,'buying')">⚙</div>
+            <div class="config-panel" id="config-buying"><label>URL 설정</label><input type="url" id="url-buying" placeholder="https://..."><button onclick="saveLink(event,'buying')">저장</button></div>
+            <div class="card-number">03</div>
+            <div><div class="card-label">Buying</div><div class="card-desc">바잉 현황 공유 및 협의</div></div>
         </div>
-
-        <div class="agenda-card card-ip" id="card-ip" onclick="handleCardClick('ip')">
-          <div class="config-toggle" onclick="toggleConfig(event,'ip')">⚙</div>
-          <div class="config-panel" id="config-ip"><label>URL 설정</label><input type="url" id="url-ip" placeholder="https://..."><button class="config-save" onclick="saveLink(event,'ip')">저장</button></div>
-          <div class="card-number">04</div>
-          <div style="margin-top:auto;">
-            <div class="card-tag">IP</div>
-            <div class="card-label">Multi IP</div>
-            <div class="card-desc">IP 관련 업데이트 및 협업 안건</div>
-          </div>
-          <div class="card-arrow">바로가기</div>
+        <div class="agenda-card" id="card-ip" onclick="handleCardClick('ip')">
+            <div class="config-toggle" onclick="toggleConfig(event,'ip')">⚙</div>
+            <div class="config-panel" id="config-ip"><label>URL 설정</label><input type="url" id="url-ip" placeholder="https://..."><button onclick="saveLink(event,'ip')">저장</button></div>
+            <div class="card-number">04</div>
+            <div><div class="card-label">Multi IP</div><div class="card-desc">IP 관련 업데이트 및 협업 안건</div></div>
         </div>
-
-        <div class="agenda-card card-brand" id="card-brand" onclick="handleCardClick('brand')">
-          <div class="config-toggle" onclick="toggleConfig(event,'brand')">⚙</div>
-          <div class="config-panel" id="config-brand"><label>URL 설정</label><input type="url" id="url-brand" placeholder="https://..."><button class="config-save" onclick="saveLink(event,'brand')">저장</button></div>
-          <div class="card-number">05</div>
-          <div style="margin-top:auto;">
-            <div class="card-tag">Brand</div>
-            <div class="card-label">Brand</div>
-            <div class="card-desc">브랜드 현황 및 주요 이슈</div>
-          </div>
-          <div class="card-arrow">바로가기</div>
+        <div class="agenda-card" id="card-brand" onclick="handleCardClick('brand')">
+            <div class="config-toggle" onclick="toggleConfig(event,'brand')">⚙</div>
+            <div class="config-panel" id="config-brand"><label>URL 설정</label><input type="url" id="url-brand" placeholder="https://..."><button onclick="saveLink(event,'brand')">저장</button></div>
+            <div class="card-number">05</div>
+            <div><div class="card-label">Brand</div><div class="card-desc">브랜드 현황 및 주요 이슈</div></div>
         </div>
       </div>
     </section>
+
   </div>
 </div>
 
 <script>
-  // 1. 여기에 구글 웹앱 URL을 붙여넣으세요!
+  /** 1. 구글 시트 연동 설정 **/
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbznbLeEtnPOfda5NQg465LpCldmedkM0c0oomgSrlnzfDA_oIr3mE69Hyd51NhLG4fd/exec";
-
-  const inner = document.getElementById('slidesInner');
-  const dots  = document.querySelectorAll('.dot');
-  let current = 0, isAnimating = false;
   const links = {};
 
-  // 페이지 로드 시 시트에서 데이터 가져오기
-  async function loadLinksFromServer() {
+  // 초기 로드: 시트에서 URL 가져오기
+  async function loadData() {
     try {
-      const response = await fetch(SCRIPT_URL);
-      const data = await response.json();
+      const res = await fetch(SCRIPT_URL);
+      const data = await res.json();
       Object.assign(links, data);
-      
-      // 데이터가 있는 카드는 테두리 표시
       Object.keys(links).forEach(id => {
-        if(links[id]) {
-          const card = document.getElementById('card-' + id);
-          if(card) card.style.borderColor = 'var(--mint)';
-        }
+        if(links[id]) document.getElementById('card-' + id).style.borderColor = 'var(--mint)';
       });
-    } catch (e) { console.error("Load Error:", e); }
+    } catch(e) { console.error("데이터 로딩 실패"); }
   }
+  loadData();
 
-  window.addEventListener('DOMContentLoaded', () => {
-    loadLinksFromServer();
-  });
+  /** 2. 스크롤 기능 복구 (휠/도트/키보드) **/
+  const inner = document.getElementById('slidesInner');
+  const dots = document.querySelectorAll('.dot');
+  let current = 0;
+  let isAnimating = false;
 
   function goTo(idx) {
     if (idx < 0 || idx >= 2 || isAnimating) return;
-    isAnimating = true; current = idx;
+    isAnimating = true;
+    current = idx;
     inner.style.transform = `translateY(-${current * 100}vh)`;
-    dots.forEach((d,i) => d.classList.toggle('active', i === current));
+    dots.forEach((d, i) => d.classList.toggle('active', i === current));
     setTimeout(() => { isAnimating = false; }, 900);
   }
 
+  // 휠 이벤트
   let acc = 0;
   window.addEventListener('wheel', e => {
-    e.preventDefault(); if (isAnimating) return;
+    if (isAnimating) return;
     acc += e.deltaY;
-    if (Math.abs(acc) > 50) { goTo(current + (acc > 0 ? 1 : -1)); acc = 0; }
-  }, { passive: false });
+    if (Math.abs(acc) > 50) {
+      goTo(current + (acc > 0 ? 1 : -1));
+      acc = 0;
+    }
+  }, { passive: true });
 
+  // 키보드 이벤트
   window.addEventListener('keydown', e => {
-    if (e.key==='ArrowDown'||e.key==='PageDown') goTo(current+1);
-    if (e.key==='ArrowUp'||e.key==='PageUp') goTo(current-1);
+    if (e.key === 'ArrowDown') goTo(current + 1);
+    if (e.key === 'ArrowUp') goTo(current - 1);
   });
 
+  /** 3. 카드 클릭 및 링크 관리 **/
   function handleCardClick(id) {
-    if (document.getElementById('config-'+id).classList.contains('open')) return;
-    if (links[id]) window.open(links[id],'_blank');
-    else alert("등록된 링크가 없습니다. ⚙ 아이콘을 눌러 설정해주세요.");
+    if (document.getElementById('config-' + id).classList.contains('open')) return;
+    if (links[id]) window.open(links[id], '_blank');
+    else alert("설정된 링크가 없습니다. ⚙를 눌러 설정해주세요.");
   }
 
-  function toggleConfig(e,id) {
+  function toggleConfig(e, id) {
     e.stopPropagation();
-    const p = document.getElementById('config-'+id);
-    document.querySelectorAll('.config-panel').forEach(x=>{ if(x!==p) x.classList.remove('open'); });
+    const p = document.getElementById('config-' + id);
+    document.querySelectorAll('.config-panel').forEach(x => { if(x !== p) x.classList.remove('open'); });
     p.classList.toggle('open');
-    if (p.classList.contains('open')) { 
-        const i=document.getElementById('url-'+id); 
-        i.value=links[id]||''; 
-        i.focus(); 
+    if (p.classList.contains('open')) {
+      document.getElementById('url-' + id).value = links[id] || '';
+      document.getElementById('url-' + id).focus();
     }
   }
 
-  async function saveLink(e,id) {
+  async function saveLink(e, id) {
     e.stopPropagation();
-    const input = document.getElementById('url-'+id);
-    const v = input.value.trim();
-    const finalUrl = v ? (v.startsWith('http') ? v : 'https://' + v) : '';
-    
+    const input = document.getElementById('url-' + id);
     const btn = e.target;
-    btn.innerText = "저장중...";
-    btn.disabled = true;
+    const finalUrl = input.value.trim();
 
+    btn.innerText = "저장중...";
     try {
       await fetch(SCRIPT_URL, {
         method: "POST",
         body: JSON.stringify({ id: id, url: finalUrl })
       });
-
-      if (finalUrl) {
-        links[id] = finalUrl;
-        document.getElementById('card-' + id).style.borderColor = 'var(--mint)';
-      } else {
-        delete links[id];
-        document.getElementById('card-' + id).style.borderColor = '';
-      }
+      links[id] = finalUrl;
+      document.getElementById('card-' + id).style.borderColor = finalUrl ? 'var(--mint)' : 'transparent';
       alert("서버에 저장되었습니다.");
-      document.getElementById('config-' + id).classList.remove('open');
-    } catch (err) {
-      alert("저장 실패. URL 설정을 확인하세요.");
-    } finally {
-      btn.innerText = "저장";
-      btn.disabled = false;
-    }
+    } catch(e) { alert("저장 실패"); }
+    btn.innerText = "저장";
+    document.getElementById('config-' + id).classList.remove('open');
   }
 
-  document.addEventListener('click',()=>document.querySelectorAll('.config-panel').forEach(p=>p.classList.remove('open')));
-  document.querySelectorAll('.config-panel').forEach(p=>p.addEventListener('click',e=>e.stopPropagation()));
+  // 바탕 클릭시 설정창 닫기
+  document.addEventListener('click', () => {
+    document.querySelectorAll('.config-panel').forEach(p => p.classList.remove('open'));
+  });
 </script>
 </body>
 </html>
