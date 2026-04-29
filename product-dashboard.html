@@ -47,11 +47,13 @@ body{font-family:var(--font-sans,sans-serif);font-size:13px;color:var(--color-te
 .stats-filter-btn:hover{background:var(--color-background-primary);border-color:#185FA5}
 .stats-filter-btn.has-selection{background:#1a1a1a;border-color:#000;color:#fff}
 .filter-btn .arrow{font-size:9px}
-.filter-panel{display:none;position:absolute;top:32px;left:0;background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary);border-radius:8px;padding:8px;z-index:100;box-shadow:0 4px 16px rgba(0,0,0,0.12);min-width:120px}
+.filter-panel{display:none;position:absolute;top:34px;left:0;background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary);border-radius:8px;padding:8px;z-index:200;box-shadow:0 4px 16px rgba(0,0,0,0.12);min-width:130px}
 .filter-panel.open{display:block}
 .cb-item{display:flex;align-items:center;gap:7px;padding:5px 6px;border-radius:5px;cursor:pointer;font-size:12px;color:var(--color-text-primary);user-select:none}
 .cb-item:hover{background:var(--color-background-secondary)}
 .cb-item input[type=checkbox]{accent-color:#185FA5;width:13px;height:13px;cursor:pointer;flex-shrink:0}
+.cb-item input[type=radio]{accent-color:#185FA5;width:13px;height:13px;cursor:pointer;flex-shrink:0}
+#panelStatsYear,#panelStatsMonth{top:40px}
 .cb-badge{display:inline-block;padding:2px 9px;border-radius:8px;font-size:12px;font-weight:500}
 .cb-badge.all{background:#E6F1FB;color:#0C447C}
 .cb-badge.new{background:#EAF3DE;color:#3B6D11}
@@ -252,6 +254,46 @@ function buildMonthPanel() {
 }
 buildYearPanel();
 buildMonthPanel();
+
+let statsYear = String(new Date().getFullYear()), statsMonth = '';
+
+function buildStatsYearPanel() {
+  const panel = document.getElementById('panelStatsYear');
+  YEARS.forEach(function(y) {
+    const lbl = document.createElement('label');
+    lbl.className = 'cb-item';
+    const checked = String(y) === statsYear ? ' checked' : '';
+    lbl.innerHTML = '<input type="radio" name="statsYear" value="'+y+'"'+checked+' onchange="onStatsFilterChange()"><span style="font-size:13px">'+y+'년</span>';
+    panel.appendChild(lbl);
+  });
+  document.querySelector('#panelStatsYear input[value=""]').checked = false;
+  document.getElementById('lblStatsYear').textContent = statsYear + '년';
+  document.getElementById('btnStatsYear').classList.add('has-selection');
+}
+function buildStatsMonthPanel() {
+  const panel = document.getElementById('panelStatsMonth');
+  MONTHS.forEach(function(m) {
+    const lbl = document.createElement('label');
+    lbl.className = 'cb-item';
+    lbl.innerHTML = '<input type="radio" name="statsMonth" value="'+m+'" onchange="onStatsFilterChange()"><span style="font-size:13px">'+m+'</span>';
+    panel.appendChild(lbl);
+  });
+}
+function onStatsFilterChange() {
+  const yr = document.querySelector('input[name="statsYear"]:checked');
+  const mo = document.querySelector('input[name="statsMonth"]:checked');
+  statsYear = yr ? yr.value : '';
+  statsMonth = mo ? mo.value : '';
+  const btnY = document.getElementById('btnStatsYear');
+  const btnM = document.getElementById('btnStatsMonth');
+  document.getElementById('lblStatsYear').textContent = statsYear ? statsYear+'년' : '연도 전체';
+  document.getElementById('lblStatsMonth').textContent = statsMonth || '월 전체';
+  btnY.classList.toggle('has-selection', !!statsYear);
+  btnM.classList.toggle('has-selection', !!statsMonth);
+  document.querySelectorAll('.filter-panel').forEach(function(p){ p.classList.remove('open'); });
+  updateStats();
+}
+
 buildStatsYearPanel();
 buildStatsMonthPanel();
 
@@ -486,46 +528,6 @@ function handleVolInput(id, el) {
   const fmt = raw ? parseInt(raw, 10).toLocaleString() : '';
   el.value = fmt;
   setVal(id, 'vol', fmt);
-}
-
-let statsYear = String(new Date().getFullYear()), statsMonth = '';
-
-function buildStatsYearPanel() {
-  const panel = document.getElementById('panelStatsYear');
-  YEARS.forEach(function(y) {
-    const lbl = document.createElement('label');
-    lbl.className = 'cb-item';
-    const checked = String(y) === statsYear ? ' checked' : '';
-    lbl.innerHTML = '<input type="radio" name="statsYear" value="'+y+'"'+checked+' onchange="onStatsFilterChange()"><span style="font-size:13px">'+y+'년</span>';
-    panel.appendChild(lbl);
-  });
-  // 전체 라디오 체크 해제
-  document.querySelector('#panelStatsYear input[value=""]').checked = false;
-  // 버튼 레이블 & 스타일 즉시 반영
-  document.getElementById('lblStatsYear').textContent = statsYear + '년';
-  document.getElementById('btnStatsYear').classList.add('has-selection');
-}
-function buildStatsMonthPanel() {
-  const panel = document.getElementById('panelStatsMonth');
-  MONTHS.forEach(function(m) {
-    const lbl = document.createElement('label');
-    lbl.className = 'cb-item';
-    lbl.innerHTML = '<input type="radio" name="statsMonth" value="'+m+'" onchange="onStatsFilterChange()"><span style="font-size:13px">'+m+'</span>';
-    panel.appendChild(lbl);
-  });
-}
-function onStatsFilterChange() {
-  const yr = document.querySelector('input[name="statsYear"]:checked');
-  const mo = document.querySelector('input[name="statsMonth"]:checked');
-  statsYear = yr ? yr.value : '';
-  statsMonth = mo ? mo.value : '';
-  const btnY = document.getElementById('btnStatsYear');
-  const btnM = document.getElementById('btnStatsMonth');
-  document.getElementById('lblStatsYear').textContent = statsYear ? statsYear+'년' : '연도 전체';
-  document.getElementById('lblStatsMonth').textContent = statsMonth || '월 전체';
-  btnY.classList.toggle('has-selection', !!statsYear);
-  btnM.classList.toggle('has-selection', !!statsMonth);
-  updateStats();
 }
 
 function buildIpVolMap(subset) {
