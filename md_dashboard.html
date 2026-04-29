@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MD TEAM DASHBOARD</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #f4f4f2;
+    --white: #ffffff;
+    --black: #111111;
+    --gray-100: #f0f0ee;
+    --gray-200: #e0e0dd;
+    --gray-400: #aaaaaa;
+    --gray-600: #666666;
+    --blue: #2563eb;
+    --blue-light: #dbeafe;
+    --blue-mid: #3b82f6;
+    --green: #16a34a;
+    --green-light: #dcfce7;
+    --teal: #0d9488;
+    --teal-light: #ccfbf1;
+    --red: #e53935;
+    --notice-pin: #f59e0b;
+    --radius: 6px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08);
+    --shadow-md: 0 2px 8px rgba(0,0,0,0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    padding: 16px;
+    color: var(--black);
+    font-size: 13px;
+  }
+
+  /* ── SYNC INDICATOR ── */
+  .sync-bar {
+    position: fixed; top: 0; left: 0; right: 0;
+    height: 3px; background: var(--blue);
+    transform: scaleX(0); transform-origin: left;
+    transition: transform 0.3s; z-index: 9999;
+  }
+  .sync-bar.active { transform: scaleX(1); }
+  .sync-status {
+    position: fixed; bottom: 12px; right: 14px;
+    font-size: 10px; color: var(--gray-400);
+    font-family: 'DM Mono', monospace;
+    background: var(--white); padding: 4px 8px;
+    border-radius: 4px; box-shadow: var(--shadow);
+    z-index: 9998; transition: opacity 0.3s;
+  }
+  .sync-status.ok { color: var(--green); }
+  .sync-status.err { color: var(--red); }
+
+  /* ── HEADER ── */
+  .header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px; padding: 10px 16px;
+    background: var(--white); border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+  .header-title { font-size: 15px; font-weight: 600; letter-spacing: 0.04em; }
+  .header-sub { font-size: 11px; color: var(--gray-400); margin-top: 1px; }
+  .header-right { display: flex; align-items: center; gap: 10px; }
+  .header-date { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--gray-400); }
+  .gas-config-btn {
+    font-size: 10px; padding: 4px 9px;
+    background: var(--blue-light); color: var(--blue);
+    border: 1px solid #bfdbfe; border-radius: 4px;
+    cursor: pointer; font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+  }
+  .gas-config-btn:hover { background: #bfdbfe; }
+  .gas-connected { color: var(--green); font-size: 10px; font-family: 'DM Mono', monospace; }
+
+  /* ── GRID ── */
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 10px;
+  }
+
+  .cell {
+    background: var(--white); border-radius: var(--radius);
+    box-shadow: var(--shadow); overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .cell-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 12px; border-bottom: 1px solid var(--gray-200);
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.06em; text-transform: uppercase; flex-shrink: 0;
+  }
+  .cell-body { padding: 10px 12px; flex: 1; overflow: hidden; }
+
+  .btn-sm {
+    font-size: 10px; padding: 3px 8px; border-radius: 4px;
+    border: 1px solid var(--gray-200); background: var(--white);
+    cursor: pointer; font-family: 'DM Sans', sans-serif;
+    color: var(--gray-600); transition: all 0.15s;
+  }
+  .btn-sm:hover { background: var(--gray-100); border-color: var(--gray-400); }
+
+  /* ── NOTICE ── */
+  .notice { grid-column: 1; grid-row: 1; }
+  .notice-list { list-style: none; }
+  .notice-item {
+    display: flex; align-items: flex-start; gap: 8px;
+    padding: 6px 0; border-bottom: 1px solid var(--gray-100); cursor: pointer;
+  }
+  .notice-item:last-child { border-bottom: none; }
+  .notice-pin-badge {
+    font-size: 9px; background: var(--notice-pin); color: white;
+    border-radius: 3px; padding: 1px 4px; flex-shrink: 0; margin-top: 2px;
+  }
+  .notice-title { font-size: 12px; flex: 1; line-height: 1.4; }
+  .notice-item.pinned .notice-title { font-weight: 600; }
+  .notice-date { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--gray-400); flex-shrink: 0; }
+  .notice-more {
+    display: block; text-align: right; font-size: 10px;
+    color: var(--blue); margin-top: 6px; cursor: pointer;
+  }
+  .notice-more:hover { text-decoration: underline; }
+
+  /* ── BILLBOARD ── */
+  .billboard { grid-column: 2 / 4; grid-row: 1; min-height: 180px; }
+  .billboard-inner {
+    flex: 1; position: relative; background: #1a1a1a;
+    overflow: hidden; min-height: 160px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .billboard-slide { display: none; width: 100%; height: 100%; position: absolute; inset: 0; }
+  .billboard-slide.active { display: flex; align-items: center; justify-content: center; }
+  .billboard-slide img { width: 100%; height: 100%; object-fit: cover; }
+  .billboard-slide video { width: 100%; height: 100%; object-fit: cover; }
+  .billboard-empty { color: #666; font-size: 12px; text-align: center; }
+  .billboard-dots {
+    position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 5px; z-index: 2;
+  }
+  .billboard-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: rgba(255,255,255,0.4); cursor: pointer; transition: background 0.2s;
+  }
+  .billboard-dot.active { background: white; }
+  .bb-settings-btn {
+    position: absolute; top: 6px; right: 6px; z-index: 10;
+    background: rgba(0,0,0,0.5); color: white; border: none;
+    border-radius: 4px; padding: 3px 8px; font-size: 10px;
+    cursor: pointer; font-family: 'DM Sans', sans-serif;
+  }
+  .bb-settings-btn:hover { background: rgba(0,0,0,0.75); }
+
+  /* ── ISSUE Calendar ── */
+  .issue { grid-column: 1; grid-row: 2; }
+  .cal-nav {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 8px; font-size: 12px; font-weight: 600;
+  }
+  .cal-nav button { background: none; border: none; cursor: pointer; font-size: 14px; color: var(--gray-600); padding: 0 4px; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center; }
+  .cal-day-header { font-size: 9px; color: var(--gray-400); font-weight: 600; padding: 2px 0; }
+  .cal-day {
+    font-size: 10px; padding: 4px 2px; border-radius: 4px;
+    cursor: pointer; position: relative; transition: background 0.1s;
+    min-height: 24px; display: flex; flex-direction: column;
+    align-items: center; justify-content: flex-start; line-height: 1;
+  }
+  .cal-day:hover { background: var(--gray-100); }
+  .cal-day.today { background: var(--blue); color: white; font-weight: 600; }
+  .cal-day.today:hover { background: var(--blue-mid); }
+  .cal-day.other-month { color: var(--gray-400); }
+  .cal-day.has-issue::after {
+    content: ''; display: block; width: 4px; height: 4px;
+    border-radius: 50%; background: var(--red); margin-top: 2px;
+  }
+  .cal-day.today.has-issue::after { background: white; }
+  .issue-tooltip {
+    display: none; position: fixed; background: var(--black); color: white;
+    font-size: 11px; padding: 6px 10px; border-radius: 5px;
+    max-width: 200px; z-index: 9999; pointer-events: none; line-height: 1.5;
+  }
+
+  /* ── MEET ── */
+  .meet { grid-column: 2; grid-row: 2; }
+  .meet-btns { display: flex; flex-direction: column; gap: 6px; }
+  .meet-btn {
+    display: flex; align-items: center; justify-content: center;
+    padding: 10px 12px; border-radius: 5px; font-size: 12px; font-weight: 500;
+    cursor: pointer; text-decoration: none; transition: opacity 0.15s, transform 0.1s;
+    color: white; border: none; font-family: 'DM Sans', sans-serif;
+    position: relative;
+  }
+  .meet-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+  .meet-btn-weekly { background: var(--blue); }
+  .meet-btn-monthly { background: var(--blue-mid); }
+  .meet-btn-tbd { background: var(--gray-400); }
+  .meet-url-set {
+    position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+    font-size: 9px; opacity: 0.7; background: rgba(255,255,255,0.2);
+    border-radius: 3px; padding: 1px 5px; cursor: pointer;
+  }
+  .meet-url-set:hover { opacity: 1; }
+
+  /* ── TOOL ── */
+  .tool { grid-column: 3; grid-row: 2; }
+  .tool-list { display: flex; flex-direction: column; gap: 5px; }
+  .tool-item {
+    display: flex; align-items: center; gap: 6px;
+    padding: 7px 10px; background: var(--green-light);
+    border-radius: 5px; cursor: pointer; transition: opacity 0.15s; text-decoration: none;
+  }
+  .tool-item:hover { opacity: 0.8; }
+  .tool-name { font-size: 12px; font-weight: 500; color: var(--green); flex: 1; }
+  .tool-edit-btn {
+    font-size: 9px; color: var(--green); opacity: 0.6;
+    background: none; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif;
+  }
+  .tool-edit-btn:hover { opacity: 1; }
+
+  /* ── SHARE URL ── */
+  .shareurl { grid-column: 4; grid-row: 1 / 3; }
+  .share-list { display: flex; flex-direction: column; gap: 6px; }
+  .share-item {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 10px; background: var(--teal-light); border-radius: 5px;
+  }
+  .share-content { flex: 1; min-width: 0; }
+  .share-label { font-size: 11px; font-weight: 500; color: var(--teal); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .share-desc { font-size: 10px; color: var(--gray-600); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .share-arrow {
+    flex-shrink: 0; width: 22px; height: 22px; background: var(--teal);
+    border-radius: 4px; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: white; font-size: 10px; text-decoration: none;
+    transition: opacity 0.15s;
+  }
+  .share-arrow:hover { opacity: 0.75; }
+  .share-edit-btn {
+    font-size: 9px; color: var(--teal); opacity: 0.6;
+    background: none; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif;
+  }
+  .share-edit-btn:hover { opacity: 1; }
+
+  /* ── TBD ── */
+  .tbd-big { grid-column: 3; grid-row: 1; }
+  .tbd-inner {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    color: var(--gray-400); font-size: 12px; letter-spacing: 0.08em;
+    min-height: 80px;
+  }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45); z-index: 1000;
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--white); border-radius: 10px;
+    padding: 20px 24px; width: 360px; max-width: 95vw;
+    box-shadow: var(--shadow-md); position: relative;
+  }
+  .modal h3 { font-size: 14px; font-weight: 600; margin-bottom: 14px; }
+  .modal label { font-size: 11px; color: var(--gray-600); display: block; margin-bottom: 4px; margin-top: 10px; }
+  .modal input, .modal textarea, .modal select {
+    width: 100%; padding: 7px 10px; border: 1px solid var(--gray-200);
+    border-radius: 5px; font-size: 12px; font-family: 'DM Sans', sans-serif;
+    outline: none; transition: border 0.15s;
+  }
+  .modal input:focus, .modal textarea:focus { border-color: var(--blue); }
+  .modal textarea { resize: vertical; min-height: 70px; }
+  .modal-actions { display: flex; gap: 8px; margin-top: 16px; justify-content: flex-end; }
+  .modal-close { position: absolute; top: 12px; right: 14px; background: none; border: none; font-size: 16px; cursor: pointer; color: var(--gray-400); }
+  .btn-primary {
+    padding: 7px 16px; background: var(--blue); color: white;
+    border: none; border-radius: 5px; cursor: pointer;
+    font-size: 12px; font-family: 'DM Sans', sans-serif; font-weight: 500;
+  }
+  .btn-primary:hover { opacity: 0.85; }
+  .btn-cancel {
+    padding: 7px 16px; background: var(--gray-100); color: var(--gray-600);
+    border: 1px solid var(--gray-200); border-radius: 5px; cursor: pointer;
+    font-size: 12px; font-family: 'DM Sans', sans-serif;
+  }
+  .btn-danger {
+    padding: 7px 16px; background: #fee2e2; color: var(--red);
+    border: 1px solid #fca5a5; border-radius: 5px; cursor: pointer;
+    font-size: 12px; font-family: 'DM Sans', sans-serif;
+  }
+
+  /* modal sub-items */
+  .modal-list { max-height: 280px; overflow-y: auto; margin-top: 10px; }
+  .modal-list-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 0; border-bottom: 1px solid var(--gray-100);
+  }
+  .modal-list-item:last-child { border-bottom: none; }
+  .modal-list-item span { flex: 1; font-size: 12px; }
+  .modal-list-item .date-tag { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--gray-400); flex-shrink: 0; }
+  .modal-list-item .del-btn { font-size: 10px; padding: 2px 7px; border: 1px solid #fca5a5; background: #fee2e2; color: var(--red); border-radius: 3px; cursor: pointer; }
+  .modal-list-item .pin-badge { font-size: 9px; background: var(--notice-pin); color: white; border-radius: 3px; padding: 1px 4px; flex-shrink: 0; }
+
+  /* GAS setup */
+  .gas-setup-note {
+    font-size: 11px; color: var(--gray-600); line-height: 1.6;
+    background: var(--gray-100); padding: 10px 12px; border-radius: 6px; margin-top: 10px;
+  }
+  .gas-setup-note ol { margin-left: 16px; margin-top: 6px; }
+  .gas-setup-note li { margin-bottom: 4px; }
+  .gas-setup-note a { color: var(--blue); }
+
+  /* billboard upload */
+  .bb-list { max-height: 180px; overflow-y: auto; margin-top: 8px; }
+  .bb-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 5px 0; border-bottom: 1px solid var(--gray-100); font-size: 11px;
+  }
+  .bb-item span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .upload-label {
+    display: block; padding: 8px 14px;
+    background: var(--gray-100); border: 1px dashed var(--gray-400);
+    border-radius: 5px; cursor: pointer; font-size: 11px; color: var(--gray-600);
+    text-align: center; margin-top: 8px;
+  }
+  .upload-label:hover { background: var(--gray-200); }
+  #bbFileInput { display: none; }
+  .upload-progress { font-size: 11px; margin-top: 6px; padding: 5px 8px; border-radius: 4px; display: none; }
+  .upload-progress.uploading { display: block; color: var(--blue); background: var(--blue-light); }
+  .upload-progress.done { display: block; color: var(--green); background: var(--green-light); }
+  .upload-progress.error { display: block; color: var(--red); background: #fee2e2; }
+</style>
+</head>
+<body>
+
+<div class="sync-bar" id="syncBar"></div>
+<div class="sync-status" id="syncStatus" style="opacity:0"></div>
+<div class="issue-tooltip" id="issueTooltip"></div>
+
+<!-- HEADER -->
+<div class="header">
+  <div>
+    <div class="header-title">■ MD TEAM DASHBOARD</div>
+    <div class="header-sub">LFSQ MD팀만 이용가능합니다.</div>
+  </div>
+  <div class="header-right">
+    <span id="gasConnectedBadge" class="gas-connected" style="display:none">● GAS 연동됨</span>
+    <button class="gas-config-btn" onclick="openGASConfig()">⚙ GAS 연동설정</button>
+    <div class="header-date" id="headerDate"></div>
+  </div>
+</div>
+
+<!-- GRID -->
+<div class="grid">
+
+  <!-- 1. NOTICE -->
+  <div class="cell notice">
+    <div class="cell-header">
+      <span>■ NOTICE</span>
+      <div style="display:flex;gap:5px;">
+        <button class="btn-sm" onclick="openNoticeWrite()">+ 글쓰기</button>
+        <button class="btn-sm" onclick="openNoticeAll()">More ›</button>
+      </div>
+    </div>
+    <div class="cell-body">
+      <ul class="notice-list" id="noticeList"></ul>
+      <span class="notice-more" onclick="openNoticeAll()">More ›</span>
+    </div>
+  </div>
+
+  <!-- 2. 전광판 -->
+  <div class="cell billboard">
+    <div class="cell-header"><span>■ 전광판</span></div>
+    <div class="billboard-inner" id="billboardInner">
+      <div class="billboard-empty" id="bbEmpty">이미지/영상을 업로드하거나 URL을 추가하세요</div>
+      <div class="billboard-dots" id="bbDots"></div>
+      <button class="bb-settings-btn" onclick="openBBSettings()">⚙ 설정</button>
+    </div>
+  </div>
+
+  <!-- TBD -->
+  <div class="cell tbd-big">
+    <div class="cell-header"><span>■ TBD</span></div>
+    <div class="tbd-inner">TBD</div>
+  </div>
+
+  <!-- 6. SHARE URL -->
+  <div class="cell shareurl" style="grid-column:4;grid-row:1/3;">
+    <div class="cell-header"><span>■ SHARE URL</span></div>
+    <div class="cell-body"><div class="share-list" id="shareList"></div></div>
+  </div>
+
+  <!-- 3. ISSUE Calendar -->
+  <div class="cell issue">
+    <div class="cell-header">
+      <span>■ ISSUE</span>
+      <button class="btn-sm" onclick="openIssueWrite()">+ 추가</button>
+    </div>
+    <div class="cell-body">
+      <div class="cal-nav">
+        <button onclick="calPrev()">‹</button>
+        <span id="calTitle"></span>
+        <button onclick="calNext()">›</button>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+    </div>
+  </div>
+
+  <!-- 4. MEET -->
+  <div class="cell meet">
+    <div class="cell-header"><span>■ MEET</span></div>
+    <div class="cell-body"><div class="meet-btns" id="meetBtns"></div></div>
+  </div>
+
+  <!-- 5. TOOL -->
+  <div class="cell tool">
+    <div class="cell-header"><span>■ TOOL</span></div>
+    <div class="cell-body"><div class="tool-list" id="toolList"></div></div>
+  </div>
+
+</div>
+
+<!-- ===== MODALS ===== -->
+
+<!-- GAS 연동 설정 -->
+<div class="modal-overlay" id="modalGASConfig">
+  <div class="modal" style="width:420px;">
+    <button class="modal-close" onclick="closeModal('modalGASConfig')">✕</button>
+    <h3>⚙ Google Apps Script 연동 설정</h3>
+    <label>GAS 웹앱 URL</label>
+    <input type="text" id="gasUrlInput" placeholder="https://script.google.com/macros/s/...">
+    <div class="gas-setup-note">
+      <strong>연동 방법:</strong>
+      <ol>
+        <li><a href="https://script.google.com" target="_blank">script.google.com</a> → 새 프로젝트</li>
+        <li>함께 제공된 <strong>Code.gs</strong> 파일 내용 전체 붙여넣기</li>
+        <li>배포 → 웹앱으로 배포<br>• 실행 계정: 본인<br>• 액세스: 모든 사용자</li>
+        <li>웹앱 URL 복사 후 위에 붙여넣기</li>
+        <li>저장 후 자동으로 Google Sheets가 생성됩니다</li>
+      </ol>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modalGASConfig')">취소</button>
+      <button class="btn-primary" onclick="saveGASUrl()">저장 & 연동 테스트</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOTICE 작성 -->
+<div class="modal-overlay" id="modalNoticeWrite">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modalNoticeWrite')">✕</button>
+    <h3>✏️ 공지 작성</h3>
+    <label>제목</label>
+    <input type="text" id="noticeInputTitle" placeholder="공지 제목을 입력하세요">
+    <label>내용</label>
+    <textarea id="noticeInputBody" placeholder="내용을 입력하세요"></textarea>
+    <label style="margin-top:10px;display:flex;align-items:center;gap:6px;cursor:pointer;">
+      <input type="checkbox" id="noticePin" style="width:auto;">
+      고정글로 설정
+    </label>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modalNoticeWrite')">취소</button>
+      <button class="btn-primary" onclick="submitNotice()">등록</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOTICE 전체 보기 -->
+<div class="modal-overlay" id="modalNoticeAll">
+  <div class="modal" style="width:440px;">
+    <button class="modal-close" onclick="closeModal('modalNoticeAll')">✕</button>
+    <h3>■ NOTICE 전체</h3>
+    <div class="modal-list" id="noticeAllList"></div>
+  </div>
+</div>
+
+<!-- NOTICE 상세 보기 -->
+<div class="modal-overlay" id="modalNoticeView">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modalNoticeView')">✕</button>
+    <h3 id="noticeViewTitle"></h3>
+    <div id="noticeViewDate" style="font-size:10px;color:var(--gray-400);margin-bottom:12px;font-family:'DM Mono',monospace;"></div>
+    <div id="noticeViewBody" style="font-size:13px;line-height:1.8;white-space:pre-wrap;"></div>
+  </div>
+</div>
+
+<!-- BILLBOARD 설정 -->
+<div class="modal-overlay" id="modalBBSettings">
+  <div class="modal" style="width:410px;">
+    <button class="modal-close" onclick="closeModal('modalBBSettings')">✕</button>
+    <h3>⚙ 전광판 설정</h3>
+
+    <label>이미지 / 영상 업로드</label>
+    <label class="upload-label" for="bbFileInput">📁 파일 선택 (이미지 · 영상)</label>
+    <input type="file" id="bbFileInput" accept="image/*,video/*" multiple onchange="handleBBUpload(event)">
+    <div class="upload-progress" id="bbProgress"></div>
+
+    <label style="margin-top:14px;">URL 슬라이드 추가</label>
+    <input type="text" id="bbUrlInput" placeholder="https://...">
+    <input type="text" id="bbUrlLabel" placeholder="슬라이드 이름 (예: 이벤트 페이지)" style="margin-top:4px;">
+    <div style="text-align:right;margin-top:6px;">
+      <button class="btn-primary" style="padding:5px 12px;font-size:11px;" onclick="addBBUrl()">URL 추가</button>
+    </div>
+
+    <label style="margin-top:10px;">현재 슬라이드 목록</label>
+    <div class="bb-list" id="bbList"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modalBBSettings')">닫기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ISSUE 추가 -->
+<div class="modal-overlay" id="modalIssueWrite">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modalIssueWrite')">✕</button>
+    <h3>📅 이슈 추가</h3>
+    <label>날짜</label>
+    <input type="date" id="issueDate">
+    <label>내용</label>
+    <input type="text" id="issueContent" placeholder="예: 김팀장 생일 🎂, 월간보고 마감">
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modalIssueWrite')">취소</button>
+      <button class="btn-primary" onclick="submitIssue()">등록</button>
+    </div>
+  </div>
+</div>
+
+<!-- MEET URL -->
+<div class="modal-overlay" id="modalMeetUrl">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modalMeetUrl')">✕</button>
+    <h3 id="meetModalTitle">미팅 URL 설정</h3>
+    <label>미팅 이름</label>
+    <input type="text" id="meetLabelInput">
+    <label>URL</label>
+    <input type="text" id="meetUrlInput" placeholder="https://zoom.us/...">
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modalMeetUrl')">취소</button>
+      <button class="btn-primary" onclick="saveMeetUrl()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOOL 편집 -->
+<div class="modal-overlay" id="modalToolEdit">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modalToolEdit')">✕</button>
+    <h3>🔧 TOOL 설정</h3>
+    <label>이름</label>
+    <input type="text" id="toolNameInput" placeholder="툴 이름">
+    <label>URL</label>
+    <input type="text" id="toolUrlInput" placeholder="https://...">
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modalToolEdit')">취소</button>
+      <button class="btn-primary" onclick="saveTool()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- SHARE 편집 -->
+<div class="modal-overlay" id="modalShareEdit">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modalShareEdit')">✕</button>
+    <h3>🔗 SHARE URL 설정</h3>
+    <label>이름</label>
+    <input type="text" id="shareNameInput">
+    <label>설명</label>
+    <input type="text" id="shareDescInput" placeholder="간단한 설명">
+    <label>URL</label>
+    <input type="text" id="shareUrlInput" placeholder="https://...">
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modalShareEdit')">취소</button>
+      <button class="btn-primary" onclick="saveShare()">저장</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// CONFIG
+// ============================================================
+let GAS_URL = localStorage.getItem('GAS_URL') || '';
+
+// ============================================================
+// SYNC HELPERS
+// ============================================================
+function showSync(msg, type='') {
+  const bar = document.getElementById('syncBar');
+  const status = document.getElementById('syncStatus');
+  bar.classList.add('active');
+  status.textContent = msg;
+  status.className = 'sync-status ' + type;
+  status.style.opacity = 1;
+  setTimeout(() => {
+    bar.classList.remove('active');
+    setTimeout(() => { status.style.opacity = 0; }, 800);
+  }, 1200);
+}
+
+async function gasGet(action) {
+  if (!GAS_URL) return null;
+  try {
+    const res = await fetch(`${GAS_URL}?action=${action}`);
+    const json = await res.json();
+    return json;
+  } catch(e) { return null; }
+}
+
+async function gasPost(body) {
+  if (!GAS_URL) return null;
+  try {
+    const res = await fetch(GAS_URL, {
+      method: 'POST',
+      body: JSON.stringify(body)
+    });
+    const json = await res.json();
+    return json;
+  } catch(e) { return null; }
+}
+
+// ============================================================
+// GAS URL 설정
+// ============================================================
+function openGASConfig() {
+  document.getElementById('gasUrlInput').value = GAS_URL;
+  openModal('modalGASConfig');
+}
+
+async function saveGASUrl() {
+  const url = document.getElementById('gasUrlInput').value.trim();
+  if (!url) return alert('URL을 입력하세요.');
+  GAS_URL = url;
+  localStorage.setItem('GAS_URL', GAS_URL);
+  showSync('연동 테스트 중...', '');
+  const data = await gasGet('getAll');
+  if (data && !data.error) {
+    showSync('✓ GAS 연동 성공!', 'ok');
+    document.getElementById('gasConnectedBadge').style.display = 'inline';
+    loadAllFromGAS(data);
+    closeModal('modalGASConfig');
+  } else {
+    showSync('✗ 연동 실패. URL을 확인하세요.', 'err');
+    alert('연동에 실패했습니다. GAS URL이 올바른지, 배포 설정이 "모든 사용자"로 되어있는지 확인하세요.');
+  }
+}
+
+// ============================================================
+// STATE (localStorage fallback)
+// ============================================================
+const DEFAULT_MEET = [
+  {idx:0, label:'Weekly Meeting', url:'', color:'meet-btn-weekly'},
+  {idx:1, label:'Monthly Meeting', url:'', color:'meet-btn-monthly'},
+  {idx:2, label:'TBD', url:'', color:'meet-btn-tbd'}
+];
+const DEFAULT_TOOLS = [
+  {idx:0, name:'TBD', url:''},
+  {idx:1, name:'TBD', url:''},
+  {idx:2, name:'TBD', url:''}
+];
+const DEFAULT_SHARES = Array.from({length:5}, (_,i) => ({idx:i, name:'내용', desc:'', url:''}));
+
+const state = {
+  notices:   JSON.parse(localStorage.getItem('notices')   || '[]'),
+  issues:    JSON.parse(localStorage.getItem('issues')    || '[]'),
+  billboard: JSON.parse(localStorage.getItem('billboard') || '[]'),
+  meet:      JSON.parse(localStorage.getItem('meet')      || JSON.stringify(DEFAULT_MEET)),
+  tools:     JSON.parse(localStorage.getItem('tools')     || JSON.stringify(DEFAULT_TOOLS)),
+  shares:    JSON.parse(localStorage.getItem('shares')    || JSON.stringify(DEFAULT_SHARES)),
+};
+
+function save(key) { localStorage.setItem(key, JSON.stringify(state[key])); }
+
+// GAS에서 받아온 데이터로 state 전체 교체
+function loadAllFromGAS(data) {
+  if (data.notices  && data.notices.length)  { state.notices  = data.notices;  save('notices'); }
+  if (data.issues   && data.issues.length)   { state.issues   = data.issues;   save('issues'); }
+  if (data.billboard&& data.billboard.length){ state.billboard= data.billboard; save('billboard'); }
+  if (data.meet     && data.meet.length)     { state.meet     = data.meet.map(m => ({...m, idx: Number(m.idx)}));  save('meet'); }
+  if (data.tools    && data.tools.length)    { state.tools    = data.tools.map(t => ({...t, idx: Number(t.idx)})); save('tools'); }
+  if (data.shares   && data.shares.length)   { state.shares   = data.shares.map(s => ({...s, idx: Number(s.idx)}));save('shares'); }
+  renderAll();
+}
+
+// ============================================================
+// INIT - 페이지 로드 시 GAS에서 데이터 불러오기
+// ============================================================
+async function initLoad() {
+  updateDate();
+  renderAll();
+  if (GAS_URL) {
+    document.getElementById('gasConnectedBadge').style.display = 'inline';
+    showSync('데이터 불러오는 중...', '');
+    const data = await gasGet('getAll');
+    if (data && !data.error) {
+      showSync('✓ 동기화 완료', 'ok');
+      loadAllFromGAS(data);
+    } else {
+      showSync('⚠ 오프라인 (로컬 데이터 사용)', 'err');
+    }
+  }
+}
+
+function renderAll() {
+  renderNotice();
+  renderBillboard();
+  renderCal();
+  renderMeet();
+  renderTool();
+  renderShare();
+}
+
+// ============================================================
+// HEADER DATE
+// ============================================================
+function updateDate() {
+  const now = new Date();
+  const days = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+  document.getElementById('headerDate').textContent =
+    `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} ${days[now.getDay()]}`;
+}
+
+// ============================================================
+// MODAL
+// ============================================================
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(el =>
+  el.addEventListener('click', e => { if(e.target === el) el.classList.remove('open'); })
+);
+
+// ============================================================
+// 1. NOTICE
+// ============================================================
+function renderNotice() {
+  const list = document.getElementById('noticeList');
+  const sorted = sortedNotices();
+  list.innerHTML = '';
+  sorted.slice(0, 5).forEach(n => {
+    const li = document.createElement('li');
+    li.className = 'notice-item' + (n.pinned ? ' pinned' : '');
+    li.innerHTML = `
+      ${n.pinned ? '<span class="notice-pin-badge">고정</span>' : ''}
+      <span class="notice-title">${n.title}</span>
+      <span class="notice-date">${String(n.date||'').slice(5)}</span>`;
+    li.onclick = () => viewNotice(n);
+    list.appendChild(li);
+  });
+}
+
+function sortedNotices() {
+  return [...state.notices].sort((a,b) => {
+    if(a.pinned && !b.pinned) return -1;
+    if(!a.pinned && b.pinned) return 1;
+    return new Date(b.date) - new Date(a.date);
+  });
+}
+
+function openNoticeWrite() {
+  document.getElementById('noticeInputTitle').value = '';
+  document.getElementById('noticeInputBody').value = '';
+  document.getElementById('noticePin').checked = false;
+  openModal('modalNoticeWrite');
+}
+
+async function submitNotice() {
+  const title = document.getElementById('noticeInputTitle').value.trim();
+  if (!title) return alert('제목을 입력하세요.');
+  const body  = document.getElementById('noticeInputBody').value.trim();
+  const pinned = document.getElementById('noticePin').checked;
+  const now = new Date();
+  const notice = {
+    id: Date.now(), title, body, pinned,
+    date: `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')}`
+  };
+  state.notices.unshift(notice);
+  save('notices');
+  renderNotice();
+  closeModal('modalNoticeWrite');
+
+  showSync('공지 저장 중...', '');
+  const res = await gasPost({action:'addNotice', data:notice});
+  showSync(res?.success ? '✓ 공지 저장됨' : '⚠ 로컬만 저장됨', res?.success ? 'ok' : 'err');
+}
+
+function openNoticeAll() {
+  const list = document.getElementById('noticeAllList');
+  list.innerHTML = '';
+  sortedNotices().forEach(n => {
+    const div = document.createElement('div');
+    div.className = 'modal-list-item';
+    div.innerHTML = `
+      ${n.pinned ? '<span class="pin-badge">고정</span>' : ''}
+      <span style="cursor:pointer;" onclick="viewNotice(${escAttr(n)})">${n.title}</span>
+      <span class="date-tag">${String(n.date||'').slice(5)}</span>
+      <button class="del-btn" onclick="deleteNotice('${n.id}')">삭제</button>`;
+    list.appendChild(div);
+  });
+  openModal('modalNoticeAll');
+}
+
+function escAttr(obj) { return "'" + JSON.stringify(obj).replace(/'/g,"\\'") + "'"; }
+
+function viewNotice(n) {
+  if(typeof n === 'string') n = JSON.parse(n);
+  document.getElementById('noticeViewTitle').textContent = (n.pinned?'📌 ':'') + n.title;
+  document.getElementById('noticeViewDate').textContent  = n.date || '';
+  document.getElementById('noticeViewBody').textContent  = n.body || '(내용 없음)';
+  openModal('modalNoticeView');
+}
+
+async function deleteNotice(id) {
+  if(!confirm('삭제하시겠습니까?')) return;
+  state.notices = state.notices.filter(n => String(n.id) !== String(id));
+  save('notices');
+  renderNotice();
+  openNoticeAll();
+  await gasPost({action:'deleteNotice', id});
+}
+
+// ============================================================
+// 2. BILLBOARD
+// ============================================================
+let bbInterval = null, bbCurrent = 0;
+
+function renderBillboard() {
+  const inner = document.getElementById('billboardInner');
+  const empty = document.getElementById('bbEmpty');
+  const dotsEl = document.getElementById('bbDots');
+  inner.querySelectorAll('.billboard-slide').forEach(el => el.remove());
+  dotsEl.innerHTML = '';
+  clearInterval(bbInterval);
+  if (!state.billboard.length) { empty.style.display = 'flex'; return; }
+  empty.style.display = 'none';
+
+  state.billboard.forEach((item, i) => {
+    const slide = document.createElement('div');
+    slide.className = 'billboard-slide' + (i===0?' active':'');
+    if (item.type === 'image') {
+      const img = document.createElement('img');
+      img.src = item.src; img.alt = item.label||'';
+      if (item.url) { const a = document.createElement('a'); a.href=item.url; a.target='_blank'; a.appendChild(img); slide.appendChild(a); }
+      else slide.appendChild(img);
+    } else if (item.type === 'video') {
+      const vid = document.createElement('video');
+      vid.src=item.src; vid.autoplay=true; vid.muted=true; vid.loop=true;
+      slide.appendChild(vid);
+    } else {
+      const a = document.createElement('a');
+      a.href=item.url||'#'; a.target='_blank';
+      a.style.cssText='display:flex;align-items:center;justify-content:center;width:100%;height:100%;color:white;font-size:14px;font-weight:500;text-decoration:none;background:linear-gradient(135deg,#1e3a5f,#2563eb);';
+      a.textContent = item.label || item.url;
+      slide.appendChild(a);
+    }
+    inner.insertBefore(slide, document.querySelector('.bb-settings-btn'));
+    const dot = document.createElement('div');
+    dot.className = 'billboard-dot'+(i===0?' active':'');
+    dot.onclick = () => goSlide(i);
+    dotsEl.appendChild(dot);
+  });
+  bbCurrent = 0;
+  if (state.billboard.length > 1)
+    bbInterval = setInterval(() => goSlide((bbCurrent+1) % state.billboard.length), 4000);
+}
+
+function goSlide(idx) {
+  document.querySelectorAll('.billboard-slide').forEach((s,i)=>s.classList.toggle('active',i===idx));
+  document.querySelectorAll('.billboard-dot').forEach((d,i)=>d.classList.toggle('active',i===idx));
+  bbCurrent = idx;
+}
+
+function openBBSettings() { renderBBList(); openModal('modalBBSettings'); }
+
+function renderBBList() {
+  const el = document.getElementById('bbList');
+  el.innerHTML = '';
+  if (!state.billboard.length) { el.innerHTML = '<div style="font-size:11px;color:var(--gray-400);padding:6px 0;">슬라이드 없음</div>'; return; }
+  state.billboard.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'bb-item';
+    div.innerHTML = `<span>${item.label||item.url||item.type}</span>
+      <button class="del-btn" onclick="removeBB(${i})">삭제</button>`;
+    el.appendChild(div);
+  });
+}
+
+async function handleBBUpload(e) {
+  const files = Array.from(e.target.files);
+  if (!files.length) return;
+  const prog = document.getElementById('bbProgress');
+  prog.className = 'upload-progress uploading';
+  prog.textContent = `업로드 중... (0/${files.length})`;
+
+  let done = 0;
+  for (const file of files) {
+    const reader = new FileReader();
+    const b64 = await new Promise(res => { reader.onload = ev => res(ev.target.result.split(',')[1]); reader.readAsDataURL(file); });
+    const type = file.type.startsWith('video') ? 'video' : 'image';
+    let src = 'data:'+file.type+';base64,'+b64;
+    let gasId = null;
+
+    // GAS Drive 업로드
+    if (GAS_URL) {
+      showSync('Drive에 업로드 중...','');
+      const res = await gasPost({action:'uploadFile', fileName:file.name, mimeType:file.type, fileData:b64});
+      if (res?.success) { src = res.url; gasId = res.id; showSync('✓ Drive 업로드 완료','ok'); }
+    }
+
+    const item = {id: gasId || Date.now(), type, src, label: file.name, url:''};
+    state.billboard.push(item);
+    done++;
+    prog.textContent = `업로드 중... (${done}/${files.length})`;
+  }
+
+  save('billboard');
+  renderBillboard();
+  renderBBList();
+  prog.className = 'upload-progress done';
+  prog.textContent = `✓ ${done}개 파일 업로드 완료!`;
+  setTimeout(() => { prog.className='upload-progress'; }, 3000);
+  e.target.value = '';
+}
+
+async function addBBUrl() {
+  const url = document.getElementById('bbUrlInput').value.trim();
+  if (!url) return;
+  const label = document.getElementById('bbUrlLabel').value.trim() || url;
+  const item = {id: Date.now(), type:'url', src:'', url, label};
+  state.billboard.push(item);
+  save('billboard');
+  renderBillboard();
+  renderBBList();
+  document.getElementById('bbUrlInput').value='';
+  document.getElementById('bbUrlLabel').value='';
+  showSync('URL 저장 중...','');
+  const res = await gasPost({action:'addBillboardUrl', data:item});
+  showSync(res?.success?'✓ 저장됨':'⚠ 로컬만 저장', res?.success?'ok':'err');
+}
+
+async function removeBB(i) {
+  const item = state.billboard[i];
+  state.billboard.splice(i,1);
+  save('billboard');
+  renderBillboard();
+  renderBBList();
+  if (item.id) await gasPost({action:'deleteBillboard', id:item.id});
+}
+
+// ============================================================
+// 3. ISSUE (Calendar)
+// ============================================================
+let calYear, calMonth;
+const today = new Date();
+
+function initCal() { calYear=today.getFullYear(); calMonth=today.getMonth(); renderCal(); }
+function calPrev() { if(--calMonth<0){calMonth=11;calYear--;} renderCal(); }
+function calNext() { if(++calMonth>11){calMonth=0;calYear++;} renderCal(); }
+
+function renderCal() {
+  document.getElementById('calTitle').textContent =
+    `${calYear}.${String(calMonth+1).padStart(2,'0')}`;
+  const grid = document.getElementById('calGrid');
+  grid.innerHTML = '';
+  ['일','월','화','수','목','금','토'].forEach(d => {
+    const h=document.createElement('div'); h.className='cal-day-header'; h.textContent=d; grid.appendChild(h);
+  });
+  const firstDay = new Date(calYear,calMonth,1).getDay();
+  const daysInMonth = new Date(calYear,calMonth+1,0).getDate();
+  const prevDays = new Date(calYear,calMonth,0).getDate();
+
+  for(let i=0;i<firstDay;i++){
+    const d=document.createElement('div'); d.className='cal-day other-month';
+    d.textContent=prevDays-firstDay+1+i; grid.appendChild(d);
+  }
+  for(let d=1;d<=daysInMonth;d++){
+    const el=document.createElement('div'); el.className='cal-day';
+    const ds=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const issues=state.issues.filter(iss=>String(iss.date)===ds);
+    if(d===today.getDate()&&calMonth===today.getMonth()&&calYear===today.getFullYear()) el.classList.add('today');
+    if(issues.length){ el.classList.add('has-issue');
+      el.addEventListener('mouseenter',ev=>{
+        const tt=document.getElementById('issueTooltip');
+        tt.innerHTML=issues.map(i=>`• ${i.content}`).join('<br>');
+        tt.style.display='block'; tt.style.left=(ev.clientX+10)+'px'; tt.style.top=(ev.clientY+10)+'px';
+      });
+      el.addEventListener('mousemove',ev=>{
+        const tt=document.getElementById('issueTooltip');
+        tt.style.left=(ev.clientX+10)+'px'; tt.style.top=(ev.clientY+10)+'px';
+      });
+      el.addEventListener('mouseleave',()=>{ document.getElementById('issueTooltip').style.display='none'; });
+    }
+    el.textContent=d;
+    el.onclick=()=>{ document.getElementById('issueDate').value=ds; openModal('modalIssueWrite'); };
+    grid.appendChild(el);
+  }
+}
+
+function openIssueWrite() {
+  const now=new Date();
+  document.getElementById('issueDate').value=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+  document.getElementById('issueContent').value='';
+  openModal('modalIssueWrite');
+}
+
+async function submitIssue() {
+  const date=document.getElementById('issueDate').value;
+  const content=document.getElementById('issueContent').value.trim();
+  if(!date||!content) return alert('날짜와 내용을 모두 입력하세요.');
+  const issue={id:Date.now(), date, content};
+  state.issues.push(issue); save('issues'); renderCal();
+  closeModal('modalIssueWrite');
+  showSync('이슈 저장 중...','');
+  const res=await gasPost({action:'addIssue',data:issue});
+  showSync(res?.success?'✓ 이슈 저장됨':'⚠ 로컬만 저장',res?.success?'ok':'err');
+}
+
+// ============================================================
+// 4. MEET
+// ============================================================
+let editMeetIdx=null;
+
+function renderMeet() {
+  const el=document.getElementById('meetBtns'); el.innerHTML='';
+  state.meet.forEach((m,i)=>{
+    const btn=document.createElement('div');
+    btn.className=`meet-btn ${m.color||'meet-btn-tbd'}`;
+    btn.innerHTML=`${m.label}<span class="meet-url-set" onclick="event.stopPropagation();openMeetUrl(${i})">⚙</span>`;
+    btn.onclick=()=>{ if(m.url) window.open(m.url,'_blank'); else openMeetUrl(i); };
+    el.appendChild(btn);
+  });
+}
+
+function openMeetUrl(i){
+  editMeetIdx=i;
+  document.getElementById('meetModalTitle').textContent=state.meet[i].label+' URL 설정';
+  document.getElementById('meetLabelInput').value=state.meet[i].label;
+  document.getElementById('meetUrlInput').value=state.meet[i].url||'';
+  openModal('modalMeetUrl');
+}
+
+async function saveMeetUrl(){
+  state.meet[editMeetIdx].label=document.getElementById('meetLabelInput').value.trim()||state.meet[editMeetIdx].label;
+  state.meet[editMeetIdx].url=document.getElementById('meetUrlInput').value.trim();
+  save('meet'); renderMeet(); closeModal('modalMeetUrl');
+  showSync('저장 중...','');
+  const res=await gasPost({action:'updateMeet',data:state.meet[editMeetIdx]});
+  showSync(res?.success?'✓ 저장됨':'⚠ 로컬만 저장',res?.success?'ok':'err');
+}
+
+// ============================================================
+// 5. TOOL
+// ============================================================
+let editToolIdx=null;
+
+function renderTool(){
+  const el=document.getElementById('toolList'); el.innerHTML='';
+  state.tools.forEach((t,i)=>{
+    const div=document.createElement('div'); div.className='tool-item';
+    if(t.url) div.onclick=()=>window.open(t.url,'_blank');
+    div.innerHTML=`<span class="tool-name">${t.name}</span>
+      <button class="tool-edit-btn" onclick="event.stopPropagation();openToolEdit(${i})">✏ 편집</button>`;
+    el.appendChild(div);
+  });
+}
+
+function openToolEdit(i){
+  editToolIdx=i;
+  document.getElementById('toolNameInput').value=state.tools[i].name;
+  document.getElementById('toolUrlInput').value=state.tools[i].url||'';
+  openModal('modalToolEdit');
+}
+
+async function saveTool(){
+  state.tools[editToolIdx].name=document.getElementById('toolNameInput').value.trim()||'TBD';
+  state.tools[editToolIdx].url=document.getElementById('toolUrlInput').value.trim();
+  save('tools'); renderTool(); closeModal('modalToolEdit');
+  showSync('저장 중...','');
+  const res=await gasPost({action:'updateTool',data:state.tools[editToolIdx]});
+  showSync(res?.success?'✓ 저장됨':'⚠ 로컬만 저장',res?.success?'ok':'err');
+}
+
+// ============================================================
+// 6. SHARE URL
+// ============================================================
+let editShareIdx=null;
+
+function renderShare(){
+  const el=document.getElementById('shareList'); el.innerHTML='';
+  state.shares.forEach((s,i)=>{
+    const div=document.createElement('div'); div.className='share-item';
+    div.innerHTML=`
+      <div class="share-content">
+        <div class="share-label">${s.name}</div>
+        ${s.desc?`<div class="share-desc">${s.desc}</div>`:''}
+      </div>
+      <button class="share-edit-btn" onclick="openShareEdit(${i})">✏</button>
+      <a class="share-arrow" ${s.url?`href="${s.url}" target="_blank"`:``} onclick="${!s.url?`openShareEdit(${i})`:''}"}>▶</a>`;
+    el.appendChild(div);
+  });
+}
+
+function openShareEdit(i){
+  editShareIdx=i;
+  document.getElementById('shareNameInput').value=state.shares[i].name;
+  document.getElementById('shareDescInput').value=state.shares[i].desc||'';
+  document.getElementById('shareUrlInput').value=state.shares[i].url||'';
+  openModal('modalShareEdit');
+}
+
+async function saveShare(){
+  state.shares[editShareIdx].name=document.getElementById('shareNameInput').value.trim()||'내용';
+  state.shares[editShareIdx].desc=document.getElementById('shareDescInput').value.trim();
+  state.shares[editShareIdx].url=document.getElementById('shareUrlInput').value.trim();
+  save('shares'); renderShare(); closeModal('modalShareEdit');
+  showSync('저장 중...','');
+  const res=await gasPost({action:'updateShare',data:state.shares[editShareIdx]});
+  showSync(res?.success?'✓ 저장됨':'⚠ 로컬만 저장',res?.success?'ok':'err');
+}
+
+// ============================================================
+// BOOT
+// ============================================================
+initCal();
+initLoad();
+</script>
+</body>
+</html>
