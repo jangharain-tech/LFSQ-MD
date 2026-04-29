@@ -340,10 +340,19 @@
 
   // 초기 로드: 시트에서 URL 가져오기
   async function loadData() {
+    // localStorage 백업 먼저 적용
+    try {
+      const saved = localStorage.getItem('lfsq_links');
+      if (saved) Object.assign(links, JSON.parse(saved));
+    } catch(e) {}
+
     try {
       const res = await fetch(SCRIPT_URL);
       const data = await res.json();
       Object.assign(links, data);
+      // 시트 데이터 localStorage에 백업
+      try { localStorage.setItem('lfsq_links', JSON.stringify(links)); } catch(e) {}
+
       if (links['hero_date']) document.getElementById('heroDate').textContent = links['hero_date'];
       // 제목 적용
       if (links['agenda_title1']) document.getElementById('mainTitle1').textContent = links['agenda_title1'];
@@ -366,9 +375,19 @@
         }
       });
     } catch(e) {
-      // 로드 실패시 기본 배경
-      applyBg('');
-      console.error("데이터 로딩 실패");
+      // 시트 로드 실패 → localStorage 백업으로 UI 복원
+      applyBg(links['hero_bg'] || '');
+      if (links['ownip_nugasa']) {
+        const btn = document.getElementById('btn-nugasa');
+        if (btn) btn.href = links['ownip_nugasa'];
+      }
+      Object.keys(links).forEach(id => {
+        if(id !== 'hero_bg' && links[id]) {
+          const card = document.getElementById('card-' + id);
+          if (card) card.classList.add('has-link');
+        }
+      });
+      console.error("시트 로딩 실패, 로컬 캐시 사용");
     }
   }
   loadData();
@@ -448,6 +467,7 @@
         body: JSON.stringify({ id: id, url: finalUrl })
       });
       links[id] = finalUrl;
+      try { localStorage.setItem('lfsq_links', JSON.stringify(links)); } catch(e) {}
       const card = document.getElementById('card-' + id);
       if (finalUrl) card.classList.add('has-link');
       else card.classList.remove('has-link');
