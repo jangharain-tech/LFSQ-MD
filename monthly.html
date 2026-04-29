@@ -82,6 +82,8 @@
 
 
   .agenda-card:hover { background: #252a2f; }
+  .agenda-card.has-link { background: #1a2224; }
+  .agenda-card.has-link:hover { background: #2a3538; }
   .card-number { font-family: 'Space Grotesk', sans-serif; font-size: 50px; font-weight: 800; color: rgba(62,207,207,0.2); }
   .card-label { font-size: 32px; font-weight: 800; color: #f0f4f4; text-transform: uppercase; }
   .card-desc { font-size: 13px; color: #6a7280; margin-top: 10px; }
@@ -154,7 +156,7 @@
             <div class="config-toggle" onclick="toggleConfig(event,'review')">⚙</div>
             <div class="config-panel" id="config-review"><label>URL 설정</label><input type="url" id="url-review" placeholder="https://..."><button onclick="saveLink(event,'review')">저장</button></div>
             <div class="card-number">01</div>
-            <div><div class="card-label">Review</div><div class="card-desc">전월 성과 리뷰 및 IP별 점검</div></div>
+            <div><div class="card-label">Summary</div><div class="card-desc">전월 성과 리뷰 및 IP별 점검</div></div>
         </div>
         <div class="agenda-card" id="card-planning" onclick="handleCardClick('planning')">
             <div class="config-toggle" onclick="toggleConfig(event,'planning')">⚙</div>
@@ -172,7 +174,7 @@
             <div class="config-toggle" onclick="toggleConfig(event,'ip')">⚙</div>
             <div class="config-panel" id="config-ip"><label>URL 설정</label><input type="url" id="url-ip" placeholder="https://..."><button onclick="saveLink(event,'ip')">저장</button></div>
             <div class="card-number">04</div>
-            <div><div class="card-label">Multi IP</div><div class="card-desc">멀티IP 전개 현황</div></div>
+            <div><div class="card-label">Review</div><div class="card-desc">IP & 제품별 상세 리뷰</div></div>
         </div>
         <div class="agenda-card" id="card-ownip" onclick="handleCardClick('ownip')">
             <div class="config-toggle" onclick="toggleConfig(event,'ownip')">⚙</div>
@@ -184,7 +186,7 @@
             <div class="config-toggle" onclick="toggleConfig(event,'brand')">⚙</div>
             <div class="config-panel" id="config-brand"><label>URL 설정</label><input type="url" id="url-brand" placeholder="https://..."><button onclick="saveLink(event,'brand')">저장</button></div>
             <div class="card-number">06</div>
-            <div><div style="font-size:10px;color:var(--mint);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:4px;opacity:0.8;">PRIVATE BRAND</div><div class="card-label">Brand</div><div class="card-desc">브랜드 현황 및 주요 이슈</div></div>
+            <div><div style="font-size:10px;color:var(--mint);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:4px;opacity:0.8;">PRIVATE BRAND</div><div class="card-label">LFSQ Brand</div><div class="card-desc">신규브랜드 전략 및 전개</div></div>
         </div>
       </div>
     </section>
@@ -269,7 +271,8 @@
       // 카드 링크 적용
       Object.keys(links).forEach(id => {
         if(id !== 'hero_bg' && links[id]) {
-          // 링크 로드만, 테두리 표시 없음
+          const card = document.getElementById('card-' + id);
+          if (card) card.classList.add('has-link');
         }
       });
     } catch(e) {
@@ -343,6 +346,9 @@
         body: JSON.stringify({ id: id, url: finalUrl })
       });
       links[id] = finalUrl;
+      const card = document.getElementById('card-' + id);
+      if (finalUrl) card.classList.add('has-link');
+      else card.classList.remove('has-link');
       alert("서버에 저장되었습니다.");
     } catch(e) { alert("저장 실패"); }
     btn.innerText = "저장";
