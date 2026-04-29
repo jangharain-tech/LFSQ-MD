@@ -68,10 +68,10 @@ tbody tr:last-child{border-bottom:none}
 tbody tr:nth-child(even){background:rgba(230,241,251,0.18)}
 tbody tr:hover{background:rgba(55,138,221,0.07)}
 tbody td{padding:8px 10px;vertical-align:middle;font-size:13px}
-.col-date{width:110px}.col-ip{width:66px}.col-type{width:80px}
-.col-img{width:218px}.col-name{width:200px}.col-sku{width:54px}
-.col-price{width:90px}.col-cost{width:66px}.col-order{width:80px}
-.col-vol{width:88px}.col-remark{width:auto}.col-action{width:60px}
+.col-date{width:130px}.col-ip{width:90px}.col-type{width:95px}
+.col-img{width:210px}.col-name{width:220px}.col-sku{width:60px}
+.col-price{width:110px}.col-cost{width:75px}.col-order{width:90px}
+.col-vol{width:110px}.col-remark{width:auto}.col-action{width:72px}
 td input[type=text]{width:100%;font-size:13px;padding:5px 7px;border:0.5px solid var(--color-border-tertiary);border-radius:5px;background:transparent;color:var(--color-text-primary);font-family:inherit}
 td input[type=text]:focus{outline:none;border-color:#85B7EB;background:var(--color-background-primary)}
 td textarea{width:100%;font-size:13px;padding:6px 8px;border:0.5px solid var(--color-border-tertiary);border-radius:5px;background:transparent;color:var(--color-text-primary);font-family:inherit;resize:vertical;min-height:90px;line-height:1.7}
@@ -431,6 +431,26 @@ function handleCommaInput(id, field, el) {
   el.value = fmt; setVal(id, field, fmt);
 }
 
+function handleVolInput(id, el) {
+  // 억/만 한글 표기 그대로 허용, 순수 숫자면 천단위 콤마 적용
+  let v = el.value;
+  if (/[억만]/.test(v)) {
+    // 한글 표기 모드: 그대로 저장
+    setVal(id, 'vol', v);
+    return;
+  }
+  // 숫자 모드: 콤마 정리 후 재포맷
+  const raw = v.replace(/,/g, '').replace(/[^0-9]/g, '');
+  const fmt = raw ? parseInt(raw, 10).toLocaleString() : '';
+  const pos = el.selectionStart;
+  const prevLen = el.value.length;
+  el.value = fmt;
+  // 커서 위치 보정
+  const diff = fmt.length - prevLen;
+  el.setSelectionRange(pos + diff, pos + diff);
+  setVal(id, 'vol', fmt);
+}
+
 function buildIpVolMap(subset) {
   const m = {};
   subset.forEach(function(r){ const k = (r.ip||'').trim() || '(미입력)'; m[k] = (m[k]||0) + parseVol(r.vol); });
@@ -496,7 +516,7 @@ function render() {
       '<td><input type="text" value="'+esc(r.price)+'" placeholder="1,000~1,500" oninput="setVal(\''+r.id+'\',\'price\',this.value)"></td>'+
       '<td><div class="cost-wrap"><input class="cost-input" type="text" value="'+esc(r.cost)+'" placeholder="45" oninput="setVal(\''+r.id+'\',\'cost\',this.value)"><span class="cost-unit">%</span></div></td>'+
       '<td><input type="text" value="'+esc(r.order)+'" placeholder="0" oninput="handleCommaInput(\''+r.id+'\',\'order\',this)" style="text-align:right"></td>'+
-      '<td><input type="text" value="'+esc(r.vol)+'" placeholder="0" oninput="handleCommaInput(\''+r.id+'\',\'vol\',this)" style="text-align:right"></td>'+
+      '<td><input type="text" value="'+esc(r.vol)+'" placeholder="0" oninput="handleVolInput(\''+r.id+'\',this)" style="text-align:right"></td>'+
       '<td><textarea oninput="setVal(\''+r.id+'\',\'remark\',this.value)">'+esc(r.remark)+'</textarea></td>'+
       '<td><div class="action-btns">'+
         '<button class="save-btn" data-saveid="'+r.id+'" onclick="saveRow(\''+r.id+'\')">저장</button>'+
