@@ -190,7 +190,10 @@
             <div class="config-toggle" onclick="toggleConfig(event,'buying')">⚙</div>
             <div class="config-panel" id="config-buying"><label>URL 설정</label><input type="url" id="url-buying" placeholder="https://..."><button onclick="saveLink(event,'buying')">저장</button></div>
             <div class="card-number">03</div>
-            <div><div class="card-label">Buying</div><div class="card-desc">사입계획 및 현황</div></div>
+            <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+              <div><div class="card-label">Buying</div><div class="card-desc">사입계획 및 현황</div></div>
+              <a href="https://jangharain-tech.github.io/LFSQ-MD/product-dashboard.html" target="_blank" onclick="event.stopPropagation()" style="flex-shrink:0;padding:6px 12px;background:#b8d016;border-radius:6px;font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:700;color:#1a1f0a;text-decoration:none;letter-spacing:0.05em;white-space:nowrap;transition:background 0.2s;" onmouseover="this.style.background='#cae820'" onmouseout="this.style.background='#b8d016'">출시계획</a>
+            </div>
         </div>
         <div class="agenda-card" id="card-ip" onclick="handleCardClick('ip')">
             <div class="config-toggle" onclick="toggleConfig(event,'ip')">⚙</div>
@@ -198,11 +201,12 @@
             <div class="card-number">04</div>
             <div><div class="card-label">Review</div><div class="card-desc">IP & 제품별 상세 리뷰</div></div>
         </div>
-        <div class="agenda-card" id="card-ownip" onclick="handleCardClick('ownip')">
-            <div class="config-toggle" onclick="toggleConfig(event,'ownip')">⚙</div>
+        <div class="agenda-card" id="card-ownip" onclick="handleCardClick('ownip')" style="background-image:url('https://lh3.googleusercontent.com/d/11_TpOv5oVJjqSvSxQWWhUluulR9O22ql'); background-size:cover; background-position:center; overflow:hidden;">
+            <div style="position:absolute;inset:0;background:rgba(255,255,255,0.72);border-radius:10px;"></div>
+            <div class="config-toggle" onclick="toggleConfig(event,'ownip')" style="position:relative;z-index:2;">⚙</div>
             <div class="config-panel" id="config-ownip"><label>URL 설정</label><input type="url" id="url-ownip" placeholder="https://..."><button onclick="saveLink(event,'ownip')">저장</button></div>
-            <div class="card-number">05</div>
-            <div><div style="font-size:11px;font-weight:700;color:#7a9a00;background:rgba(168,196,26,0.12);display:inline-block;padding:3px 8px;border-radius:4px;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px;">OWN IP 전략</div><div class="card-label">LFSQ IP</div><div class="card-desc">전략IP 전개현황</div></div>
+            <div class="card-number" style="position:relative;z-index:2;">05</div>
+            <div style="position:relative;z-index:2;"><div style="font-size:11px;font-weight:700;color:#7a9a00;background:rgba(168,196,26,0.12);display:inline-block;padding:3px 8px;border-radius:4px;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px;">OWN IP 전략</div><div class="card-label">LFSQ IP</div><div class="card-desc">전략IP 전개현황</div></div>
         </div>
         <div class="agenda-card" id="card-brand" onclick="handleCardClick('brand')">
             <div class="config-toggle" onclick="toggleConfig(event,'brand')">⚙</div>
