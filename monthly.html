@@ -170,7 +170,10 @@
       <div class="agenda-body">
         <!-- 대제목 영역 -->
         <div class="agenda-title-area">
-          <div class="agenda-main-title" id="mainTitle" onclick="editTitle()" title="클릭하여 수정">IP & BRAND<br>자산화의 시작</div>
+          <div class="agenda-main-title">
+            <span id="mainTitle1" onclick="editTitleLine(1)" title="클릭하여 수정" style="cursor:pointer;display:block;transition:opacity 0.2s;" onmouseover="this.style.opacity='0.6'" onmouseout="this.style.opacity='1'">IP & BRAND</span>
+            <span id="mainTitle2" onclick="editTitleLine(2)" title="클릭하여 수정" style="cursor:pointer;display:block;transition:opacity 0.2s;" onmouseover="this.style.opacity='0.6'" onmouseout="this.style.opacity='1'">자산화의 시작</span>
+          </div>
           <div class="agenda-sub-title" id="subTitle" onclick="editSubTitle()" title="클릭하여 수정">전략IP 누가사 &amp; OWN Brand 리빈느</div>
         </div>
 
@@ -246,15 +249,15 @@
       saveTitleToSheet('hero_date', val.trim());
     }
   }
-  function editTitle() {
-    const el = document.getElementById('mainTitle');
-    const cur = el.textContent;
-    const val = prompt('대제목 수정:', cur);
+  function editTitleLine(line) {
+    const el = document.getElementById('mainTitle' + line);
+    const val = prompt((line === 1 ? '첫째 줄' : '둘째 줄') + ' 수정:', el.textContent);
     if (val !== null && val.trim()) {
       el.textContent = val.trim();
-      saveTitleToSheet('agenda_title', val.trim());
+      saveTitleToSheet('agenda_title' + line, val.trim());
     }
   }
+  function editTitle() {} // 하위호환용
   function editSubTitle() {
     const el = document.getElementById('subTitle');
     const cur = el.textContent;
@@ -343,7 +346,10 @@
       Object.assign(links, data);
       if (links['hero_date']) document.getElementById('heroDate').textContent = links['hero_date'];
       // 제목 적용
-      if (links['agenda_title']) document.getElementById('mainTitle').textContent = links['agenda_title'];
+      if (links['agenda_title1']) document.getElementById('mainTitle1').textContent = links['agenda_title1'];
+      if (links['agenda_title2']) document.getElementById('mainTitle2').textContent = links['agenda_title2'];
+      // 기존 단일 키 호환
+      if (links['agenda_title'] && !links['agenda_title1']) document.getElementById('mainTitle1').textContent = links['agenda_title'];
       if (links['agenda_subtitle']) document.getElementById('subTitle').textContent = links['agenda_subtitle'];
       // 배경 이미지 적용
       applyBg(links['hero_bg'] || '');
