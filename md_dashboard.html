@@ -503,6 +503,7 @@
     <label class="upload-label" for="bbFileInput">📁 파일 선택 (이미지 · 영상)</label>
     <input type="file" id="bbFileInput" accept="image/*,video/*" multiple onchange="handleBBUpload(event)">
     <div class="upload-progress" id="bbProgress"></div>
+    <div style="font-size:10px;color:var(--gray-400);margin-top:5px;">💡 이미지가 깨져 보이면 기존 항목 삭제 후 재업로드하세요.</div>
 
     <label style="margin-top:14px;">URL 슬라이드 추가</label>
     <input type="text" id="bbUrlInput" placeholder="https://...">
@@ -847,7 +848,11 @@ function renderBillboard() {
     slide.className = 'billboard-slide' + (i===0?' active':'');
     if (item.type === 'image') {
       const img = document.createElement('img');
-      img.src = item.src; img.alt = item.label||'';
+      img.src = item.src || item.driveUrl || '';
+      img.alt = item.label || '';
+      if (item.driveUrl && item.src !== item.driveUrl) {
+        img.onerror = () => { img.onerror = null; img.src = item.driveUrl; };
+      }
       if (item.url) { const a = document.createElement('a'); a.href=item.url; a.target='_blank'; a.appendChild(img); slide.appendChild(a); }
       else slide.appendChild(img);
     } else if (item.type === 'video') {
@@ -903,30 +908,42 @@ async function handleBBUpload(e) {
   let done = 0;
   for (const file of files) {
     const reader = new FileReader();
-    const b64 = await new Promise(res => { reader.onload = ev => res(ev.target.result.split(',')[1]); reader.readAsDataURL(file); });
+    // base64 전체 dataURL (미리보기 + 로컬 fallback용)
+    const dataUrl = await new Promise(res => { reader.onload = ev => res(ev.target.result); reader.readAsDataURL(file); });
+    const b64 = dataUrl.split(',')[1];
     const type = file.type.startsWith('video') ? 'video' : 'image';
-    let src = 'data:'+file.type+';base64,'+b64;
-    let gasId = null;
 
-    // GAS Drive 업로드
-    if (GAS_URL) {
-      showSync('Drive에 업로드 중...','');
-      const res = await gasPost({action:'uploadFile', fileName:file.name, mimeType:file.type, fileData:b64});
-      if (res?.success) { src = res.url; gasId = res.id; showSync('✓ Drive 업로드 완료','ok'); }
-    }
-
-    const item = {id: gasId || Date.now(), type, src, label: file.name, url:''};
+    // 1) 일단 base64로 즉시 표시
+    const item = {id: Date.now(), type, src: dataUrl, driveUrl: '', label: file.name, url: ''};
     state.billboard.push(item);
+    save('billboard');
+    renderBillboard();
+    renderBBList();
     done++;
-    prog.textContent = `업로드 중... (${done}/${files.length})`;
+    prog.textContent = `로컬 미리보기 완료 (${done}/${files.length}), Drive 업로드 중...`;
+
+    // 2) 백그라운드로 Drive 업로드 → 완료 시 src 교체
+    if (GAS_URL) {
+      showSync('Drive에 업로드 중...', '');
+      const res = await gasPost({action: 'uploadFile', fileName: file.name, mimeType: file.type, fileData: b64});
+      if (res?.success && res.url) {
+        // state에서 해당 item 찾아서 driveUrl 저장 (src는 base64 유지 → 이미지 깨짐 방지)
+        const idx = state.billboard.findIndex(it => it.id === item.id);
+        if (idx !== -1) {
+          state.billboard[idx].driveUrl = res.url;
+          state.billboard[idx].gasId = res.gasId;
+          save('billboard');
+        }
+        showSync('✓ Drive 업로드 완료', 'ok');
+      } else {
+        showSync('⚠ Drive 업로드 실패, 로컬 이미지 사용', 'err');
+      }
+    }
   }
 
-  save('billboard');
-  renderBillboard();
-  renderBBList();
   prog.className = 'upload-progress done';
-  prog.textContent = `✓ ${done}개 파일 업로드 완료!`;
-  setTimeout(() => { prog.className='upload-progress'; }, 3000);
+  prog.textContent = `✓ ${done}개 파일 처리 완료!`;
+  setTimeout(() => { prog.className = 'upload-progress'; }, 3000);
   e.target.value = '';
 }
 
