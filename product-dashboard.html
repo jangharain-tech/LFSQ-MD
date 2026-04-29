@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans,sans-serif);font-size:13px;color:var(--color-text-primary);background:transparent;padding:16px}
+.header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.header-left h1{font-size:18px;font-weight:500;margin-bottom:2px}
+.header-left p{font-size:12px;color:var(--color-text-secondary)}
+.sync-status{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--color-text-secondary);padding:5px 10px;border:0.5px solid var(--color-border-tertiary);border-radius:20px;background:var(--color-background-secondary);white-space:nowrap}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:#ccc;flex-shrink:0}
+.sync-dot.ok{background:#639922}.sync-dot.loading{background:#BA7517;animation:pulse 1s infinite}.sync-dot.err{background:#E24B4A}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.stat-card{border-radius:12px;padding:13px 14px}
+.stat-card.total{background:#E6F1FB;border:0.5px solid #B5D4F4}
+.stat-card.new{background:#EAF3DE;border:0.5px solid #C0DD97}
+.stat-card.reorder{background:#FAEEDA;border:0.5px solid #FAC775}
+.stat-card.drop{background:#FCEBEB;border:0.5px solid #F7C1C1}
+.sc-top{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px}
+.sc-label{font-size:13px;font-weight:600}
+.stat-card.total .sc-label{color:#185FA5}.stat-card.new .sc-label{color:#3B6D11}
+.stat-card.reorder .sc-label{color:#854F0B}.stat-card.drop .sc-label{color:#A32D2D}
+.sc-count{font-size:22px;font-weight:500}
+.stat-card.total .sc-count{color:#0C447C}.stat-card.new .sc-count{color:#27500A}
+.stat-card.reorder .sc-count{color:#633806}.stat-card.drop .sc-count{color:#791F1F}
+.sc-divider{border:none;border-top:0.5px solid rgba(0,0,0,0.07);margin:8px 0}
+.sc-vol-label{font-size:12px;color:var(--color-text-secondary);margin-bottom:3px}
+.sc-vol-val{font-size:15px;font-weight:500;margin-bottom:6px}
+.stat-card.total .sc-vol-val{color:#0C447C}.stat-card.new .sc-vol-val{color:#27500A}
+.stat-card.reorder .sc-vol-val{color:#633806}.stat-card.drop .sc-vol-val{color:#791F1F}
+.sc-ip-list{display:flex;flex-direction:column;gap:3px}
+.sc-ip-row{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.sc-ip-name{font-size:12px;color:var(--color-text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:60%}
+.sc-ip-vol{font-size:12px;font-weight:500}
+.stat-card.total .sc-ip-vol{color:#185FA5}.stat-card.new .sc-ip-vol{color:#3B6D11}
+.stat-card.reorder .sc-ip-vol{color:#854F0B}.stat-card.drop .sc-ip-vol{color:#A32D2D}
+.sc-no-vol{font-size:12px;color:var(--color-text-tertiary)}
+.toolbar{display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:10px 14px;background:var(--color-background-secondary);border-radius:10px;border:0.5px solid var(--color-border-tertiary);flex-wrap:wrap}
+.divider{width:0.5px;height:18px;background:var(--color-border-secondary);margin:0 2px}
+.toolbar input[type=text]{font-size:12px;padding:4px 7px;border:0.5px solid var(--color-border-secondary);border-radius:6px;background:var(--color-background-primary);color:var(--color-text-primary);height:28px}
+.filter-dropdown{position:relative;display:inline-block}
+.filter-btn{font-size:12px;padding:4px 10px;border-radius:6px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-secondary);cursor:pointer;height:28px;display:flex;align-items:center;gap:5px;white-space:nowrap;user-select:none}
+.filter-btn.has-selection{background:#E6F1FB;border-color:#185FA5;color:#0C447C;font-weight:500}
+.filter-btn .arrow{font-size:9px}
+.filter-panel{display:none;position:absolute;top:32px;left:0;background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary);border-radius:8px;padding:8px;z-index:100;box-shadow:0 4px 16px rgba(0,0,0,0.12);min-width:120px}
+.filter-panel.open{display:block}
+.cb-item{display:flex;align-items:center;gap:7px;padding:5px 6px;border-radius:5px;cursor:pointer;font-size:12px;color:var(--color-text-primary);user-select:none}
+.cb-item:hover{background:var(--color-background-secondary)}
+.cb-item input[type=checkbox]{accent-color:#185FA5;width:13px;height:13px;cursor:pointer;flex-shrink:0}
+.cb-badge{display:inline-block;padding:2px 9px;border-radius:8px;font-size:12px;font-weight:500}
+.cb-badge.all{background:#E6F1FB;color:#0C447C}
+.cb-badge.new{background:#EAF3DE;color:#3B6D11}
+.cb-badge.reorder{background:#FAEEDA;color:#854F0B}
+.cb-badge.drop{background:#FCEBEB;color:#A32D2D}
+.cb-divider{border:none;border-top:0.5px solid var(--color-border-tertiary);margin:5px 0}
+.btn-add{font-size:12px;padding:4px 14px;border-radius:6px;background:#185FA5;color:#fff;border:none;cursor:pointer;height:28px;font-weight:500;white-space:nowrap;margin-left:auto}
+.btn-add:hover{background:#0C447C}
+.btn-sm{font-size:12px;padding:4px 10px;border-radius:6px;background:var(--color-background-primary);color:var(--color-text-secondary);border:0.5px solid var(--color-border-secondary);cursor:pointer;height:28px;white-space:nowrap}
+.btn-sm:hover{background:var(--color-background-secondary)}
+.table-wrap{overflow-x:auto;border-radius:12px;border:0.5px solid var(--color-border-tertiary)}
+table{width:100%;border-collapse:collapse;table-layout:fixed;min-width:1100px}
+thead tr{background:linear-gradient(180deg,#f0f6ff,#e8f0fb)}
+thead th{font-weight:600;font-size:13px;color:#185FA5;padding:11px 10px;text-align:center;border-bottom:1.5px solid #B5D4F4;white-space:nowrap}
+tbody tr{border-bottom:0.5px solid var(--color-border-tertiary);transition:background 0.1s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:nth-child(even){background:rgba(230,241,251,0.18)}
+tbody tr:hover{background:rgba(55,138,221,0.07)}
+tbody td{padding:8px 10px;vertical-align:middle;font-size:13px}
+.col-date{width:110px}.col-ip{width:66px}.col-type{width:80px}
+.col-img{width:218px}.col-name{width:200px}.col-sku{width:54px}
+.col-price{width:90px}.col-cost{width:66px}.col-order{width:80px}
+.col-vol{width:88px}.col-remark{width:auto}.col-action{width:60px}
+td input[type=text]{width:100%;font-size:13px;padding:5px 7px;border:0.5px solid var(--color-border-tertiary);border-radius:5px;background:transparent;color:var(--color-text-primary);font-family:inherit}
+td input[type=text]:focus{outline:none;border-color:#85B7EB;background:var(--color-background-primary)}
+td textarea{width:100%;font-size:13px;padding:6px 8px;border:0.5px solid var(--color-border-tertiary);border-radius:5px;background:transparent;color:var(--color-text-primary);font-family:inherit;resize:vertical;min-height:90px;line-height:1.7}
+td textarea:focus{outline:none;border-color:#85B7EB;background:var(--color-background-primary)}
+td select{width:100%;font-size:13px;padding:5px 6px;border:0.5px solid var(--color-border-tertiary);border-radius:5px;background:var(--color-background-primary);color:var(--color-text-primary);cursor:pointer}
+.cost-wrap{display:flex;align-items:center;gap:4px}
+.cost-input{flex:1;font-size:13px;padding:5px 7px;border:0.5px solid var(--color-border-tertiary);border-radius:5px;background:transparent;color:var(--color-text-primary);font-family:inherit;min-width:0}
+.cost-input:focus{outline:none;border-color:#85B7EB;background:var(--color-background-primary)}
+.cost-unit{font-size:13px;color:var(--color-text-secondary);flex-shrink:0}
+.date-wrap{display:flex;gap:3px}
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:10px;font-size:12px;font-weight:500;margin-top:4px}
+.badge-new{background:#E6F1FB;color:#0C447C;border:0.5px solid #B5D4F4}
+.badge-reorder{background:#FAEEDA;color:#633806;border:0.5px solid #FAC775}
+.badge-drop{background:#FCEBEB;color:#791F1F;border:0.5px solid #F7C1C1}
+.img-cell{width:200px;height:200px;border:1.5px dashed #B5D4F4;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;background:#f5f9ff;position:relative}
+.img-cell:hover{border-color:#378ADD;background:#EBF3FB}
+.img-cell img{width:100%;height:100%;object-fit:cover;border-radius:6px}
+.img-cell .plus{font-size:26px;color:#85B7EB;pointer-events:none}
+.img-uploading{position:absolute;inset:0;background:rgba(255,255,255,0.8);display:flex;align-items:center;justify-content:center;font-size:11px;color:#185FA5;font-weight:500}
+.img-expand-btn{position:absolute;bottom:5px;right:5px;background:rgba(0,0,0,0.45);color:#fff;border:none;border-radius:4px;font-size:11px;padding:2px 6px;cursor:pointer;display:none}
+.img-cell:hover .img-expand-btn{display:block}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:1000;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal-img{max-width:90vw;max-height:90vh;border-radius:10px;object-fit:contain;box-shadow:0 8px 40px rgba(0,0,0,0.5)}
+.modal-close{position:absolute;top:18px;right:22px;background:none;border:none;color:#fff;font-size:28px;cursor:pointer;line-height:1}
+.action-btns{display:flex;flex-direction:column;gap:4px;align-items:stretch}
+.save-btn{font-size:13px;padding:5px 10px;border-radius:5px;background:#185FA5;color:#fff;border:none;cursor:pointer;white-space:nowrap}
+.save-btn:hover{background:#0C447C}
+.save-btn.saved{background:#3B6D11}
+.save-btn.saving{background:#BA7517}
+.del-btn{background:none;border:0.5px solid var(--color-border-tertiary);cursor:pointer;color:var(--color-text-tertiary);font-size:13px;padding:4px 6px;border-radius:4px;display:flex;align-items:center;justify-content:center}
+.del-btn:hover{color:#A32D2D;background:#FCEBEB;border-color:#F7C1C1}
+.toast{position:fixed;bottom:20px;right:20px;padding:10px 18px;border-radius:8px;font-size:14px;font-weight:500;color:#fff;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:2000}
+.toast.show{opacity:1}.toast.ok{background:#3B6D11}.toast.err{background:#A32D2D}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>상품 현황 대시보드</h1>
+    <p>구글 시트와 연동 — 팀원 누구나 데이터를 등록하고 공유할 수 있습니다</p>
+  </div>
+  <div class="sync-status">
+    <div class="sync-dot loading" id="syncDot"></div>
+    <span id="syncText">연결 중...</span>
+  </div>
+</div>
+
+<div class="stats-row" id="stats"></div>
+
+<div class="toolbar">
+  <div class="filter-dropdown" id="ddYear">
+    <div class="filter-btn" id="btnYear" onclick="togglePanel('ddYear')">
+      <span id="lblYear">연도</span><span class="arrow">▾</span>
+    </div>
+    <div class="filter-panel" id="panelYear">
+      <label class="cb-item"><input type="checkbox" value="" onchange="onYearChange(this)"><span class="cb-badge all">전체</span></label>
+      <hr class="cb-divider">
+    </div>
+  </div>
+  <div class="filter-dropdown" id="ddMonth">
+    <div class="filter-btn" id="btnMonth" onclick="togglePanel('ddMonth')">
+      <span id="lblMonth">월</span><span class="arrow">▾</span>
+    </div>
+    <div class="filter-panel" id="panelMonth">
+      <label class="cb-item"><input type="checkbox" value="" onchange="onMonthChange(this)"><span class="cb-badge all">전체</span></label>
+      <hr class="cb-divider">
+    </div>
+  </div>
+  <div class="filter-dropdown" id="ddType">
+    <div class="filter-btn" id="btnType" onclick="togglePanel('ddType')">
+      <span id="lblType">구분</span><span class="arrow">▾</span>
+    </div>
+    <div class="filter-panel" id="panelType">
+      <label class="cb-item"><input type="checkbox" value="" onchange="onTypeChange(this)"><span class="cb-badge all">전체</span></label>
+      <hr class="cb-divider">
+      <label class="cb-item"><input type="checkbox" value="신제품" onchange="onTypeChange(this)"><span class="cb-badge new">신제품</span></label>
+      <label class="cb-item"><input type="checkbox" value="재발주" onchange="onTypeChange(this)"><span class="cb-badge reorder">재발주</span></label>
+      <label class="cb-item"><input type="checkbox" value="드랍" onchange="onTypeChange(this)"><span class="cb-badge drop">드랍</span></label>
+    </div>
+  </div>
+  <div class="divider"></div>
+  <input type="text" id="filterIP" placeholder="IP 검색..." oninput="render()" style="width:100px">
+  <button class="btn-sm" onclick="loadData()">↻ 새로고침</button>
+  <button class="btn-sm" onclick="exportCSV()">CSV 내보내기</button>
+  <button class="btn-add" onclick="addRow()">+ 행 추가</button>
+</div>
+
+<div class="table-wrap">
+<table>
+  <thead>
+    <tr>
+      <th class="col-date">출시 연/월</th>
+      <th class="col-ip">IP</th>
+      <th class="col-type">구분</th>
+      <th class="col-img">이미지</th>
+      <th class="col-name">제품명</th>
+      <th class="col-sku">SKU</th>
+      <th class="col-price">판매가</th>
+      <th class="col-cost">원가율</th>
+      <th class="col-order">발주수량</th>
+      <th class="col-vol">매출볼륨</th>
+      <th class="col-remark">REMARK</th>
+      <th class="col-action">저장/삭제</th>
+    </tr>
+  </thead>
+  <tbody id="tbody"></tbody>
+</table>
+</div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal()">
+  <button class="modal-close" onclick="closeModal()">×</button>
+  <img class="modal-img" id="modalImg" src="" alt="확대 이미지">
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const API_URL = 'https://script.google.com/macros/s/AKfycbxF4Opm87_y3wuVizyFS7iGYE1wndC8TnHenTqu_LMyS-lIXE8Q5s7ySZuyhErYaLuv9w/exec';
+const CUR_YEAR = new Date().getFullYear();
+const YEARS = Array.from({length:5}, (_,i) => CUR_YEAR - 1 + i);
+const MONTHS = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+const TYPES = ['신제품','재발주','드랍'];
+const BADGE = {신제품:'badge-new', 재발주:'badge-reorder', 드랍:'badge-drop'};
+const DEFAULT_REMARK = '입고예정일 : \n전개 매장 : ';
+
+let rows = [], imgMap = {};
+let selYears = new Set(), selMonths = new Set(), selTypes = new Set();
+
+// 패널 빌드
+function buildYearPanel() {
+  const panel = document.getElementById('panelYear');
+  YEARS.forEach(y => {
+    const lbl = document.createElement('label');
+    lbl.className = 'cb-item';
+    lbl.innerHTML = '<input type="checkbox" value="' + y + '" onchange="onYearChange(this)"><span style="font-size:13px">' + y + '년</span>';
+    panel.appendChild(lbl);
+  });
+}
+function buildMonthPanel() {
+  const panel = document.getElementById('panelMonth');
+  MONTHS.forEach(function(m) {
+    const lbl = document.createElement('label');
+    lbl.className = 'cb-item';
+    lbl.innerHTML = '<input type="checkbox" value="' + m + '" onchange="onMonthChange(this)"><span style="font-size:13px">' + m + '</span>';
+    panel.appendChild(lbl);
+  });
+}
+buildYearPanel();
+buildMonthPanel();
+
+function togglePanel(id) {
+  ['ddYear','ddMonth','ddType'].forEach(function(d) {
+    if (d !== id) document.getElementById(d).querySelector('.filter-panel').classList.remove('open');
+  });
+  document.getElementById(id).querySelector('.filter-panel').classList.toggle('open');
+}
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.filter-dropdown'))
+    document.querySelectorAll('.filter-panel').forEach(function(p) { p.classList.remove('open'); });
+});
+
+function onYearChange(cb) {
+  if (cb.value === '') { selYears.clear(); document.querySelectorAll('#panelYear input[type=checkbox]').forEach(function(c){if(c.value)c.checked=false;}); }
+  else { if(cb.checked) selYears.add(cb.value); else selYears.delete(cb.value); document.querySelector('#panelYear input[value=""]').checked=false; }
+  updateFilterBtn('btnYear','lblYear',selYears,'연도'); render();
+}
+function onMonthChange(cb) {
+  if (cb.value === '') { selMonths.clear(); document.querySelectorAll('#panelMonth input[type=checkbox]').forEach(function(c){if(c.value)c.checked=false;}); }
+  else { if(cb.checked) selMonths.add(cb.value); else selMonths.delete(cb.value); document.querySelector('#panelMonth input[value=""]').checked=false; }
+  updateFilterBtn('btnMonth','lblMonth',selMonths,'월'); render();
+}
+function onTypeChange(cb) {
+  if (cb.value === '') { selTypes.clear(); document.querySelectorAll('#panelType input[type=checkbox]').forEach(function(c){if(c.value)c.checked=false;}); }
+  else { if(cb.checked) selTypes.add(cb.value); else selTypes.delete(cb.value); document.querySelector('#panelType input[value=""]').checked=false; }
+  updateFilterBtn('btnType','lblType',selTypes,'구분'); render();
+}
+function updateFilterBtn(btnId, lblId, set, defaultLabel) {
+  const btn = document.getElementById(btnId), lbl = document.getElementById(lblId);
+  if (set.size === 0) { lbl.textContent = defaultLabel; btn.classList.remove('has-selection'); }
+  else { lbl.textContent = Array.from(set).join(', '); btn.classList.add('has-selection'); }
+}
+
+function setSyncStatus(state, text) {
+  document.getElementById('syncDot').className = 'sync-dot ' + state;
+  document.getElementById('syncText').textContent = text;
+}
+function showToast(msg, type) {
+  type = type || 'ok';
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast ' + type + ' show';
+  setTimeout(function(){ t.className = 'toast'; }, 2500);
+}
+
+function apiCall(params) {
+  const url = new URL(API_URL);
+  url.searchParams.set('action', params.action || '');
+  const body = JSON.stringify(params);
+  return fetch(url.toString(), {
+    method: 'POST',
+    body: body,
+    headers: {'Content-Type': 'text/plain'},
+    mode: 'cors'
+  }).then(function(r){ return r.text(); }).then(function(t){
+    try { return JSON.parse(t); } catch(e) { throw new Error('응답 파싱 실패: ' + t.slice(0,100)); }
+  });
+}
+
+function uploadImageToServer(base64, fileName) {
+  const url = new URL(API_URL);
+  url.searchParams.set('action', 'uploadImage');
+  return fetch(url.toString(), {
+    method: 'POST',
+    body: JSON.stringify({action:'uploadImage', base64:base64, fileName:fileName}),
+    headers: {'Content-Type': 'text/plain'},
+    mode: 'cors'
+  }).then(function(r){ return r.text(); }).then(function(t){
+    try { return JSON.parse(t); } catch(e) { throw new Error('응답 파싱 실패: ' + t.slice(0,100)); }
+  });
+}
+
+function apiCall(params) {
+  const url = new URL(API_URL);
+  url.searchParams.set('action', params.action || '');
+  return fetch(url.toString(), {
+    method: 'POST',
+    body: JSON.stringify(params),
+    headers: {'Content-Type': 'text/plain'},
+    mode: 'cors'
+  }).then(function(r){ return r.text(); }).then(function(t){
+    try { return JSON.parse(t); } catch(e) { throw new Error('응답 파싱 실패: ' + t.slice(0,100)); }
+  });
+}
+
+function uploadImageToServer(base64, fileName) {
+  const url = new URL(API_URL);
+  url.searchParams.set('action', 'uploadImage');
+  return fetch(url.toString(), {
+    method: 'POST',
+    body: JSON.stringify({action:'uploadImage', base64:base64, fileName:fileName}),
+    headers: {'Content-Type': 'text/plain'},
+    mode: 'cors'
+  }).then(function(r){ return r.text(); }).then(function(t){
+    try { return JSON.parse(t); } catch(e) { throw new Error('응답 파싱 실패: ' + t.slice(0,100)); }
+  });
+}
+
+function fixImgUrl(url) {
+  if (!url) return '';
+  // uc?export=view&id=XXX → thumbnail 방식으로 변환
+  const m = url.match(/id=([a-zA-Z0-9_-]+)/);
+  if (m) return 'https://lh3.googleusercontent.com/d/' + m[1];
+  return url;
+}
+
+function loadData() {
+  setSyncStatus('loading', '불러오는 중...');
+  apiCall({action: 'getAll'}).then(function(data) {
+    if (data.error) throw new Error(data.error);
+    rows = data.rows.map(function(r) {
+      var obj = {};
+      Object.keys(r).forEach(function(k){ obj[k] = r[k] === null || r[k] === undefined ? '' : String(r[k]); });
+      if (obj.imgData) obj.imgData = fixImgUrl(obj.imgData);
+      return obj;
+    });
+    rows.forEach(function(r){ if(r.imgData) imgMap[r.id] = r.imgData; });
+    setSyncStatus('ok', '구글 시트 연동됨');
+    render();
+    showToast('데이터를 불러왔습니다');
+  }).catch(function(e) {
+    setSyncStatus('err', '연결 실패');
+    showToast('불러오기 실패: ' + e.message, 'err');
+    render();
+  });
+}
+
+function mkRow() {
+  return {id:'local_'+Date.now(), year:String(CUR_YEAR), month:'', ip:'', type:'신제품', name:'', sku:'', price:'', cost:'', order:'', vol:'', remark:DEFAULT_REMARK, imgData:'', isNew:true};
+}
+function addRow() { rows.unshift(mkRow()); render(); }
+
+function saveRow(id) {
+  const r = rows.find(function(r){ return r.id === id; });
+  if (!r) return;
+  const btn = document.querySelector('[data-saveid="' + id + '"]');
+  if (btn) { btn.textContent = '저장 중...'; btn.className = 'save-btn saving'; btn.disabled = true; }
+  const payload = Object.assign({}, r, {imgData: r.imgData || ''});
+  let p;
+  if (r.isNew) {
+    p = apiCall({action:'addRow', row:payload}).then(function(res) {
+      if (res.error) throw new Error(res.error);
+      if (imgMap[id]) { imgMap[res.id] = imgMap[id]; delete imgMap[id]; }
+      r.id = res.id; r.isNew = false;
+    });
+  } else {
+    p = apiCall({action:'updateRow', row:payload}).then(function(res) {
+      if (res.error) throw new Error(res.error);
+    });
+  }
+  p.then(function() {
+    showToast('저장됐습니다');
+    setTimeout(function(){ render(); }, 500);
+  }).catch(function(e) {
+    showToast('저장 실패: ' + e.message, 'err');
+    if (btn) { btn.textContent = '저장'; btn.className = 'save-btn'; btn.disabled = false; }
+  });
+}
+
+function delRow(id) {
+  const r = rows.find(function(r){ return r.id === id; });
+  if (!r) return;
+  if (r.isNew) {
+    rows = rows.filter(function(r){ return r.id !== id; });
+    delete imgMap[id]; render(); return;
+  }
+  apiCall({action:'deleteRow', id:id}).then(function(res) {
+    if (res.error) throw new Error(res.error);
+    rows = rows.filter(function(r){ return r.id !== id; });
+    delete imgMap[id]; render();
+    showToast('삭제됐습니다');
+  }).catch(function(e){ showToast('삭제 실패: ' + e.message, 'err'); });
+}
+
+function setVal(id, field, val) {
+  const r = rows.find(function(r){ return r.id === id; });
+  if (r) r[field] = val;
+  updateStats();
+}
+
+function filteredRows() {
+  const fi = (document.getElementById('filterIP').value || '').toLowerCase();
+  return rows.filter(function(r) {
+    if (selYears.size > 0 && !selYears.has(r.year)) return false;
+    if (selMonths.size > 0 && !selMonths.has(r.month)) return false;
+    if (selTypes.size > 0 && !selTypes.has(r.type)) return false;
+    if (fi && !(r.ip || '').toLowerCase().includes(fi)) return false;
+    return true;
+  });
+}
+
+function parseVol(v) {
+  if (!v) return 0;
+  const s = String(v).replace(/,/g,'');
+  if (s.includes('억')) { const m = s.match(/([\d.]+)억/); return m ? parseFloat(m[1])*1e8 : 0; }
+  if (s.includes('만')) { const m = s.match(/([\d.]+)만/); return m ? parseFloat(m[1])*1e4 : 0; }
+  return parseFloat(s.replace(/[^0-9.]/g,'')) || 0;
+}
+function fmtVol(n) {
+  if (!n) return '-';
+  if (n >= 1e8) return (n/1e8).toFixed(1) + '억원';
+  if (n >= 1e4) return Math.round(n/1e4).toLocaleString() + '만원';
+  return n.toLocaleString() + '원';
+}
+function handleCommaInput(id, field, el) {
+  const raw = el.value.replace(/,/g,'').replace(/[^0-9]/g,'');
+  const fmt = raw ? parseInt(raw, 10).toLocaleString() : '';
+  el.value = fmt; setVal(id, field, fmt);
+}
+
+function buildIpVolMap(subset) {
+  const m = {};
+  subset.forEach(function(r){ const k = (r.ip||'').trim() || '(미입력)'; m[k] = (m[k]||0) + parseVol(r.vol); });
+  return Object.entries(m).filter(function(e){ return e[1]>0; }).sort(function(a,b){ return b[1]-a[1]; });
+}
+
+function updateStats() {
+  const fr = filteredRows();
+  const groups = [
+    {key:'total', label:'전체 항목', rows:fr},
+    {key:'new', label:'신제품', rows:fr.filter(function(r){return r.type==='신제품';})},
+    {key:'reorder', label:'재발주', rows:fr.filter(function(r){return r.type==='재발주';})},
+    {key:'drop', label:'드랍', rows:fr.filter(function(r){return r.type==='드랍';})},
+  ];
+  document.getElementById('stats').innerHTML = groups.map(function(g) {
+    const grand = g.rows.reduce(function(s,r){ return s+parseVol(r.vol); }, 0);
+    const ipList = buildIpVolMap(g.rows);
+    const ipHtml = ipList.length ? ipList.slice(0,4).map(function(e){
+      return '<div class="sc-ip-row"><span class="sc-ip-name">'+esc(e[0])+'</span><span class="sc-ip-vol">'+fmtVol(e[1])+'</span></div>';
+    }).join('') : '<span class="sc-no-vol">매출볼륨 없음</span>';
+    return '<div class="stat-card '+g.key+'"><div class="sc-top"><span class="sc-label">'+g.label+'</span><span class="sc-count">'+g.rows.length+'</span></div><hr class="sc-divider"><div class="sc-vol-label">총 매출볼륨</div><div class="sc-vol-val">'+(grand>0?fmtVol(grand):'-')+'</div><div class="sc-vol-label" style="margin-top:4px">IP별 매출볼륨</div><div class="sc-ip-list">'+ipHtml+'</div></div>';
+  }).join('');
+}
+
+function render() {
+  updateStats();
+  const fr = filteredRows();
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML = '';
+  if (!fr.length) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = '<td colspan="12" style="text-align:center;padding:32px;color:var(--color-text-tertiary);font-size:14px">데이터가 없습니다. 행을 추가하거나 필터를 변경해 주세요.</td>';
+    tbody.appendChild(tr); return;
+  }
+  fr.forEach(function(r) {
+    const imgSrc = imgMap[r.id] || r.imgData || '';
+    const tr = document.createElement('tr');
+    const yearOpts = YEARS.map(function(y){ return '<option value="'+y+'"'+(r.year==y?' selected':'')+'>'+y+'년</option>'; }).join('');
+    const monthOpts = '<option value="">-</option>' + MONTHS.map(function(m){ return '<option'+(r.month===m?' selected':'')+'>'+m+'</option>'; }).join('');
+    const typeOpts = TYPES.map(function(t){ return '<option'+(r.type===t?' selected':'')+'>'+t+'</option>'; }).join('');
+    const imgHtml = imgSrc
+      ? '<img src="'+imgSrc+'" alt="제품이미지"><button class="img-expand-btn" onclick="event.stopPropagation();openModal(\''+r.id+'\')">확대 🔍</button>'
+      : '<span class="plus">+</span>';
+
+    tr.innerHTML =
+      '<td><div class="date-wrap">'+
+        '<select onchange="setVal(\''+r.id+'\',\'year\',this.value)" style="flex:1.3">'+yearOpts+'</select>'+
+        '<select onchange="setVal(\''+r.id+'\',\'month\',this.value)" style="flex:1">'+monthOpts+'</select>'+
+      '</div></td>'+
+      '<td><input type="text" value="'+esc(r.ip)+'" placeholder="IP명" oninput="setVal(\''+r.id+'\',\'ip\',this.value)"></td>'+
+      '<td>'+
+        '<select onchange="setVal(\''+r.id+'\',\'type\',this.value)">'+typeOpts+'</select>'+
+        '<span class="badge '+BADGE[r.type]+'">'+r.type+'</span>'+
+      '</td>'+
+      '<td>'+
+        '<div class="img-cell" id="imgcell-'+r.id+'">'+
+          imgHtml+
+          '<input type="file" accept="image/*" style="display:none;position:absolute" id="file-'+r.id+'" onchange="handleImg(\''+r.id+'\',this)">'+
+        '</div>'+
+      '</td>'+
+      '<td><input type="text" value="'+esc(r.name)+'" placeholder="제품명" oninput="setVal(\''+r.id+'\',\'name\',this.value)"></td>'+
+      '<td><input type="text" value="'+esc(r.sku)+'" placeholder="0" oninput="handleCommaInput(\''+r.id+'\',\'sku\',this)" style="text-align:right"></td>'+
+      '<td><input type="text" value="'+esc(r.price)+'" placeholder="1,000~1,500" oninput="setVal(\''+r.id+'\',\'price\',this.value)"></td>'+
+      '<td><div class="cost-wrap"><input class="cost-input" type="text" value="'+esc(r.cost)+'" placeholder="45" oninput="setVal(\''+r.id+'\',\'cost\',this.value)"><span class="cost-unit">%</span></div></td>'+
+      '<td><input type="text" value="'+esc(r.order)+'" placeholder="0" oninput="handleCommaInput(\''+r.id+'\',\'order\',this)" style="text-align:right"></td>'+
+      '<td><input type="text" value="'+esc(r.vol)+'" placeholder="0" oninput="handleCommaInput(\''+r.id+'\',\'vol\',this)" style="text-align:right"></td>'+
+      '<td><textarea oninput="setVal(\''+r.id+'\',\'remark\',this.value)">'+esc(r.remark)+'</textarea></td>'+
+      '<td><div class="action-btns">'+
+        '<button class="save-btn" data-saveid="'+r.id+'" onclick="saveRow(\''+r.id+'\')">저장</button>'+
+        '<button class="del-btn" onclick="delRow(\''+r.id+'\')">× 삭제</button>'+
+      '</div></td>';
+
+    // 이미지 클릭
+    tr.querySelector('.img-cell').addEventListener('click', function(e) {
+      if (e.target.tagName === 'BUTTON') return;
+      document.getElementById('file-' + r.id).click();
+    });
+    tbody.appendChild(tr);
+  });
+}
+
+function handleImg(id, inp) {
+  const f = inp.files[0]; if (!f) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const base64 = e.target.result;
+    // 미리보기 먼저
+    imgMap[id] = base64; render();
+    // 업로딩 표시
+    const cell = document.getElementById('imgcell-' + id);
+    if (cell) {
+      const ov = document.createElement('div');
+      ov.className = 'img-uploading'; ov.textContent = '업로드 중...';
+      cell.appendChild(ov);
+    }
+    showToast('이미지 업로드 중...');
+    uploadImageToServer(base64, f.name).then(function(res) {
+      if (res.error) throw new Error(res.error);
+      imgMap[id] = res.url;
+      const r = rows.find(function(r){ return r.id === id; });
+      if (r) r.imgData = res.url;
+      render();
+      showToast('이미지 업로드 완료!');
+    }).catch(function(e) {
+      showToast('이미지 업로드 실패: ' + e.message, 'err');
+    });
+  };
+  reader.readAsDataURL(f);
+}
+
+function openModal(id) {
+  const src = imgMap[id] || (rows.find(function(r){return r.id===id;})||{}).imgData || '';
+  if (!src) return;
+  document.getElementById('modalImg').src = src;
+  document.getElementById('modalOverlay').className = 'modal-overlay show';
+}
+function closeModal() { document.getElementById('modalOverlay').className = 'modal-overlay'; }
+document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeModal(); });
+
+function esc(v) {
+  if (v === null || v === undefined) return '';
+  return String(v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/'/g,'&#39;');
+}
+
+function exportCSV() {
+  const hdr = ['출시연도','출시월','IP','구분','제품명','SKU','판매가','원가율(%)','발주수량','매출볼륨','REMARK'];
+  const csvRows = [hdr.join(',')].concat(rows.map(function(r){
+    return [r.year,r.month,r.ip,r.type,r.name,r.sku,r.price,r.cost,r.order,r.vol,r.remark].map(function(v){ return '"'+(v||'').replace(/"/g,'""')+'"'; }).join(',');
+  }));
+  const blob = new Blob(['\uFEFF'+csvRows.join('\n')], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = '상품현황_'+new Date().toISOString().slice(0,10)+'.csv'; a.click();
+}
+
+loadData();
+</script>
+</body>
+</html>
