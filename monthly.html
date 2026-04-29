@@ -37,7 +37,7 @@
   section { width: 100%; height: 100vh; position: relative; overflow: hidden; }
 
   /* 슬라이드 1: HERO */
-  #slide1 { background: var(--black); display: flex; align-items: flex-end; padding-bottom: 28vh; }
+  #slide1 { background: var(--black); display: flex; align-items: flex-end; padding-bottom: 32vh; }
   .hero-bg { position: absolute; inset: 0; background-size: cover; background-position: center; background-repeat: no-repeat; opacity: 0.55; transition: opacity 0.5s ease; }
   .hero-bg.loading { background: var(--gray-dark); }
   .bg-config-btn { position: absolute; bottom: 24px; right: 32px; z-index: 10; background: rgba(62,207,207,0.12); border: 1px solid rgba(62,207,207,0.4); color: var(--mint); border-radius: 8px; padding: 8px 16px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; backdrop-filter: blur(8px); font-family: 'Space Grotesk', sans-serif; letter-spacing: 0.08em; }
@@ -69,7 +69,7 @@
   .agenda-body { display: flex; flex-direction: column; justify-content: space-between; width: 72%; height: calc(100vh - 90px); padding: 64px 0 60px 72px; position: relative; z-index: 1; }
 
   /* 대제목 영역 */
-  .agenda-title-area { padding-top: 0; margin-bottom: 24px; }
+  .agenda-title-area { padding-top: 0; margin-bottom: 12px; }
   .agenda-main-title { font-family: 'Space Grotesk', sans-serif; font-size: clamp(48px, 7vw, 96px); font-weight: 900; color: #fff; letter-spacing: -0.02em; line-height: 1.05; cursor: pointer; display: block; transition: opacity 0.2s; }
   .agenda-main-title:hover { opacity: 0.7; }
   .agenda-sub-title { font-size: 18px; color: var(--mint); margin-top: 16px; letter-spacing: 0.04em; cursor: pointer; display: block; transition: opacity 0.2s; opacity: 0.9; font-weight: 500; }
@@ -79,8 +79,8 @@
   .agenda-grid { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr); gap: 10px; padding-right: 20px; }
   .agenda-card { 
     position: relative; 
-    background: #f5f8e8;
-    border: 1.5px solid #d4e84a;
+    background: #c8cac8;
+    border: 1.5px solid #b0b2b0;
     border-radius: 10px;
     padding: 24px 26px; 
     cursor: pointer; 
@@ -93,9 +93,9 @@
     max-height: 340px;
   }
 
-  .agenda-card:hover { background: #eef8a0; border-color: #c8e832; transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,0.18); }
-  .agenda-card.has-link { background: #edfab0; border-color: #b8d016; }
-  .agenda-card.has-link:hover { background: #e4f880; border-color: #a8c010; }
+  .agenda-card:hover { background: #d4d6d4; border-color: #b8bab8; transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,0.18); }
+  .agenda-card.has-link { background: #ffffff; border-color: #e0e0e0; }
+  .agenda-card.has-link:hover { background: #f4fca0; border-color: #c8e832; transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,0.18); }
   .card-number { font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 900; color: #c8e832; line-height: 1; text-shadow: 0 1px 0 rgba(0,0,0,0.15); }
   .card-label { font-size: 38px; font-weight: 900; color: #0e1200; text-transform: uppercase; margin-top: 6px; letter-spacing: -0.01em; }
   .card-desc { font-size: 14px; color: #3a4a10; margin-top: 8px; line-height: 1.4; font-weight: 500; }
@@ -154,9 +154,10 @@
       <button class="bg-config-btn" onclick="document.getElementById('bgModal').classList.add('open')">⚙ 배경 이미지 변경</button>
       <a href="https://jangharain-tech.github.io/2026_MD/LFSQ_MD_2026_Plan_with_images.html" target="_blank" style="position:absolute;top:70px;left:96px;z-index:10;padding:10px 18px;background:rgba(120,120,120,0.6);border:1px solid rgba(255,255,255,0.15);border-radius:8px;text-decoration:none;backdrop-filter:blur(12px);transition:all 0.2s;cursor:pointer;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;color:#fff;letter-spacing:0.08em;white-space:nowrap;" onmouseover="this.style.background='rgba(150,150,150,0.7)'" onmouseout="this.style.background='rgba(120,120,120,0.6)'">(참고) MD 2026 PLAN</a>
       <div class="hero-content">
-        <div class="hero-eyebrow">LINEFRIENDS SQUARE</div>
+        <div class="hero-eyebrow" style="margin-bottom:12px;">LINEFRIENDS SQUARE</div>
         <h1 class="hero-title">LFSQ MD<span>Monthly Meet</span></h1>
-        <div id="heroDate" onclick="editHeroDate()" title="클릭하여 수정" style="margin-top:30px; background:var(--mint); color:#000; display:inline-block; padding:10px 28px; border-radius:100px; font-weight:800; font-size:22px; font-family:'Space Grotesk',sans-serif; letter-spacing:0.08em; cursor:pointer; transition:opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">2026 · 04</div>
+        <div style="width:220px; height:1px; background:rgba(255,255,255,0.4); margin:20px 0;"></div>
+        <div id="heroDate" onclick="editHeroDate()" title="클릭하여 수정" style="margin-top:0; background:var(--mint); color:#000; display:inline-block; padding:10px 28px; border-radius:100px; font-weight:800; font-size:22px; font-family:'Space Grotesk',sans-serif; letter-spacing:0.08em; cursor:pointer; transition:opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">2026 · 04</div>
       </div>
     </section>
 
@@ -173,7 +174,7 @@
           <div class="agenda-sub-title" id="subTitle" onclick="editSubTitle()" title="클릭하여 수정">전략IP 누가사 &amp; OWN Brand 리빈느</div>
         </div>
 
-        <div style="margin-bottom:8px; margin-left:2px;">
+        <div style="margin-bottom:4px; margin-left:2px;">
           <span style="font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;letter-spacing:0.08em;color:#ffffff;">📋 각 사업 / 파트별 아젠다</span>
         </div>
         <div class="agenda-grid">
@@ -204,7 +205,7 @@
             <div class="card-number">04</div>
             <div><div class="card-label">Review</div><div class="card-desc">IP & 제품별 상세 리뷰</div></div>
         </div>
-        <div class="agenda-card" id="card-ownip" onclick="handleCardClick('ownip')" style="background-color:#f5f8e8; background-image:url('https://lh3.googleusercontent.com/d/11_TpOv5oVJjqSvSxQWWhUluulR9O22ql'); background-size:35%; background-position:85% bottom; background-repeat:no-repeat; overflow:hidden;">
+        <div class="agenda-card" id="card-ownip" onclick="handleCardClick('ownip')" style="background-color:#c8cac8; background-image:url('https://lh3.googleusercontent.com/d/11_TpOv5oVJjqSvSxQWWhUluulR9O22ql'); background-size:35%; background-position:85% bottom; background-repeat:no-repeat; overflow:hidden;">
             <div class="config-toggle" onclick="toggleConfig(event,'ownip')">⚙</div>
             <div class="config-panel" id="config-ownip"><label>URL 설정</label><input type="url" id="url-ownip" placeholder="https://..."><button onclick="saveLink(event,'ownip')">저장</button></div>
             <div class="card-number">05</div>
