@@ -78,16 +78,9 @@
     flex-direction: column; 
     justify-content: space-between; 
     transition: all 0.25s;
-    /* 테두리 대신 outline 사용 준비 */
-    outline: 2px solid transparent;
-    outline-offset: -2px; /* 안쪽으로 살짝 들여서 겹침 방지 */
   }
 
-  /* 링크가 저장되었을 때의 스타일 클래스 추가 */
-  .agenda-card.has-link {
-    outline-color: var(--mint);
-    z-index: 5; /* 테두리가 있는 카드를 위로 올려서 선이 명확하게 보이게 함 */
-  }
+
   .agenda-card:hover { background: #252a2f; }
   .card-number { font-family: 'Space Grotesk', sans-serif; font-size: 50px; font-weight: 800; color: rgba(62,207,207,0.2); }
   .card-label { font-size: 32px; font-weight: 800; color: #f0f4f4; text-transform: uppercase; }
@@ -119,26 +112,26 @@
   <div class="dot" onclick="goTo(1)"></div>
 </div>
 
+<!-- 배경 설정 모달 -->
+<div class="bg-modal-overlay" id="bgModal" onclick="closeBgModal(event)">
+  <div class="bg-modal">
+    <h3>🖼 배경 이미지 설정</h3>
+    <p>구글 드라이브에 이미지를 올린 후, 공유 링크에서 파일 ID를 복사하세요.</p>
+    <div class="hint">
+      <span style="color:#aaa;font-size:11px;">드라이브 공유 링크 예시:</span>
+      <code>https://drive.google.com/file/d/<span style="color:#fff;background:rgba(62,207,207,0.2);padding:0 4px;border-radius:3px;">여기가 파일 ID</span>/view</code>
+    </div>
+    <div class="preview-box" id="previewBox">미리보기</div>
+    <input type="text" id="bgFileId" placeholder="파일 ID를 붙여넣으세요 (예: 1aBcDeFgHiJk...)" oninput="previewBg(this.value)" />
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeBgModal()">취소</button>
+      <button class="btn-save" onclick="saveBgImage()">저장</button>
+    </div>
+  </div>
+</div>
+
 <div class="slides-wrap">
   <div class="slides-inner" id="slidesInner">
-
-    <!-- 배경 설정 모달 -->
-    <div class="bg-modal-overlay" id="bgModal" onclick="closeBgModal(event)">
-      <div class="bg-modal">
-        <h3>🖼 배경 이미지 설정</h3>
-        <p>구글 드라이브에 이미지를 올린 후, 공유 링크에서 파일 ID를 복사하세요.</p>
-        <div class="hint">
-          <span style="color:#aaa;font-size:11px;">드라이브 공유 링크 예시:</span>
-          <code>https://drive.google.com/file/d/<span style="color:#fff;background:rgba(62,207,207,0.2);padding:0 4px;border-radius:3px;">여기가 파일 ID</span>/view</code>
-        </div>
-        <div class="preview-box" id="previewBox">미리보기</div>
-        <input type="text" id="bgFileId" placeholder="파일 ID를 붙여넣으세요 (예: 1aBcDeFgHiJk...)" oninput="previewBg(this.value)" />
-        <div class="modal-actions">
-          <button class="btn-cancel" onclick="closeBgModal()">취소</button>
-          <button class="btn-save" onclick="saveBgImage()">저장</button>
-        </div>
-      </div>
-    </div>
 
     <section id="slide1">
       <div class="hero-bg" id="heroBg"></div>
@@ -270,8 +263,7 @@
       // 카드 링크 적용
       Object.keys(links).forEach(id => {
         if(id !== 'hero_bg' && links[id]) {
-          const card = document.getElementById('card-' + id);
-          if (card) card.classList.add('has-link');
+          // 링크 로드만, 테두리 표시 없음
         }
       });
     } catch(e) {
@@ -345,7 +337,6 @@
         body: JSON.stringify({ id: id, url: finalUrl })
       });
       links[id] = finalUrl;
-      document.getElementById('card-' + id).style.borderColor = finalUrl ? 'var(--mint)' : 'transparent';
       alert("서버에 저장되었습니다.");
     } catch(e) { alert("저장 실패"); }
     btn.innerText = "저장";
