@@ -38,7 +38,23 @@
 
   /* 슬라이드 1: HERO */
   #slide1 { background: var(--black); display: flex; align-items: center; }
-  .hero-bg { position: absolute; inset: 0; background: url('https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=2069') center/cover; opacity: 0.55; }
+  .hero-bg { position: absolute; inset: 0; background-size: cover; background-position: center; background-repeat: no-repeat; opacity: 0.55; transition: opacity 0.5s ease; }
+  .hero-bg.loading { background: var(--gray-dark); }
+  .bg-config-btn { position: absolute; bottom: 24px; right: 32px; z-index: 10; background: rgba(62,207,207,0.12); border: 1px solid rgba(62,207,207,0.4); color: var(--mint); border-radius: 8px; padding: 8px 16px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; backdrop-filter: blur(8px); font-family: 'Space Grotesk', sans-serif; letter-spacing: 0.08em; }
+  .bg-config-btn:hover { background: rgba(62,207,207,0.25); }
+  .bg-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+  .bg-modal-overlay.open { display: flex; }
+  .bg-modal { background: #1a1c1f; border: 1px solid rgba(62,207,207,0.3); border-radius: 16px; padding: 32px; width: 480px; max-width: 90vw; }
+  .bg-modal h3 { font-family: 'Space Grotesk', sans-serif; color: var(--mint); margin-bottom: 6px; font-size: 16px; letter-spacing: 0.1em; }
+  .bg-modal p { color: var(--text-muted); font-size: 12px; margin-bottom: 20px; line-height: 1.6; }
+  .bg-modal input { width: 100%; padding: 10px 14px; background: #0d0e10; border: 1px solid #3a3d42; color: #fff; border-radius: 8px; font-size: 13px; margin-bottom: 10px; outline: none; }
+  .bg-modal input:focus { border-color: var(--mint); }
+  .bg-modal .modal-actions { display: flex; gap: 10px; margin-top: 6px; }
+  .bg-modal .btn-save { flex: 1; padding: 10px; background: var(--mint); border: none; border-radius: 8px; font-weight: 700; color: #000; cursor: pointer; font-size: 13px; }
+  .bg-modal .btn-cancel { padding: 10px 20px; background: transparent; border: 1px solid #3a3d42; border-radius: 8px; color: var(--text-muted); cursor: pointer; font-size: 13px; }
+  .bg-modal .preview-box { width: 100%; height: 100px; border-radius: 8px; background: #0d0e10; border: 1px solid #2a2d30; margin-bottom: 12px; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; color: #444; font-size: 12px; transition: 0.4s; }
+  .bg-modal .hint { background: rgba(62,207,207,0.06); border: 1px solid rgba(62,207,207,0.15); border-radius: 8px; padding: 12px; margin-bottom: 16px; }
+  .bg-modal .hint code { color: var(--mint); font-size: 11px; display: block; margin-top: 4px; word-break: break-all; }
   .hero-overlay { position: absolute; inset: 0; background: linear-gradient(135deg, rgba(17,18,20,0.92) 0%, rgba(17,18,20,0.65) 50%, rgba(62,207,207,0.08) 100%); }
   .hero-content { position: relative; z-index: 2; padding: 0 64px; max-width: 900px; animation: fadeUp 0.9s ease both; }
   .hero-title { font-family: 'Space Grotesk', sans-serif; font-size: clamp(52px, 8vw, 100px); line-height: 0.95; font-weight: 700; }
@@ -106,9 +122,28 @@
 <div class="slides-wrap">
   <div class="slides-inner" id="slidesInner">
 
+    <!-- 배경 설정 모달 -->
+    <div class="bg-modal-overlay" id="bgModal" onclick="closeBgModal(event)">
+      <div class="bg-modal">
+        <h3>🖼 배경 이미지 설정</h3>
+        <p>구글 드라이브에 이미지를 올린 후, 공유 링크에서 파일 ID를 복사하세요.</p>
+        <div class="hint">
+          <span style="color:#aaa;font-size:11px;">드라이브 공유 링크 예시:</span>
+          <code>https://drive.google.com/file/d/<span style="color:#fff;background:rgba(62,207,207,0.2);padding:0 4px;border-radius:3px;">여기가 파일 ID</span>/view</code>
+        </div>
+        <div class="preview-box" id="previewBox">미리보기</div>
+        <input type="text" id="bgFileId" placeholder="파일 ID를 붙여넣으세요 (예: 1aBcDeFgHiJk...)" oninput="previewBg(this.value)" />
+        <div class="modal-actions">
+          <button class="btn-cancel" onclick="closeBgModal()">취소</button>
+          <button class="btn-save" onclick="saveBgImage()">저장</button>
+        </div>
+      </div>
+    </div>
+
     <section id="slide1">
-      <div class="hero-bg"></div>
+      <div class="hero-bg" id="heroBg"></div>
       <div class="hero-overlay"></div>
+      <button class="bg-config-btn" onclick="document.getElementById('bgModal').classList.add('open')">⚙ 배경 이미지 변경</button>
       <div class="hero-content">
         <div class="hero-eyebrow">LINEFRIENDS SQUARE</div>
         <h1 class="hero-title">LFSQ MD<span>Monthly Meet</span></h1>
@@ -138,13 +173,13 @@
             <div class="config-toggle" onclick="toggleConfig(event,'buying')">⚙</div>
             <div class="config-panel" id="config-buying"><label>URL 설정</label><input type="url" id="url-buying" placeholder="https://..."><button onclick="saveLink(event,'buying')">저장</button></div>
             <div class="card-number">03</div>
-            <div><div class="card-label">Buying</div><div class="card-desc">바잉 현황 공유 및 협의</div></div>
+            <div><div class="card-label">Buying</div><div class="card-desc">사입계획 및 현황</div></div>
         </div>
         <div class="agenda-card" id="card-ip" onclick="handleCardClick('ip')">
             <div class="config-toggle" onclick="toggleConfig(event,'ip')">⚙</div>
             <div class="config-panel" id="config-ip"><label>URL 설정</label><input type="url" id="url-ip" placeholder="https://..."><button onclick="saveLink(event,'ip')">저장</button></div>
             <div class="card-number">04</div>
-            <div><div class="card-label">Multi IP</div><div class="card-desc">IP 관련 업데이트 및 협업 안건</div></div>
+            <div><div class="card-label">Multi IP</div><div class="card-desc">전략IP 전개 및 신규IP 현황</div></div>
         </div>
         <div class="agenda-card" id="card-brand" onclick="handleCardClick('brand')">
             <div class="config-toggle" onclick="toggleConfig(event,'brand')">⚙</div>
@@ -163,16 +198,87 @@
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbznbLeEtnPOfda5NQg465LpCldmedkM0c0oomgSrlnzfDA_oIr3mE69Hyd51NhLG4fd/exec";
   const links = {};
 
+  // 구글 드라이브 파일 ID → 직접 이미지 URL 변환
+  function driveImgUrl(fileId) {
+    return `https://lh3.googleusercontent.com/d/${fileId}`;
+  }
+
+  // 배경 적용
+  function applyBg(fileId) {
+    const el = document.getElementById('heroBg');
+    if (!fileId) {
+      // fallback: unsplash 기본 이미지
+      el.style.backgroundImage = "url('https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=2069')";
+      return;
+    }
+    const url = driveImgUrl(fileId);
+    el.style.opacity = '0';
+    const img = new Image();
+    img.onload = () => {
+      el.style.backgroundImage = `url('${url}')`;
+      el.style.opacity = '0.55';
+    };
+    img.onerror = () => {
+      // 로드 실패 시 fallback
+      el.style.backgroundImage = "url('https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=2069')";
+      el.style.opacity = '0.55';
+    };
+    img.src = url;
+  }
+
+  // 미리보기
+  function previewBg(fileId) {
+    const box = document.getElementById('previewBox');
+    if (!fileId.trim()) { box.style.backgroundImage = 'none'; box.textContent = '미리보기'; return; }
+    const url = driveImgUrl(fileId.trim());
+    box.style.backgroundImage = `url('${url}')`;
+    box.textContent = '';
+  }
+
+  // 모달 닫기
+  function closeBgModal(e) {
+    if (e && e.target !== document.getElementById('bgModal')) return;
+    document.getElementById('bgModal').classList.remove('open');
+  }
+
+  // 배경 저장
+  async function saveBgImage() {
+    const fileId = document.getElementById('bgFileId').value.trim();
+    const btn = document.querySelector('.btn-save');
+    btn.textContent = '저장중...';
+    try {
+      await fetch(SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify({ id: 'hero_bg', url: fileId })
+      });
+      links['hero_bg'] = fileId;
+      applyBg(fileId);
+      document.getElementById('bgModal').classList.remove('open');
+      document.getElementById('bgFileId').value = '';
+    } catch(e) { alert("저장 실패. 다시 시도해주세요."); }
+    btn.textContent = '저장';
+  }
+
   // 초기 로드: 시트에서 URL 가져오기
   async function loadData() {
     try {
       const res = await fetch(SCRIPT_URL);
       const data = await res.json();
       Object.assign(links, data);
+      // 배경 이미지 적용
+      applyBg(links['hero_bg'] || '');
+      // 카드 링크 적용
       Object.keys(links).forEach(id => {
-        if(links[id]) document.getElementById('card-' + id).style.borderColor = 'var(--mint)';
+        if(id !== 'hero_bg' && links[id]) {
+          const card = document.getElementById('card-' + id);
+          if (card) card.classList.add('has-link');
+        }
       });
-    } catch(e) { console.error("데이터 로딩 실패"); }
+    } catch(e) {
+      // 로드 실패시 기본 배경
+      applyBg('');
+      console.error("데이터 로딩 실패");
+    }
   }
   loadData();
 
