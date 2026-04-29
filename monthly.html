@@ -172,13 +172,19 @@
             <div class="config-toggle" onclick="toggleConfig(event,'ip')">⚙</div>
             <div class="config-panel" id="config-ip"><label>URL 설정</label><input type="url" id="url-ip" placeholder="https://..."><button onclick="saveLink(event,'ip')">저장</button></div>
             <div class="card-number">04</div>
-            <div><div class="card-label">Multi IP</div><div class="card-desc">전략IP 전개 및 신규IP 현황</div></div>
+            <div><div class="card-label">Multi IP</div><div class="card-desc">멀티IP 전개 현황</div></div>
+        </div>
+        <div class="agenda-card" id="card-ownip" onclick="handleCardClick('ownip')">
+            <div class="config-toggle" onclick="toggleConfig(event,'ownip')">⚙</div>
+            <div class="config-panel" id="config-ownip"><label>URL 설정</label><input type="url" id="url-ownip" placeholder="https://..."><button onclick="saveLink(event,'ownip')">저장</button></div>
+            <div class="card-number">05</div>
+            <div><div style="font-size:10px;color:var(--mint);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:4px;opacity:0.8;">OWN IP 전략</div><div class="card-label">LFSQ IP</div><div class="card-desc">전략IP 전개현황</div></div>
         </div>
         <div class="agenda-card" id="card-brand" onclick="handleCardClick('brand')">
             <div class="config-toggle" onclick="toggleConfig(event,'brand')">⚙</div>
             <div class="config-panel" id="config-brand"><label>URL 설정</label><input type="url" id="url-brand" placeholder="https://..."><button onclick="saveLink(event,'brand')">저장</button></div>
-            <div class="card-number">05</div>
-            <div><div class="card-label">Brand</div><div class="card-desc">브랜드 현황 및 주요 이슈</div></div>
+            <div class="card-number">06</div>
+            <div><div style="font-size:10px;color:var(--mint);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:4px;opacity:0.8;">PRIVATE BRAND</div><div class="card-label">Brand</div><div class="card-desc">브랜드 현황 및 주요 이슈</div></div>
         </div>
       </div>
     </section>
