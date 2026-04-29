@@ -61,32 +61,31 @@
   .hero-title span { color: var(--mint); display: block; }
 
   /* 슬라이드 2: AGENDA */
-  #slide2 { background: #0e0f11; display: flex; flex-direction: column; padding: 0; }
-  .agenda-header { display: flex; align-items: flex-end; justify-content: space-between; padding: 14px 36px; border-bottom: 1px solid #252628; margin-top: 50px; }
+  #slide2 { background: #13151a; display: flex; flex-direction: column; padding: 0; }
+  .agenda-header { display: flex; align-items: flex-end; justify-content: space-between; padding: 14px 36px; border-bottom: 1px solid rgba(255,255,255,0.07); margin-top: 50px; }
   .agenda-supertitle { font-family: 'Space Grotesk', sans-serif; color: var(--mint); font-weight: 700; letter-spacing: 0.22em; }
   
-  .agenda-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr; flex: 1; }
+  .agenda-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr; flex: 1; padding: 0 24px 24px 24px; gap: 12px; }
   .agenda-card { 
     position: relative; 
-    background: #111315; 
-    /* 기존 border 대신 얇은 구분선만 유지 */
-    border-right: 1px solid #252628; 
-    border-bottom: 1px solid #252628; 
+    background: linear-gradient(145deg, #1e2228, #191d23);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px;
     padding: 30px; 
     cursor: pointer; 
     display: flex; 
     flex-direction: column; 
     justify-content: space-between; 
     transition: all 0.25s;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
   }
 
-
-  .agenda-card:hover { background: #252a2f; }
-  .agenda-card.has-link { background: #1a2224; }
-  .agenda-card.has-link:hover { background: #2a3538; }
-  .card-number { font-family: 'Space Grotesk', sans-serif; font-size: 50px; font-weight: 800; color: rgba(62,207,207,0.2); }
-  .card-label { font-size: 32px; font-weight: 800; color: #f0f4f4; text-transform: uppercase; }
-  .card-desc { font-size: 13px; color: #6a7280; margin-top: 10px; }
+  .agenda-card:hover { background: linear-gradient(145deg, #262c35, #1f242c); border-color: rgba(62,207,207,0.2); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+  .agenda-card.has-link { background: linear-gradient(145deg, #1c2830, #172028); border-color: rgba(62,207,207,0.15); }
+  .agenda-card.has-link:hover { background: linear-gradient(145deg, #243540, #1d2c38); border-color: rgba(62,207,207,0.35); }
+  .card-number { font-family: 'Space Grotesk', sans-serif; font-size: 50px; font-weight: 800; color: rgba(62,207,207,0.18); }
+  .card-label { font-size: 32px; font-weight: 800; color: #e8eff0; text-transform: uppercase; }
+  .card-desc { font-size: 13px; color: #7a8fa0; margin-top: 10px; }
 
   /* 설정 패널 */
   .config-toggle { position: absolute; top: 15px; right: 15px; background: rgba(62,207,207,0.1); border: 1px solid rgba(62,207,207,0.3); border-radius: 4px; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--mint); z-index: 10; opacity: 0.5; transition: 0.2s; }
@@ -139,6 +138,7 @@
       <div class="hero-bg" id="heroBg"></div>
       <div class="hero-overlay"></div>
       <button class="bg-config-btn" onclick="document.getElementById('bgModal').classList.add('open')">⚙ 배경 이미지 변경</button>
+      <a href="https://jangharain-tech.github.io/2026_MD/LFSQ_MD_2026_Plan_with_images.html" target="_blank" style="position:absolute;top:70px;right:32px;z-index:10;padding:12px 20px;background:#1a56db;border:none;border-radius:10px;text-decoration:none;backdrop-filter:blur(12px);transition:all 0.2s;cursor:pointer;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;color:#fff;letter-spacing:0.06em;white-space:nowrap;" onmouseover="this.style.background='#1e4fbe'" onmouseout="this.style.background='#1a56db'">MD팀 2026 PLAN</a>
       <div class="hero-content">
         <div class="hero-eyebrow">LINEFRIENDS SQUARE</div>
         <h1 class="hero-title">LFSQ MD<span>Monthly Meet</span></h1>
