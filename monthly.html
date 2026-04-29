@@ -79,8 +79,8 @@
   .agenda-grid { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr); gap: 10px; padding-right: 20px; }
   .agenda-card { 
     position: relative; 
-    background: linear-gradient(145deg, #c8ccc4, #bfc3bb);
-    border: 1px solid rgba(0,0,0,0.08);
+    background: #f5f8e8;
+    border: 1.5px solid #d4e84a;
     border-radius: 10px;
     padding: 24px 26px; 
     cursor: pointer; 
@@ -88,17 +88,17 @@
     flex-direction: column; 
     justify-content: space-between; 
     transition: all 0.25s;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 16px rgba(0,0,0,0.12);
     min-height: 260px;
     max-height: 300px;
   }
 
-  .agenda-card:hover { background: linear-gradient(145deg, #f0f4f0, #e8ede8); border-color: rgba(200,232,50,0.4); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
-  .agenda-card.has-link { background: linear-gradient(145deg, #f4fad8, #edf5c0); border-color: rgba(168,196,26,0.3); }
-  .agenda-card.has-link:hover { background: linear-gradient(145deg, #eef8b8, #e5f0a8); border-color: rgba(168,196,26,0.5); }
-  .card-number { font-family: 'Space Grotesk', sans-serif; font-size: 30px; font-weight: 800; color: #b8d016; line-height: 1; }
-  .card-label { font-size: 34px; font-weight: 800; color: #1a1f0a; text-transform: uppercase; margin-top: 6px; }
-  .card-desc { font-size: 15px; color: #6b7a50; margin-top: 8px; line-height: 1.4; }
+  .agenda-card:hover { background: #eef8a0; border-color: #c8e832; transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,0.18); }
+  .agenda-card.has-link { background: #edfab0; border-color: #b8d016; }
+  .agenda-card.has-link:hover { background: #e4f880; border-color: #a8c010; }
+  .card-number { font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 900; color: #c8e832; line-height: 1; text-shadow: 0 1px 0 rgba(0,0,0,0.15); }
+  .card-label { font-size: 38px; font-weight: 900; color: #0e1200; text-transform: uppercase; margin-top: 6px; letter-spacing: -0.01em; }
+  .card-desc { font-size: 14px; color: #3a4a10; margin-top: 8px; line-height: 1.4; font-weight: 500; }
 
   /* 설정 패널 */
   .config-toggle { position: absolute; top: 15px; right: 15px; background: rgba(150,180,20,0.1); border: 1px solid rgba(150,180,20,0.3); border-radius: 4px; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #7a9a00; z-index: 10; opacity: 0.4; transition: 0.2s; }
@@ -201,7 +201,7 @@
             <div class="card-number">04</div>
             <div><div class="card-label">Review</div><div class="card-desc">IP & 제품별 상세 리뷰</div></div>
         </div>
-        <div class="agenda-card" id="card-ownip" onclick="handleCardClick('ownip')" style="background-color:#c8ccc4; background-image:url('https://lh3.googleusercontent.com/d/11_TpOv5oVJjqSvSxQWWhUluulR9O22ql'); background-size:35%; background-position:85% bottom; background-repeat:no-repeat; overflow:hidden;">
+        <div class="agenda-card" id="card-ownip" onclick="handleCardClick('ownip')" style="background-color:#f5f8e8; background-image:url('https://lh3.googleusercontent.com/d/11_TpOv5oVJjqSvSxQWWhUluulR9O22ql'); background-size:35%; background-position:85% bottom; background-repeat:no-repeat; overflow:hidden;">
             <div class="config-toggle" onclick="toggleConfig(event,'ownip')">⚙</div>
             <div class="config-panel" id="config-ownip"><label>URL 설정</label><input type="url" id="url-ownip" placeholder="https://..."><button onclick="saveLink(event,'ownip')">저장</button></div>
             <div class="card-number">05</div>
