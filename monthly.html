@@ -55,24 +55,24 @@
   .bg-modal .preview-box { width: 100%; height: 100px; border-radius: 8px; background: #0d0e10; border: 1px solid #2a2d30; margin-bottom: 12px; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; color: #444; font-size: 12px; transition: 0.4s; }
   .bg-modal .hint { background: rgba(62,207,207,0.06); border: 1px solid rgba(62,207,207,0.15); border-radius: 8px; padding: 12px; margin-bottom: 16px; }
   .bg-modal .hint code { color: var(--mint); font-size: 11px; display: block; margin-top: 4px; word-break: break-all; }
-  .hero-overlay { position: absolute; inset: 0; background: linear-gradient(135deg, rgba(17,18,20,0.92) 0%, rgba(17,18,20,0.65) 50%, rgba(62,207,207,0.08) 100%); }
-  .hero-content { position: relative; z-index: 2; padding: 0 64px; max-width: 900px; animation: fadeUp 0.9s ease both; }
-  .hero-title { font-family: 'Space Grotesk', sans-serif; font-size: clamp(72px, 12vw, 160px); line-height: 0.95; font-weight: 700; text-transform: uppercase; }
+  .hero-overlay { position: absolute; inset: 0; background: linear-gradient(135deg, rgba(17,18,20,0.97) 0%, rgba(17,18,20,0.80) 50%, rgba(17,18,20,0.4) 100%); }
+  .hero-content { position: relative; z-index: 2; padding: 0 96px; max-width: 900px; animation: fadeUp 0.9s ease both; }
+  .hero-title { font-family: 'Space Grotesk', sans-serif; font-size: clamp(72px, 12vw, 160px); line-height: 0.95; font-weight: 700; text-transform: uppercase; white-space: nowrap; }
   .hero-title span { color: var(--mint); display: block; }
 
   /* 슬라이드 2: AGENDA */
   #slide2 { background: #13151a; display: flex; flex-direction: column; padding: 0; position: relative; }
-  .agenda-header { display: flex; align-items: flex-end; justify-content: space-between; padding: 14px 36px; border-bottom: 1px solid rgba(255,255,255,0.07); margin-top: 50px; }
+  .agenda-header { display: flex; align-items: flex-end; justify-content: space-between; padding: 14px 72px; border-bottom: 1px solid rgba(255,255,255,0.07); margin-top: 50px; }
   .agenda-supertitle { font-family: 'Space Grotesk', sans-serif; color: var(--mint); font-weight: 700; letter-spacing: 0.22em; }
 
   /* 메인 바디: 좌측 콘텐츠 영역 */
-  .agenda-body { display: flex; flex-direction: column; justify-content: space-between; width: 78%; height: calc(100vh - 90px); padding: 48px 0 80px 36px; position: relative; z-index: 1; }
+  .agenda-body { display: flex; flex-direction: column; justify-content: space-between; width: 78%; height: calc(100vh - 90px); padding: 48px 0 80px 72px; position: relative; z-index: 1; }
 
   /* 대제목 영역 */
   .agenda-title-area { padding-top: 0; margin-bottom: 32px; }
-  .agenda-main-title { font-family: 'Space Grotesk', sans-serif; font-size: clamp(36px, 5.5vw, 72px); font-weight: 900; color: #fff; letter-spacing: -0.02em; line-height: 1.1; cursor: pointer; display: block; transition: opacity 0.2s; }
+  .agenda-main-title { font-family: 'Space Grotesk', sans-serif; font-size: clamp(48px, 7vw, 96px); font-weight: 900; color: #fff; letter-spacing: -0.02em; line-height: 1.05; cursor: pointer; display: block; transition: opacity 0.2s; }
   .agenda-main-title:hover { opacity: 0.7; }
-  .agenda-sub-title { font-size: 14px; color: var(--mint); margin-top: 12px; letter-spacing: 0.06em; cursor: pointer; display: block; transition: opacity 0.2s; opacity: 0.85; }
+  .agenda-sub-title { font-size: 18px; color: var(--mint); margin-top: 16px; letter-spacing: 0.04em; cursor: pointer; display: block; transition: opacity 0.2s; opacity: 0.9; font-weight: 500; }
   .agenda-sub-title:hover { opacity: 0.5; }
 
   /* 카드 그리드: 좌측 하단 */
@@ -152,11 +152,11 @@
       <div class="hero-bg" id="heroBg"></div>
       <div class="hero-overlay"></div>
       <button class="bg-config-btn" onclick="document.getElementById('bgModal').classList.add('open')">⚙ 배경 이미지 변경</button>
-      <a href="https://jangharain-tech.github.io/2026_MD/LFSQ_MD_2026_Plan_with_images.html" target="_blank" style="position:absolute;top:70px;right:32px;z-index:10;padding:12px 20px;background:#1a56db;border:none;border-radius:10px;text-decoration:none;backdrop-filter:blur(12px);transition:all 0.2s;cursor:pointer;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;color:#fff;letter-spacing:0.06em;white-space:nowrap;" onmouseover="this.style.background='#1e4fbe'" onmouseout="this.style.background='#1a56db'">MD팀 2026 PLAN</a>
+      <a href="https://jangharain-tech.github.io/2026_MD/LFSQ_MD_2026_Plan_with_images.html" target="_blank" style="position:absolute;top:70px;left:96px;z-index:10;padding:10px 18px;background:rgba(120,120,120,0.6);border:1px solid rgba(255,255,255,0.15);border-radius:8px;text-decoration:none;backdrop-filter:blur(12px);transition:all 0.2s;cursor:pointer;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;color:#fff;letter-spacing:0.08em;white-space:nowrap;" onmouseover="this.style.background='rgba(150,150,150,0.7)'" onmouseout="this.style.background='rgba(120,120,120,0.6)'">(참고) MD 2026 PLAN</a>
       <div class="hero-content">
         <div class="hero-eyebrow">LINEFRIENDS SQUARE</div>
         <h1 class="hero-title">LFSQ MD<span>Monthly Meet</span></h1>
-        <div style="margin-top:30px; background:var(--mint); color:#000; display:inline-block; padding:8px 20px; border-radius:100px; font-weight:bold;">2026 · 04</div>
+        <div id="heroDate" onclick="editHeroDate()" title="클릭하여 수정" style="margin-top:30px; background:var(--mint); color:#000; display:inline-block; padding:10px 28px; border-radius:100px; font-weight:800; font-size:22px; font-family:'Space Grotesk',sans-serif; letter-spacing:0.08em; cursor:pointer; transition:opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">2026 · 04</div>
       </div>
     </section>
 
@@ -170,7 +170,7 @@
         <!-- 대제목 영역 -->
         <div class="agenda-title-area">
           <div class="agenda-main-title" id="mainTitle" onclick="editTitle()" title="클릭하여 수정">IP & BRAND<br>자산화의 시작</div>
-          <div class="agenda-sub-title" id="subTitle" onclick="editSubTitle()" title="클릭하여 수정">전략IP 누가사 &amp; OWN Brand 리빌드</div>
+          <div class="agenda-sub-title" id="subTitle" onclick="editSubTitle()" title="클릭하여 수정">전략IP 누가사 &amp; OWN Brand 리빈느</div>
         </div>
 
         <div class="agenda-grid">
@@ -223,7 +223,14 @@
 
 <script>
   // 대제목 / 서브타이틀 인라인 편집
-  function editTitle() {
+  function editHeroDate() {
+    const el = document.getElementById('heroDate');
+    const val = prompt('날짜 수정:', el.textContent);
+    if (val !== null && val.trim()) {
+      el.textContent = val.trim();
+      saveTitleToSheet('hero_date', val.trim());
+    }
+  }
     const el = document.getElementById('mainTitle');
     const cur = el.textContent;
     const val = prompt('대제목 수정:', cur);
@@ -318,6 +325,7 @@
       const res = await fetch(SCRIPT_URL);
       const data = await res.json();
       Object.assign(links, data);
+      if (links['hero_date']) document.getElementById('heroDate').textContent = links['hero_date'];
       // 제목 적용
       if (links['agenda_title']) document.getElementById('mainTitle').textContent = links['agenda_title'];
       if (links['agenda_subtitle']) document.getElementById('subTitle').textContent = links['agenda_subtitle'];
