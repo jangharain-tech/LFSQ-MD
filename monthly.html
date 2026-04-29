@@ -145,6 +145,14 @@
   </div>
 </div>
 
+<!-- 05번 이미지 팝업 -->
+<div id="ownipPopup" onclick="closeOwnipPopup()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
+  <div onclick="event.stopPropagation()" style="position:relative;max-width:90vw;max-height:90vh;">
+    <img src="https://lh3.googleusercontent.com/d/1MwER_4OudvcajkNznwUHJkxbQENyenCJ" style="max-width:90vw;max-height:85vh;object-fit:contain;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.6);" />
+    <button onclick="closeOwnipPopup()" style="position:absolute;top:-16px;right:-16px;width:36px;height:36px;border-radius:50%;background:#c8e832;border:none;font-size:18px;font-weight:900;cursor:pointer;color:#1a1f0a;line-height:1;">×</button>
+  </div>
+</div>
+
 <!-- 이미지 팝업 모달 -->
 <div id="imagePopup" onclick="closeImagePopup()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
   <div onclick="event.stopPropagation()" style="position:relative;max-width:90vw;max-height:90vh;">
@@ -216,7 +224,7 @@
             <div class="card-number">04</div>
             <div><div class="card-label">Review</div><div class="card-desc">IP & 제품별 상세 리뷰</div></div>
         </div>
-        <div class="agenda-card" id="card-ownip" onclick="handleCardClick('ownip')" style="background-color:#c8cac8; background-image:url('https://lh3.googleusercontent.com/d/11_TpOv5oVJjqSvSxQWWhUluulR9O22ql'); background-size:35%; background-position:85% bottom; background-repeat:no-repeat; overflow:hidden;">
+        <div class="agenda-card" id="card-ownip" onclick="openOwnipPopup()" style="background-color:#c8cac8; background-image:url('https://lh3.googleusercontent.com/d/11_TpOv5oVJjqSvSxQWWhUluulR9O22ql'); background-size:35%; background-position:85% bottom; background-repeat:no-repeat; overflow:hidden;">
             <div class="config-toggle" onclick="toggleConfig(event,'ownip')">⚙</div>
             <div class="config-panel" id="config-ownip">
               <label>카드 URL</label><input type="url" id="url-ownip" placeholder="https://...">
@@ -225,7 +233,7 @@
             </div>
             <div>
               <div class="card-number">05</div>
-              <a id="btn-nugasa" href="https://doeun-ai.github.io/nugasapopup" target="_blank" onclick="event.stopPropagation();" style="display:inline-block;margin-top:8px;padding:6px 14px;background:#1a1f0a;color:#c8e832;border-radius:6px;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;text-decoration:none;letter-spacing:0.06em;transition:background 0.2s;" onmouseover="this.style.background='#2e3a10'" onmouseout="this.style.background='#1a1f0a'">누가사</a>
+              <a id="btn-nugasa" href="https://doeun-ai.github.io/nugasapopup" target="_blank" onclick="event.stopPropagation(); event.stopImmediatePropagation();" style="display:inline-block;margin-top:8px;padding:6px 14px;background:#1a1f0a;color:#c8e832;border-radius:6px;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;text-decoration:none;letter-spacing:0.06em;transition:background 0.2s;" onmouseover="this.style.background='#2e3a10'" onmouseout="this.style.background='#1a1f0a'">누가사</a>
             </div>
             <div><div style="font-size:11px;font-weight:700;color:#7a9a00;background:rgba(168,196,26,0.12);display:inline-block;padding:3px 8px;border-radius:4px;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px;">OWN IP 전략</div><div class="card-label">LFSQ IP</div><div class="card-desc">전략IP 전개현황</div></div>
         </div>
@@ -257,6 +265,13 @@
       saveTitleToSheet('hero_date', val.trim());
     }
   }
+  function openOwnipPopup() {
+    document.getElementById('ownipPopup').style.display = 'flex';
+  }
+  function closeOwnipPopup() {
+    document.getElementById('ownipPopup').style.display = 'none';
+  }
+
   function openImagePopup() {
     const el = document.getElementById('imagePopup');
     el.style.display = 'flex';
@@ -266,7 +281,7 @@
   }
   // ESC 키로 닫기
   window.addEventListener('keydown', e => {
-    if (e.key === 'Escape') closeImagePopup();
+    if (e.key === 'Escape') { closeImagePopup(); closeOwnipPopup(); }
   });
 
   function editTitleLine(line) {
