@@ -61,31 +61,44 @@
   .hero-title span { color: var(--mint); display: block; }
 
   /* 슬라이드 2: AGENDA */
-  #slide2 { background: #13151a; display: flex; flex-direction: column; padding: 0; }
+  #slide2 { background: #13151a; display: flex; flex-direction: column; padding: 0; position: relative; }
   .agenda-header { display: flex; align-items: flex-end; justify-content: space-between; padding: 14px 36px; border-bottom: 1px solid rgba(255,255,255,0.07); margin-top: 50px; }
   .agenda-supertitle { font-family: 'Space Grotesk', sans-serif; color: var(--mint); font-weight: 700; letter-spacing: 0.22em; }
-  
-  .agenda-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr; flex: 1; padding: 0 24px 24px 24px; gap: 12px; }
+
+  /* 메인 바디: 좌측 콘텐츠 영역 */
+  .agenda-body { display: flex; flex-direction: column; justify-content: space-between; width: 68%; height: calc(100vh - 90px); padding: 80px 0 48px 36px; }
+
+  /* 대제목 영역 */
+  .agenda-title-area { padding-top: 80px; }
+  .agenda-main-title { font-family: 'Space Grotesk', sans-serif; font-size: clamp(36px, 5.5vw, 72px); font-weight: 900; color: #fff; letter-spacing: -0.02em; line-height: 1.1; cursor: pointer; display: block; transition: opacity 0.2s; }
+  .agenda-main-title:hover { opacity: 0.7; }
+  .agenda-sub-title { font-size: 14px; color: var(--mint); margin-top: 12px; letter-spacing: 0.06em; cursor: pointer; display: block; transition: opacity 0.2s; opacity: 0.85; }
+  .agenda-sub-title:hover { opacity: 0.5; }
+
+  /* 카드 그리드: 좌측 하단 */
+  .agenda-grid { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr); gap: 10px; padding-right: 20px; }
   .agenda-card { 
     position: relative; 
     background: linear-gradient(145deg, #1e2228, #191d23);
     border: 1px solid rgba(255,255,255,0.07);
-    border-radius: 12px;
-    padding: 30px; 
+    border-radius: 10px;
+    padding: 24px 26px; 
     cursor: pointer; 
     display: flex; 
     flex-direction: column; 
     justify-content: space-between; 
     transition: all 0.25s;
     box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+    min-height: 260px;
+    max-height: 300px;
   }
 
   .agenda-card:hover { background: linear-gradient(145deg, #262c35, #1f242c); border-color: rgba(200,232,50,0.2); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
   .agenda-card.has-link { background: linear-gradient(145deg, #1f2318, #191d14); border-color: rgba(200,232,50,0.15); }
   .agenda-card.has-link:hover { background: linear-gradient(145deg, #272e1c, #202618); border-color: rgba(200,232,50,0.35); }
-  .card-number { font-family: 'Space Grotesk', sans-serif; font-size: 50px; font-weight: 800; color: rgba(200,232,50,0.2); }
-  .card-label { font-size: 32px; font-weight: 800; color: #e8eff0; text-transform: uppercase; }
-  .card-desc { font-size: 13px; color: #7a8fa0; margin-top: 10px; }
+  .card-number { font-family: 'Space Grotesk', sans-serif; font-size: 42px; font-weight: 800; color: rgba(200,232,50,0.2); line-height: 1; }
+  .card-label { font-size: 28px; font-weight: 800; color: #e8eff0; text-transform: uppercase; margin-top: 6px; }
+  .card-desc { font-size: 13px; color: #7a8fa0; margin-top: 8px; line-height: 1.4; }
 
   /* 설정 패널 */
   .config-toggle { position: absolute; top: 15px; right: 15px; background: rgba(200,232,50,0.1); border: 1px solid rgba(200,232,50,0.3); border-radius: 4px; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--mint); z-index: 10; opacity: 0.5; transition: 0.2s; }
@@ -152,7 +165,15 @@
         <div class="agenda-supertitle">MD Monthly Agenda</div>
         <div style="color:#555">2026 · 04</div>
       </div>
-      <div class="agenda-grid">
+
+      <div class="agenda-body">
+        <!-- 대제목 영역 -->
+        <div class="agenda-title-area">
+          <div class="agenda-main-title" id="mainTitle" onclick="editTitle()" title="클릭하여 수정">IP & BRAND<br>자산화의 시작</div>
+          <div class="agenda-sub-title" id="subTitle" onclick="editSubTitle()" title="클릭하여 수정">전략IP 누가사 &amp; OWN Brand 리빌드</div>
+        </div>
+
+        <div class="agenda-grid">
         <div class="agenda-card" id="card-review" onclick="handleCardClick('review')">
             <div class="config-toggle" onclick="toggleConfig(event,'review')">⚙</div>
             <div class="config-panel" id="config-review"><label>URL 설정</label><input type="url" id="url-review" placeholder="https://..."><button onclick="saveLink(event,'review')">저장</button></div>
@@ -190,12 +211,42 @@
             <div><div style="font-size:10px;color:var(--mint);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:4px;opacity:0.8;">PRIVATE BRAND</div><div class="card-label">LFSQ Brand</div><div class="card-desc">신규브랜드 전략 및 전개</div></div>
         </div>
       </div>
+      </div><!-- end agenda-body -->
+
+      <!-- 우측 하단 이미지 -->
+      <img src="https://lh3.googleusercontent.com/d/1TMI-jvINT2Jcg-GHoSx024hOWh2w8vvM" alt="" style="position:absolute; bottom:0; right:0; width:46%; max-height:85vh; object-fit:contain; object-position:right bottom; pointer-events:none;" />
+
     </section>
 
   </div>
 </div>
 
 <script>
+  // 대제목 / 서브타이틀 인라인 편집
+  function editTitle() {
+    const el = document.getElementById('mainTitle');
+    const cur = el.textContent;
+    const val = prompt('대제목 수정:', cur);
+    if (val !== null && val.trim()) {
+      el.textContent = val.trim();
+      saveTitleToSheet('agenda_title', val.trim());
+    }
+  }
+  function editSubTitle() {
+    const el = document.getElementById('subTitle');
+    const cur = el.textContent;
+    const val = prompt('서브타이틀 수정:', cur);
+    if (val !== null && val.trim()) {
+      el.textContent = val.trim();
+      saveTitleToSheet('agenda_subtitle', val.trim());
+    }
+  }
+  async function saveTitleToSheet(id, text) {
+    try {
+      await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ id, url: text }) });
+    } catch(e) { console.error('제목 저장 실패'); }
+  }
+
   /** 1. 구글 시트 연동 설정 **/
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbznbLeEtnPOfda5NQg465LpCldmedkM0c0oomgSrlnzfDA_oIr3mE69Hyd51NhLG4fd/exec";
   const links = {};
@@ -267,6 +318,9 @@
       const res = await fetch(SCRIPT_URL);
       const data = await res.json();
       Object.assign(links, data);
+      // 제목 적용
+      if (links['agenda_title']) document.getElementById('mainTitle').textContent = links['agenda_title'];
+      if (links['agenda_subtitle']) document.getElementById('subTitle').textContent = links['agenda_subtitle'];
       // 배경 이미지 적용
       applyBg(links['hero_bg'] || '');
       // 카드 링크 적용
