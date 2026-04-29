@@ -66,10 +66,10 @@
   .agenda-supertitle { font-family: 'Space Grotesk', sans-serif; color: var(--mint); font-weight: 700; letter-spacing: 0.22em; }
 
   /* 메인 바디: 좌측 콘텐츠 영역 */
-  .agenda-body { display: flex; flex-direction: column; justify-content: space-between; width: 68%; height: calc(100vh - 90px); padding: 80px 0 48px 36px; }
+  .agenda-body { display: flex; flex-direction: column; justify-content: space-between; width: 78%; height: calc(100vh - 90px); padding: 48px 0 48px 36px; position: relative; z-index: 1; }
 
   /* 대제목 영역 */
-  .agenda-title-area { padding-top: 80px; }
+  .agenda-title-area { padding-top: 0; margin-bottom: 32px; }
   .agenda-main-title { font-family: 'Space Grotesk', sans-serif; font-size: clamp(36px, 5.5vw, 72px); font-weight: 900; color: #fff; letter-spacing: -0.02em; line-height: 1.1; cursor: pointer; display: block; transition: opacity 0.2s; }
   .agenda-main-title:hover { opacity: 0.7; }
   .agenda-sub-title { font-size: 14px; color: var(--mint); margin-top: 12px; letter-spacing: 0.06em; cursor: pointer; display: block; transition: opacity 0.2s; opacity: 0.85; }
@@ -79,8 +79,8 @@
   .agenda-grid { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr); gap: 10px; padding-right: 20px; }
   .agenda-card { 
     position: relative; 
-    background: linear-gradient(145deg, #1e2228, #191d23);
-    border: 1px solid rgba(255,255,255,0.07);
+    background: linear-gradient(145deg, #ffffff, #f5f7f2);
+    border: 1px solid rgba(0,0,0,0.08);
     border-radius: 10px;
     padding: 24px 26px; 
     cursor: pointer; 
@@ -88,20 +88,20 @@
     flex-direction: column; 
     justify-content: space-between; 
     transition: all 0.25s;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
     min-height: 260px;
     max-height: 300px;
   }
 
-  .agenda-card:hover { background: linear-gradient(145deg, #262c35, #1f242c); border-color: rgba(200,232,50,0.2); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
-  .agenda-card.has-link { background: linear-gradient(145deg, #1f2318, #191d14); border-color: rgba(200,232,50,0.15); }
-  .agenda-card.has-link:hover { background: linear-gradient(145deg, #272e1c, #202618); border-color: rgba(200,232,50,0.35); }
-  .card-number { font-family: 'Space Grotesk', sans-serif; font-size: 42px; font-weight: 800; color: rgba(200,232,50,0.2); line-height: 1; }
-  .card-label { font-size: 28px; font-weight: 800; color: #e8eff0; text-transform: uppercase; margin-top: 6px; }
-  .card-desc { font-size: 13px; color: #7a8fa0; margin-top: 8px; line-height: 1.4; }
+  .agenda-card:hover { background: linear-gradient(145deg, #f0f4f0, #e8ede8); border-color: rgba(200,232,50,0.4); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+  .agenda-card.has-link { background: linear-gradient(145deg, #f4fad8, #edf5c0); border-color: rgba(168,196,26,0.3); }
+  .agenda-card.has-link:hover { background: linear-gradient(145deg, #eef8b8, #e5f0a8); border-color: rgba(168,196,26,0.5); }
+  .card-number { font-family: 'Space Grotesk', sans-serif; font-size: 40px; font-weight: 800; color: #d8f020; line-height: 1; }
+  .card-label { font-size: 34px; font-weight: 800; color: #1a1f0a; text-transform: uppercase; margin-top: 6px; }
+  .card-desc { font-size: 15px; color: #6b7a50; margin-top: 8px; line-height: 1.4; }
 
   /* 설정 패널 */
-  .config-toggle { position: absolute; top: 15px; right: 15px; background: rgba(200,232,50,0.1); border: 1px solid rgba(200,232,50,0.3); border-radius: 4px; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--mint); z-index: 10; opacity: 0.5; transition: 0.2s; }
+  .config-toggle { position: absolute; top: 15px; right: 15px; background: rgba(150,180,20,0.1); border: 1px solid rgba(150,180,20,0.3); border-radius: 4px; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #7a9a00; z-index: 10; opacity: 0.4; transition: 0.2s; }
   .agenda-card:hover .config-toggle { opacity: 1; }
   .config-panel { display: none; position: absolute; top: 45px; right: 15px; background: #1a1c1f; border: 1px solid var(--mint); border-radius: 8px; padding: 15px; width: 220px; z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
   .config-panel.open { display: block; }
@@ -202,19 +202,19 @@
             <div class="config-toggle" onclick="toggleConfig(event,'ownip')">⚙</div>
             <div class="config-panel" id="config-ownip"><label>URL 설정</label><input type="url" id="url-ownip" placeholder="https://..."><button onclick="saveLink(event,'ownip')">저장</button></div>
             <div class="card-number">05</div>
-            <div><div style="font-size:10px;color:var(--mint);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:4px;opacity:0.8;">OWN IP 전략</div><div class="card-label">LFSQ IP</div><div class="card-desc">전략IP 전개현황</div></div>
+            <div><div style="font-size:11px;font-weight:700;color:#7a9a00;background:rgba(168,196,26,0.12);display:inline-block;padding:3px 8px;border-radius:4px;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px;">OWN IP 전략</div><div class="card-label">LFSQ IP</div><div class="card-desc">전략IP 전개현황</div></div>
         </div>
         <div class="agenda-card" id="card-brand" onclick="handleCardClick('brand')">
             <div class="config-toggle" onclick="toggleConfig(event,'brand')">⚙</div>
             <div class="config-panel" id="config-brand"><label>URL 설정</label><input type="url" id="url-brand" placeholder="https://..."><button onclick="saveLink(event,'brand')">저장</button></div>
             <div class="card-number">06</div>
-            <div><div style="font-size:10px;color:var(--mint);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:4px;opacity:0.8;">PRIVATE BRAND</div><div class="card-label">LFSQ Brand</div><div class="card-desc">신규브랜드 전략 및 전개</div></div>
+            <div><div style="font-size:11px;font-weight:700;color:#7a9a00;background:rgba(168,196,26,0.12);display:inline-block;padding:3px 8px;border-radius:4px;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px;">PRIVATE BRAND</div><div class="card-label">LFSQ Brand</div><div class="card-desc">신규브랜드 전략 및 전개</div></div>
         </div>
       </div>
       </div><!-- end agenda-body -->
 
-      <!-- 우측 하단 이미지 -->
-      <img src="https://lh3.googleusercontent.com/d/1TMI-jvINT2Jcg-GHoSx024hOWh2w8vvM" alt="" style="position:absolute; bottom:0; right:0; width:46%; max-height:85vh; object-fit:contain; object-position:right bottom; pointer-events:none;" />
+      <!-- 우측 하단 배경 이미지 -->
+      <img src="https://lh3.googleusercontent.com/d/1wu-CohyGti8YIK5IS9qmL6vPFP0AXES0" alt="" style="position:absolute; bottom:0; right:0; width:46%; max-height:85vh; object-fit:contain; object-position:right bottom; pointer-events:none; z-index:0; opacity:0.85;" />
 
     </section>
 
