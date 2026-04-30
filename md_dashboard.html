@@ -425,7 +425,10 @@
 
   <!-- 4. MEET -->
   <div class="cell meet">
-    <div class="cell-header"><span>MEET</span></div>
+    <div class="cell-header">
+      <span>MEET</span>
+      <button class="btn-sm" onclick="addMeetItem()">+ 추가</button>
+    </div>
     <div class="cell-body"><div class="meet-btns" id="meetBtns"></div></div>
   </div>
 
@@ -1063,10 +1066,28 @@ function renderMeet() {
   state.meet.forEach((m,i)=>{
     const btn=document.createElement('div');
     btn.className=`meet-btn ${m.color||'meet-btn-tbd'}`;
-    btn.innerHTML=`${m.label}<span class="meet-url-set" onclick="event.stopPropagation();openMeetUrl(${i})">⚙</span>`;
+    btn.innerHTML=`
+      <span style="flex:1;text-align:center;">${m.label}</span>
+      <span class="meet-url-set" onclick="event.stopPropagation();openMeetUrl(${i})">⚙</span>
+      <span class="meet-url-set" style="background:rgba(255,255,255,0.15);" onclick="event.stopPropagation();deleteMeet(${i})">✕</span>`;
     btn.onclick=()=>{ if(m.url) window.open(m.url,'_blank'); else openMeetUrl(i); };
     el.appendChild(btn);
   });
+}
+
+function addMeetItem(){
+  const newItem = {idx: Date.now(), label: '새 미팅', url: '', color: 'meet-btn-tbd'};
+  state.meet.push(newItem);
+  save('meet');
+  renderMeet();
+  openMeetUrl(state.meet.length - 1);
+}
+
+async function deleteMeet(i){
+  if(!confirm(`"${state.meet[i].label}" 을 삭제하시겠습니까?`)) return;
+  state.meet.splice(i, 1);
+  save('meet');
+  renderMeet();
 }
 
 function openMeetUrl(i){
