@@ -413,13 +413,28 @@
       <span>ISSUE</span>
       <button class="btn-sm" onclick="openIssueWrite()">+ 추가</button>
     </div>
-    <div class="cell-body">
-      <div class="cal-nav">
-        <button onclick="calPrev()">‹</button>
-        <span id="calTitle"></span>
-        <button onclick="calNext()">›</button>
+    <div class="cell-body" style="display:flex;flex-direction:column;gap:10px;">
+      <div>
+        <div class="cal-nav">
+          <button onclick="calPrev()">‹</button>
+          <span id="calTitle"></span>
+          <button onclick="calNext()">›</button>
+        </div>
+        <div class="cal-grid" id="calGrid"></div>
       </div>
-      <div class="cal-grid" id="calGrid"></div>
+      <!-- 순환 말풍선 -->
+      <div id="issueBubble" style="
+        display:none;
+        background:#111;color:#fff;
+        border-radius:10px;padding:9px 14px;
+        font-size:13px;line-height:1.5;
+        position:relative;
+        animation: fadeInUp 0.4s ease;
+      ">
+        <div style="position:absolute;top:-7px;left:18px;width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:7px solid #111;"></div>
+        <span id="issueBubbleDate" style="font-size:11px;opacity:0.55;font-family:'DM Mono',monospace;margin-right:8px;"></span>
+        <span id="issueBubbleText"></span>
+      </div>
     </div>
   </div>
 
@@ -538,16 +553,20 @@
 
 <!-- ISSUE 추가 -->
 <div class="modal-overlay" id="modalIssueWrite">
-  <div class="modal">
+  <div class="modal" style="width:420px;">
     <button class="modal-close" onclick="closeModal('modalIssueWrite')">✕</button>
-    <h3>📅 이슈 추가</h3>
+    <h3>📅 이슈 관리</h3>
     <label>날짜</label>
-    <input type="date" id="issueDate">
-    <label>내용</label>
-    <input type="text" id="issueContent" placeholder="예: 김팀장 생일 🎂, 월간보고 마감">
+    <input type="date" id="issueDate" onchange="renderIssueDateList()">
+    <!-- 해당 날짜 기존 이슈 목록 -->
+    <div id="issueDateList" style="margin-top:10px;max-height:140px;overflow-y:auto;"></div>
+    <label style="margin-top:12px;">새 이슈 추가</label>
+    <div style="display:flex;gap:6px;">
+      <input type="text" id="issueContent" placeholder="예: 김팀장 생일 🎂" style="flex:1;">
+      <button class="btn-primary" style="padding:7px 14px;white-space:nowrap;" onclick="submitIssue()">추가</button>
+    </div>
     <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeModal('modalIssueWrite')">취소</button>
-      <button class="btn-primary" onclick="submitIssue()">등록</button>
+      <button class="btn-cancel" onclick="closeModal('modalIssueWrite')">닫기</button>
     </div>
   </div>
 </div>
@@ -1041,7 +1060,29 @@ function openIssueWrite() {
   const now=new Date();
   document.getElementById('issueDate').value=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
   document.getElementById('issueContent').value='';
+  renderIssueDateList();
   openModal('modalIssueWrite');
+}
+
+function renderIssueDateList() {
+  const date = document.getElementById('issueDate').value;
+  const el = document.getElementById('issueDateList');
+  const dayIssues = state.issues.filter(iss => iss.date === date);
+  if (!dayIssues.length) { el.innerHTML = '<div style="font-size:12px;color:var(--gray-400);padding:4px 0;">이 날짜에 등록된 이슈가 없습니다.</div>'; return; }
+  el.innerHTML = dayIssues.map((iss, i) => `
+    <div style="display:flex;align-items:center;gap:8px;padding:6px 8px;background:var(--gray-100);border-radius:5px;margin-bottom:5px;font-size:13px;">
+      <span style="flex:1;">• ${iss.content}</span>
+      <button onclick="deleteIssue('${iss.id}')" style="font-size:11px;color:var(--red);background:none;border:none;cursor:pointer;flex-shrink:0;">✕ 삭제</button>
+    </div>`).join('');
+}
+
+async function deleteIssue(id) {
+  state.issues = state.issues.filter(iss => String(iss.id) !== String(id));
+  save('issues');
+  renderCal();
+  renderIssueDateList();
+  startIssueBubble();
+  await gasPost({action:'deleteIssue', id});
 }
 
 async function submitIssue() {
@@ -1050,10 +1091,57 @@ async function submitIssue() {
   if(!date||!content) return alert('날짜와 내용을 모두 입력하세요.');
   const issue={id:Date.now(), date, content};
   state.issues.push(issue); save('issues'); renderCal();
-  closeModal('modalIssueWrite');
+  document.getElementById('issueContent').value='';
+  renderIssueDateList();
+  startIssueBubble();
   showSync('이슈 저장 중...','');
   const res=await gasPost({action:'addIssue',data:issue});
   showSync(res?.success?'✓ 이슈 저장됨':'⚠ 로컬만 저장',res?.success?'ok':'err');
+}
+
+// ── 순환 말풍선 ──
+let bubbleTimer = null;
+let bubbleIdx = 0;
+
+function getUpcomingIssues() {
+  const todayStr = new Date().toISOString().slice(0,10);
+  return [...state.issues]
+    .filter(iss => iss.date >= todayStr)
+    .sort((a,b) => a.date.localeCompare(b.date));
+}
+
+function startIssueBubble() {
+  clearInterval(bubbleTimer);
+  const bubble = document.getElementById('issueBubble');
+  const upcoming = getUpcomingIssues();
+  if (!upcoming.length) { bubble.style.display='none'; return; }
+  bubbleIdx = 0;
+  showBubble(upcoming);
+  bubbleTimer = setInterval(() => {
+    bubbleIdx = (bubbleIdx + 1) % upcoming.length;
+    showBubble(upcoming);
+  }, 3500);
+}
+
+function showBubble(upcoming) {
+  const bubble = document.getElementById('issueBubble');
+  const iss = upcoming[bubbleIdx];
+  // 날짜 포맷
+  const d = new Date(iss.date + 'T00:00:00');
+  const today = new Date(); today.setHours(0,0,0,0);
+  const diff = Math.round((d - today) / 86400000);
+  const label = diff === 0 ? '오늘' : diff === 1 ? '내일' : `${diff}일 후`;
+  document.getElementById('issueBubbleDate').textContent = `${iss.date.slice(5).replace('-','/')} (${label})`;
+  document.getElementById('issueBubbleText').textContent = iss.content;
+  bubble.style.display = 'block';
+  // fade 애니메이션
+  bubble.style.opacity = '0';
+  bubble.style.transform = 'translateY(4px)';
+  setTimeout(() => {
+    bubble.style.transition = 'opacity 0.35s, transform 0.35s';
+    bubble.style.opacity = '1';
+    bubble.style.transform = 'translateY(0)';
+  }, 10);
 }
 
 // ============================================================
@@ -1216,7 +1304,7 @@ async function saveShare(){
 // BOOT
 // ============================================================
 initCal();
-initLoad();
+initLoad().then(() => startIssueBubble());
 </script>
 </body>
 </html>
