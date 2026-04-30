@@ -746,9 +746,28 @@ const state = {
 function save(key) { localStorage.setItem(key, JSON.stringify(state[key])); }
 
 // GAS에서 받아온 데이터로 state 전체 교체
+// 날짜 문자열 정규화 (GAS에서 Date 객체로 넘어오는 경우 대응)
+function normalizeDate(raw) {
+  if (!raw) return '';
+  const s = String(raw);
+  // 이미 YYYY-MM-DD 형식이면 그대로
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  // ISO 8601 or Date string → YYYY-MM-DD 추출
+  const d = new Date(s);
+  if (!isNaN(d)) {
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+  // MM/DD/YYYY 등 → 그냥 앞 10자 사용
+  return s.slice(0, 10);
+}
+
 function loadAllFromGAS(data) {
   if (data.notices  && data.notices.length)  { state.notices  = data.notices;  save('notices'); }
-  if (data.issues   && data.issues.length)   { state.issues   = data.issues;   save('issues'); }
+  if (data.issues   && data.issues.length)   {
+    // 날짜 정규화 적용
+    state.issues = data.issues.map(iss => ({...iss, date: normalizeDate(iss.date)}));
+    save('issues');
+  }
   if (data.billboard&& data.billboard.length){ state.billboard= data.billboard; save('billboard'); }
   if (data.meet     && data.meet.length)     { state.meet     = data.meet.map(m => ({...m, idx: Number(m.idx)}));  save('meet'); }
   if (data.tools    && data.tools.length)    { state.tools    = data.tools.map(t => ({...t, idx: Number(t.idx)})); save('tools'); }
