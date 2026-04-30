@@ -414,26 +414,55 @@
       <button class="btn-sm" onclick="openIssueWrite()">+ 추가</button>
     </div>
     <div class="cell-body" style="display:flex;flex-direction:column;gap:10px;">
-      <div>
-        <div class="cal-nav">
-          <button onclick="calPrev()">‹</button>
-          <span id="calTitle"></span>
-          <button onclick="calNext()">›</button>
-        </div>
-        <div class="cal-grid" id="calGrid"></div>
+      <div class="cal-nav">
+        <button onclick="calPrev()">‹</button>
+        <span id="calTitle"></span>
+        <button onclick="calNext()">›</button>
       </div>
-      <!-- 순환 말풍선 -->
-      <div id="issueBubble" style="
-        display:none;
-        background:#111;color:#fff;
-        border-radius:10px;padding:9px 14px;
-        font-size:13px;line-height:1.5;
-        position:relative;
-        animation: fadeInUp 0.4s ease;
-      ">
-        <div style="position:absolute;top:-7px;left:18px;width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:7px solid #111;"></div>
-        <span id="issueBubbleDate" style="font-size:11px;opacity:0.55;font-family:'DM Mono',monospace;margin-right:8px;"></span>
-        <span id="issueBubbleText"></span>
+      <!-- 캘린더 + 말풍선 공통 relative 컨테이너 -->
+      <div style="position:relative;">
+        <div class="cal-grid" id="calGrid"></div>
+        <!-- 말풍선: 날짜 칸 위에 absolute 위치 -->
+        <div id="issueBubble" style="
+          display:none;
+          position:absolute;
+          background:#fff;
+          border:1.5px solid #d1d5db;
+          border-radius:8px;
+          padding:8px 13px;
+          font-size:12.5px;
+          line-height:1.6;
+          color:#111;
+          box-shadow:0 4px 14px rgba(0,0,0,0.10);
+          white-space:nowrap;
+          z-index:100;
+          pointer-events:none;
+          transition:opacity 0.35s, transform 0.35s;
+        ">
+          <!-- 아래 꼬리 -->
+          <div id="issueBubbleTail" style="
+            position:absolute;
+            bottom:-7px;
+            left:50%;
+            transform:translateX(-50%);
+            width:0;height:0;
+            border-left:7px solid transparent;
+            border-right:7px solid transparent;
+            border-top:7px solid #d1d5db;
+          "></div>
+          <div id="issueBubbleTailInner" style="
+            position:absolute;
+            bottom:-5.5px;
+            left:50%;
+            transform:translateX(-50%);
+            width:0;height:0;
+            border-left:6px solid transparent;
+            border-right:6px solid transparent;
+            border-top:6px solid #fff;
+          "></div>
+          <span id="issueBubbleDate" style="font-size:11px;color:#888;font-family:'DM Mono',monospace;margin-right:7px;"></span>
+          <span id="issueBubbleText" style="font-weight:500;"></span>
+        </div>
       </div>
     </div>
   </div>
@@ -1126,22 +1155,50 @@ function startIssueBubble() {
 function showBubble(upcoming) {
   const bubble = document.getElementById('issueBubble');
   const iss = upcoming[bubbleIdx];
-  // 날짜 포맷
+
+  // 날짜 라벨
   const d = new Date(iss.date + 'T00:00:00');
-  const today = new Date(); today.setHours(0,0,0,0);
-  const diff = Math.round((d - today) / 86400000);
-  const label = diff === 0 ? '오늘' : diff === 1 ? '내일' : `${diff}일 후`;
+  const todayMid = new Date(); todayMid.setHours(0,0,0,0);
+  const diff = Math.round((d - todayMid) / 86400000);
+  const label = diff === 0 ? '오늘' : diff === 1 ? '내일' : diff < 0 ? `${Math.abs(diff)}일 전` : `${diff}일 후`;
   document.getElementById('issueBubbleDate').textContent = `${iss.date.slice(5).replace('-','/')} (${label})`;
   document.getElementById('issueBubbleText').textContent = iss.content;
+
+  // 해당 날짜 칸 찾기 (calGrid 안에서)
+  const grid = document.getElementById('calGrid');
+  const container = grid.parentElement; // position:relative 컨테이너
+  const dayCells = grid.querySelectorAll('.cal-day:not(.other-month)');
+  const [y, m, dayNum] = iss.date.split('-').map(Number);
+
+  let targetCell = null;
+  if (y === calYear && m === calMonth + 1) {
+    dayCells.forEach(cell => {
+      if (parseInt(cell.textContent) === dayNum) targetCell = cell;
+    });
+  }
+
+  if (!targetCell) {
+    // 현재 달에 없으면 그냥 가운데 위
+    bubble.style.left = '50%';
+    bubble.style.transform = 'translateX(-50%)';
+    bubble.style.bottom = ''; 
+    bubble.style.top = '-60px';
+  } else {
+    // 칸의 상대 위치 계산
+    const cellRect = targetCell.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+    const cellCenterX = cellRect.left - containerRect.left + cellRect.width / 2;
+    const cellTop = cellRect.top - containerRect.top;
+
+    bubble.style.transform = 'none';
+    bubble.style.bottom = '';
+    bubble.style.top = (cellTop - 70) + 'px'; // 칸 위쪽
+    bubble.style.left = Math.max(0, cellCenterX - 110) + 'px';
+  }
+
   bubble.style.display = 'block';
-  // fade 애니메이션
   bubble.style.opacity = '0';
-  bubble.style.transform = 'translateY(4px)';
-  setTimeout(() => {
-    bubble.style.transition = 'opacity 0.35s, transform 0.35s';
-    bubble.style.opacity = '1';
-    bubble.style.transform = 'translateY(0)';
-  }, 10);
+  setTimeout(() => { bubble.style.opacity = '1'; }, 10);
 }
 
 // ============================================================
