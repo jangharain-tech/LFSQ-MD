@@ -439,26 +439,26 @@
           pointer-events:none;
           transition:opacity 0.35s, transform 0.35s;
         ">
-          <!-- 아래 꼬리 -->
+          <!-- 위쪽 꼬리 (날짜 칸 가리킴) -->
           <div id="issueBubbleTail" style="
             position:absolute;
-            bottom:-7px;
+            top:-7px;
             left:50%;
             transform:translateX(-50%);
             width:0;height:0;
             border-left:7px solid transparent;
             border-right:7px solid transparent;
-            border-top:7px solid #d1d5db;
+            border-bottom:7px solid #d1d5db;
           "></div>
           <div id="issueBubbleTailInner" style="
             position:absolute;
-            bottom:-5.5px;
+            top:-5.5px;
             left:50%;
             transform:translateX(-50%);
             width:0;height:0;
             border-left:6px solid transparent;
             border-right:6px solid transparent;
-            border-top:6px solid #fff;
+            border-bottom:6px solid #fff;
           "></div>
           <span id="issueBubbleDate" style="font-size:11px;color:#888;font-family:'DM Mono',monospace;margin-right:7px;"></span>
           <span id="issueBubbleText" style="font-weight:500;"></span>
@@ -1144,61 +1144,110 @@ function startIssueBubble() {
   const bubble = document.getElementById('issueBubble');
   const upcoming = getUpcomingIssues();
   if (!upcoming.length) { bubble.style.display='none'; return; }
+
+  // 날짜 그룹 수 계산
+  const dateGroups = [];
+  upcoming.forEach(iss => {
+    const last = dateGroups[dateGroups.length - 1];
+    if (last && last.date === iss.date) last.items.push(iss.content);
+    else dateGroups.push({ date: iss.date, items: [iss.content] });
+  });
+
   bubbleIdx = 0;
   showBubble(upcoming);
   bubbleTimer = setInterval(() => {
-    bubbleIdx = (bubbleIdx + 1) % upcoming.length;
-    showBubble(upcoming);
+    // 먼저 접기
+    const bubble = document.getElementById('issueBubble');
+    bubble.style.transition = 'opacity 0.2s ease, transform 0.25s cubic-bezier(0.55, 0, 1, 0.45)';
+    bubble.style.transform = 'scaleY(0)';
+    bubble.style.opacity = '0';
+    setTimeout(() => {
+      bubbleIdx = (bubbleIdx + 1) % dateGroups.length;
+      showBubble(upcoming);
+    }, 280);
   }, 3500);
 }
 
 function showBubble(upcoming) {
   const bubble = document.getElementById('issueBubble');
-  const iss = upcoming[bubbleIdx];
+  if (!upcoming.length) { bubble.style.display = 'none'; return; }
 
-  // 날짜 라벨
-  const d = new Date(iss.date + 'T00:00:00');
+  // 같은 날짜 이슈 묶기 — bubbleIdx는 날짜 기준으로 순환
+  const dateGroups = [];
+  upcoming.forEach(iss => {
+    const last = dateGroups[dateGroups.length - 1];
+    if (last && last.date === iss.date) last.items.push(iss.content);
+    else dateGroups.push({ date: iss.date, items: [iss.content] });
+  });
+  const group = dateGroups[bubbleIdx % dateGroups.length];
+
+  // D-day 라벨
+  const d = new Date(group.date + 'T00:00:00');
   const todayMid = new Date(); todayMid.setHours(0,0,0,0);
   const diff = Math.round((d - todayMid) / 86400000);
-  const label = diff === 0 ? '오늘' : diff === 1 ? '내일' : diff < 0 ? `${Math.abs(diff)}일 전` : `${diff}일 후`;
-  document.getElementById('issueBubbleDate').textContent = `${iss.date.slice(5).replace('-','/')} (${label})`;
-  document.getElementById('issueBubbleText').textContent = iss.content;
+  const dLabel = diff === 0 ? 'D-00' : diff > 0 ? `D-${String(diff).padStart(2,'0')}` : `D+${String(Math.abs(diff)).padStart(2,'0')}`;
+  const dateLabel = group.date.slice(5).replace('-', '/');
 
-  // 해당 날짜 칸 찾기 (calGrid 안에서)
+  // 말풍선 내용 — 같은 날짜 이슈 여러 줄
+  document.getElementById('issueBubbleDate').textContent = '';
+  document.getElementById('issueBubbleText').textContent = '';
+  const textEl = document.getElementById('issueBubbleText');
+  textEl.innerHTML = group.items.map(item =>
+    `<div><span style="color:#888;font-family:'DM Mono',monospace;margin-right:6px;font-size:11px;">${dateLabel}</span>${item}<span style="color:#aaa;font-size:11px;margin-left:7px;">(${dLabel})</span></div>`
+  ).join('');
+
+  // 해당 날짜 칸 찾기
   const grid = document.getElementById('calGrid');
-  const container = grid.parentElement; // position:relative 컨테이너
-  const dayCells = grid.querySelectorAll('.cal-day:not(.other-month)');
-  const [y, m, dayNum] = iss.date.split('-').map(Number);
-
+  const container = grid.parentElement;
+  const [y, m, dayNum] = group.date.split('-').map(Number);
   let targetCell = null;
   if (y === calYear && m === calMonth + 1) {
-    dayCells.forEach(cell => {
+    grid.querySelectorAll('.cal-day:not(.other-month)').forEach(cell => {
       if (parseInt(cell.textContent) === dayNum) targetCell = cell;
     });
   }
 
-  if (!targetCell) {
-    // 현재 달에 없으면 그냥 가운데 위
-    bubble.style.left = '50%';
-    bubble.style.transform = 'translateX(-50%)';
-    bubble.style.bottom = ''; 
-    bubble.style.top = '-60px';
-  } else {
-    // 칸의 상대 위치 계산
-    const cellRect = targetCell.getBoundingClientRect();
-    const containerRect = container.getBoundingClientRect();
-    const cellCenterX = cellRect.left - containerRect.left + cellRect.width / 2;
-    const cellTop = cellRect.top - containerRect.top;
-
-    bubble.style.transform = 'none';
-    bubble.style.bottom = '';
-    bubble.style.top = (cellTop - 70) + 'px'; // 칸 위쪽
-    bubble.style.left = Math.max(0, cellCenterX - 110) + 'px';
-  }
-
   bubble.style.display = 'block';
   bubble.style.opacity = '0';
-  setTimeout(() => { bubble.style.opacity = '1'; }, 10);
+  bubble.style.transform = 'scaleY(0)';
+  bubble.style.transformOrigin = 'top center';
+  bubble.style.transition = 'none';
+
+  // 위치 계산 — 날짜 칸 바로 아래, 꼬리는 위쪽
+  requestAnimationFrame(() => {
+    const bubbleW = bubble.offsetWidth;
+    if (targetCell) {
+      const cellRect = targetCell.getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
+      const cellCenterX = cellRect.left - containerRect.left + cellRect.width / 2;
+      const cellBottom = cellRect.bottom - containerRect.top;
+
+      // 말풍선 좌측 위치 (화면 밖 방지)
+      const containerW = containerRect.width;
+      let leftPos = cellCenterX - bubbleW / 2;
+      leftPos = Math.max(4, Math.min(leftPos, containerW - bubbleW - 4));
+
+      bubble.style.top = (cellBottom + 10) + 'px';
+      bubble.style.left = leftPos + 'px';
+
+      // 꼬리 X 위치 조정
+      const tailX = Math.max(10, Math.min(cellCenterX - leftPos, bubbleW - 10));
+      document.getElementById('issueBubbleTail').style.left = tailX + 'px';
+      document.getElementById('issueBubbleTail').style.transform = 'translateX(-50%)';
+      document.getElementById('issueBubbleTailInner').style.left = tailX + 'px';
+      document.getElementById('issueBubbleTailInner').style.transform = 'translateX(-50%)';
+    } else {
+      bubble.style.top = '10px';
+      bubble.style.left = '50%';
+    }
+
+    // 책 펼치기 애니메이션 시작
+    requestAnimationFrame(() => {
+      bubble.style.transition = 'opacity 0.28s ease, transform 0.38s cubic-bezier(0.23, 1, 0.32, 1)';
+      bubble.style.opacity = '1';
+      bubble.style.transform = 'scaleY(1)';
+    });
+  });
 }
 
 // ============================================================
