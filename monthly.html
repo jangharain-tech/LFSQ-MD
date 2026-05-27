@@ -218,9 +218,9 @@
               <a href="https://jangharain-tech.github.io/LFSQ-MD/product-dashboard.html" target="_blank" onclick="event.stopPropagation()" style="flex-shrink:0;padding:6px 12px;background:#b8d016;border-radius:6px;font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:700;color:#1a1f0a;text-decoration:none;letter-spacing:0.05em;white-space:nowrap;transition:background 0.2s;" onmouseover="this.style.background='#cae820'" onmouseout="this.style.background='#b8d016'">출시계획</a>
             </div>
         </div>
-        <div class="agenda-card has-link" id="card-ip" onclick="openImagePopup()">
+        <div class="agenda-card has-link" id="card-ip" onclick="openImagePopup()" style="background-color:#ffffff; background-image:none; background-size:35%; background-position:85% bottom; background-repeat:no-repeat; overflow:hidden;">
             <div class="config-toggle" onclick="toggleConfig(event,'ip')">⚙</div>
-            <div class="config-panel" id="config-ip"><label>제목</label><input type="text" id="title-ip" placeholder="제목"><label>설명</label><input type="text" id="desc-ip" placeholder="설명"><label>URL 설정</label><input type="url" id="url-ip" placeholder="https://..."><button onclick="saveLink(event,'ip')">저장</button></div>
+            <div class="config-panel" id="config-ip"><label>제목</label><input type="text" id="title-ip" placeholder="제목"><label>설명</label><input type="text" id="desc-ip" placeholder="설명"><label>URL 설정</label><input type="url" id="url-ip" placeholder="https://..."><label style="margin-top:6px;display:block;">누끼 이미지 (PNG)</label><input type="file" id="img-ip" accept="image/png,image/*" onchange="uploadCardImage(event,'ip')" style="padding:6px 4px;font-size:11px;"><div id="imgstatus-ip" style="font-size:10px;color:#7a9a00;margin-bottom:8px;min-height:12px;"></div><button onclick="saveLink(event,'ip')">저장</button></div>
             <div class="card-number">04</div>
             <div><div class="card-label" id="label-ip">Review</div><div class="card-desc" id="cdesc-ip">IP & 제품별 상세 리뷰</div></div>
         </div>
@@ -232,6 +232,7 @@
               <label>설명</label><input type="text" id="desc-ownip" placeholder="설명">
               <label>카드 URL</label><input type="url" id="url-ownip" placeholder="https://...">
               <label style="margin-top:6px;display:block;">누가사 URL</label><input type="url" id="url-ownip-nugasa" placeholder="https://...">
+              <label style="margin-top:6px;display:block;">누끼 이미지 (PNG)</label><input type="file" id="img-ownip" accept="image/png,image/*" onchange="uploadCardImage(event,'ownip')" style="padding:6px 4px;font-size:11px;"><div id="imgstatus-ownip" style="font-size:10px;color:#7a9a00;margin-bottom:8px;min-height:12px;"></div>
               <button onclick="saveLink(event,'ownip')">저장</button>
             </div>
             <div>
@@ -312,7 +313,7 @@
   }
 
   /** 1. 구글 시트 연동 설정 **/
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbznbLeEtnPOfda5NQg465LpCldmedkM0c0oomgSrlnzfDA_oIr3mE69Hyd51NhLG4fd/exec";
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwhIpItxYWqvUpKrDx-TtsdzYAIt6JZ9Ib11TKP64i-s1hJpahr3wcJqDIc11yPAs7K/exec";
   const links = {};
 
   // 구글 드라이브 파일 ID → 직접 이미지 URL 변환
@@ -392,6 +393,62 @@
         const el = document.getElementById('badgetext-' + id);
         if (el) el.textContent = links[id + '_badge'];
       }
+      // 업로드된 누끼 이미지 복원 (04 ip, 05 ownip)
+      if (links[id + '_img']) {
+        applyCardImage(id, links[id + '_img']);
+      }
+    });
+  }
+
+  // fileId를 카드 배경(우측 하단 누끼 스타일)에 적용
+  function applyCardImage(id, fileId) {
+    const card = document.getElementById('card-' + id);
+    if (!card || !fileId) return;
+    card.style.backgroundImage = "url('" + driveImgUrl(fileId) + "')";
+    card.style.backgroundSize = '35%';
+    card.style.backgroundPosition = '85% bottom';
+    card.style.backgroundRepeat = 'no-repeat';
+    card.style.overflow = 'hidden';
+  }
+
+  // 파일 선택 → base64 변환 → Apps Script로 업로드 → 반환된 fileId 적용
+  async function uploadCardImage(e, id) {
+    e.stopPropagation();
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const statusEl = document.getElementById('imgstatus-' + id);
+    if (statusEl) { statusEl.style.color = '#7a9a00'; statusEl.textContent = '업로드 중...'; }
+    try {
+      const base64 = await fileToBase64(file);
+      const res = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({ id: id + '_img', image: base64, mimeType: file.type || 'image/png' })
+      });
+      const data = await res.json();
+      if (data && data.ok && data.fileId) {
+        links[id + '_img'] = data.fileId;
+        try { localStorage.setItem('lfsq_links', JSON.stringify(links)); } catch(err) {}
+        applyCardImage(id, data.fileId);
+        if (statusEl) { statusEl.style.color = '#7a9a00'; statusEl.textContent = '✓ 업로드 완료'; }
+      } else {
+        if (statusEl) { statusEl.style.color = '#d66'; statusEl.textContent = '업로드 실패'; }
+      }
+    } catch(err) {
+      if (statusEl) { statusEl.style.color = '#d66'; statusEl.textContent = '업로드 실패'; }
+    }
+  }
+
+  // File → base64 (data URL 접두어 제거)
+  function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result || '';
+        const comma = result.indexOf(',');
+        resolve(comma >= 0 ? result.slice(comma + 1) : result);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
     });
   }
 
@@ -516,6 +573,12 @@
       if (badgeInput) {
         const badgeEl = document.getElementById('badgetext-' + id);
         badgeInput.value = (links[id + '_badge'] != null ? links[id + '_badge'] : (badgeEl ? badgeEl.textContent : ''));
+      }
+      // 누끼 이미지 상태 안내
+      const statusEl = document.getElementById('imgstatus-' + id);
+      if (statusEl) {
+        statusEl.style.color = '#7a9a00';
+        statusEl.textContent = links[id + '_img'] ? '✓ 등록된 이미지 있음 (교체하려면 선택)' : '';
       }
     }
   }
