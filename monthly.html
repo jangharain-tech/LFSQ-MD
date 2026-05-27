@@ -199,34 +199,37 @@
         <div class="agenda-grid">
         <div class="agenda-card" id="card-review" onclick="handleCardClick('review')">
             <div class="config-toggle" onclick="toggleConfig(event,'review')">⚙</div>
-            <div class="config-panel" id="config-review"><label>URL 설정</label><input type="url" id="url-review" placeholder="https://..."><button onclick="saveLink(event,'review')">저장</button></div>
+            <div class="config-panel" id="config-review"><label>제목</label><input type="text" id="title-review" placeholder="제목"><label>설명</label><input type="text" id="desc-review" placeholder="설명"><label>URL 설정</label><input type="url" id="url-review" placeholder="https://..."><button onclick="saveLink(event,'review')">저장</button></div>
             <div class="card-number">01</div>
-            <div><div class="card-label">Summary</div><div class="card-desc">전월 성과 리뷰 및 IP별 점검</div></div>
+            <div><div class="card-label" id="label-review">Summary</div><div class="card-desc" id="cdesc-review">전월 성과 리뷰 및 IP별 점검</div></div>
         </div>
         <div class="agenda-card" id="card-planning" onclick="handleCardClick('planning')">
             <div class="config-toggle" onclick="toggleConfig(event,'planning')">⚙</div>
-            <div class="config-panel" id="config-planning"><label>URL 설정</label><input type="url" id="url-planning" placeholder="https://..."><button onclick="saveLink(event,'planning')">저장</button></div>
+            <div class="config-panel" id="config-planning"><label>제목</label><input type="text" id="title-planning" placeholder="제목"><label>설명</label><input type="text" id="desc-planning" placeholder="설명"><label>URL 설정</label><input type="url" id="url-planning" placeholder="https://..."><button onclick="saveLink(event,'planning')">저장</button></div>
             <div class="card-number">02</div>
-            <div><div class="card-label">Planning</div><div class="card-desc">IP/Project 출시계획 및 물량</div></div>
+            <div><div class="card-label" id="label-planning">Planning</div><div class="card-desc" id="cdesc-planning">IP/Project 출시계획 및 물량</div></div>
         </div>
         <div class="agenda-card" id="card-buying" onclick="handleCardClick('buying')">
             <div class="config-toggle" onclick="toggleConfig(event,'buying')">⚙</div>
-            <div class="config-panel" id="config-buying"><label>URL 설정</label><input type="url" id="url-buying" placeholder="https://..."><button onclick="saveLink(event,'buying')">저장</button></div>
+            <div class="config-panel" id="config-buying"><label>제목</label><input type="text" id="title-buying" placeholder="제목"><label>설명</label><input type="text" id="desc-buying" placeholder="설명"><label>URL 설정</label><input type="url" id="url-buying" placeholder="https://..."><button onclick="saveLink(event,'buying')">저장</button></div>
             <div class="card-number">03</div>
             <div style="display:flex; justify-content:space-between; align-items:flex-end;">
-              <div><div class="card-label">Buying</div><div class="card-desc">사입계획 및 현황</div></div>
+              <div><div class="card-label" id="label-buying">Buying</div><div class="card-desc" id="cdesc-buying">사입계획 및 현황</div></div>
               <a href="https://jangharain-tech.github.io/LFSQ-MD/product-dashboard.html" target="_blank" onclick="event.stopPropagation()" style="flex-shrink:0;padding:6px 12px;background:#b8d016;border-radius:6px;font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:700;color:#1a1f0a;text-decoration:none;letter-spacing:0.05em;white-space:nowrap;transition:background 0.2s;" onmouseover="this.style.background='#cae820'" onmouseout="this.style.background='#b8d016'">출시계획</a>
             </div>
         </div>
         <div class="agenda-card has-link" id="card-ip" onclick="openImagePopup()">
             <div class="config-toggle" onclick="toggleConfig(event,'ip')">⚙</div>
-            <div class="config-panel" id="config-ip"><label>URL 설정</label><input type="url" id="url-ip" placeholder="https://..."><button onclick="saveLink(event,'ip')">저장</button></div>
+            <div class="config-panel" id="config-ip"><label>제목</label><input type="text" id="title-ip" placeholder="제목"><label>설명</label><input type="text" id="desc-ip" placeholder="설명"><label>URL 설정</label><input type="url" id="url-ip" placeholder="https://..."><button onclick="saveLink(event,'ip')">저장</button></div>
             <div class="card-number">04</div>
-            <div><div class="card-label">Review</div><div class="card-desc">IP & 제품별 상세 리뷰</div></div>
+            <div><div class="card-label" id="label-ip">Review</div><div class="card-desc" id="cdesc-ip">IP & 제품별 상세 리뷰</div></div>
         </div>
         <div class="agenda-card" id="card-ownip" onclick="openOwnipPopup()" style="background-color:#c8cac8; background-image:url('https://lh3.googleusercontent.com/d/11_TpOv5oVJjqSvSxQWWhUluulR9O22ql'); background-size:35%; background-position:85% bottom; background-repeat:no-repeat; overflow:hidden;">
             <div class="config-toggle" onclick="toggleConfig(event,'ownip')">⚙</div>
             <div class="config-panel" id="config-ownip">
+              <label>배지</label><input type="text" id="badge-ownip" placeholder="배지">
+              <label>제목</label><input type="text" id="title-ownip" placeholder="제목">
+              <label>설명</label><input type="text" id="desc-ownip" placeholder="설명">
               <label>카드 URL</label><input type="url" id="url-ownip" placeholder="https://...">
               <label style="margin-top:6px;display:block;">누가사 URL</label><input type="url" id="url-ownip-nugasa" placeholder="https://...">
               <button onclick="saveLink(event,'ownip')">저장</button>
@@ -235,14 +238,14 @@
               <div class="card-number">05</div>
               <a id="btn-nugasa" href="https://doeun-ai.github.io/nugasapopup" target="_blank" onclick="event.stopPropagation(); event.stopImmediatePropagation();" style="display:inline-block;margin-top:8px;padding:6px 14px;background:#1a1f0a;color:#c8e832;border-radius:6px;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;text-decoration:none;letter-spacing:0.06em;transition:background 0.2s;" onmouseover="this.style.background='#2e3a10'" onmouseout="this.style.background='#1a1f0a'">누가사</a>
             </div>
-            <div><div style="font-size:11px;font-weight:700;color:#7a9a00;background:rgba(168,196,26,0.12);display:inline-block;padding:3px 8px;border-radius:4px;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px;">OWN IP 전략</div><div class="card-label">LFSQ IP</div><div class="card-desc">전략IP 전개현황</div></div>
+            <div><div id="badgetext-ownip" style="font-size:11px;font-weight:700;color:#7a9a00;background:rgba(168,196,26,0.12);display:inline-block;padding:3px 8px;border-radius:4px;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px;">OWN IP 전략</div><div class="card-label" id="label-ownip">LFSQ IP</div><div class="card-desc" id="cdesc-ownip">전략IP 전개현황</div></div>
         </div>
         <div class="agenda-card" id="card-brand" onclick="handleCardClick('brand')" style="background-color:#c8cac8; background-image:url('https://lh3.googleusercontent.com/d/1S9MDdfQoN9g5RquigTKRoQYyaC4GGhvP'); background-size:cover; background-position:center; background-repeat:no-repeat; overflow:hidden; position:relative;">
             <div style="position:absolute;inset:0;background:rgba(200,202,200,0.45);border-radius:10px;pointer-events:none;"></div>
             <div class="config-toggle" onclick="toggleConfig(event,'brand')">⚙</div>
-            <div class="config-panel" id="config-brand"><label>URL 설정</label><input type="url" id="url-brand" placeholder="https://..."><button onclick="saveLink(event,'brand')">저장</button></div>
+            <div class="config-panel" id="config-brand"><label>배지</label><input type="text" id="badge-brand" placeholder="배지"><label>제목</label><input type="text" id="title-brand" placeholder="제목"><label>설명</label><input type="text" id="desc-brand" placeholder="설명"><label>URL 설정</label><input type="url" id="url-brand" placeholder="https://..."><button onclick="saveLink(event,'brand')">저장</button></div>
             <div class="card-number" style="position:relative;z-index:2;">06</div>
-            <div style="position:relative;z-index:2;"><div style="font-size:11px;font-weight:700;color:#7a9a00;background:rgba(168,196,26,0.12);display:inline-block;padding:3px 8px;border-radius:4px;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px;">PRIVATE BRAND</div><div class="card-label" style="color:#0e1200;">LFSQ Brand</div><div class="card-desc">신규브랜드 전략 및 전개</div></div>
+            <div style="position:relative;z-index:2;"><div id="badgetext-brand" style="font-size:11px;font-weight:700;color:#7a9a00;background:rgba(168,196,26,0.12);display:inline-block;padding:3px 8px;border-radius:4px;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px;">PRIVATE BRAND</div><div class="card-label" id="label-brand" style="color:#0e1200;">LFSQ Brand</div><div class="card-desc" id="cdesc-brand">신규브랜드 전략 및 전개</div></div>
         </div>
       </div>
       </div><!-- end agenda-body -->
@@ -373,6 +376,25 @@
     btn.textContent = '저장';
   }
 
+  // 시트/캐시에 저장된 카드 제목·설명·배지를 화면에 적용
+  function applyCardTexts() {
+    const ids = ['review','planning','buying','ip','ownip','brand'];
+    ids.forEach(id => {
+      if (links[id + '_label']) {
+        const el = document.getElementById('label-' + id);
+        if (el) el.textContent = links[id + '_label'];
+      }
+      if (links[id + '_desc']) {
+        const el = document.getElementById('cdesc-' + id);
+        if (el) el.textContent = links[id + '_desc'];
+      }
+      if (links[id + '_badge']) {
+        const el = document.getElementById('badgetext-' + id);
+        if (el) el.textContent = links[id + '_badge'];
+      }
+    });
+  }
+
   // 초기 로드: 시트에서 URL 가져오기
   async function loadData() {
     // localStorage 백업 먼저 적용
@@ -409,6 +431,8 @@
           if (card) card.classList.add('has-link');
         }
       });
+      // 카드 제목 / 설명 / 배지 적용
+      applyCardTexts();
     } catch(e) {
       // 시트 로드 실패 → localStorage 백업으로 UI 복원
       applyBg(links['hero_bg'] || '');
@@ -422,6 +446,7 @@
           if (card) card.classList.add('has-link');
         }
       });
+      applyCardTexts();
       console.error("시트 로딩 실패, 로컬 캐시 사용");
     }
   }
@@ -476,6 +501,22 @@
       document.getElementById('url-' + id).focus();
       const nugasaInput = document.getElementById('url-' + id + '-nugasa');
       if (nugasaInput) nugasaInput.value = links[id + '_nugasa'] || '';
+      // 제목 / 설명 / 배지 현재값 채우기
+      const titleInput = document.getElementById('title-' + id);
+      if (titleInput) {
+        const labelEl = document.getElementById('label-' + id);
+        titleInput.value = (links[id + '_label'] != null ? links[id + '_label'] : (labelEl ? labelEl.textContent : ''));
+      }
+      const descInput = document.getElementById('desc-' + id);
+      if (descInput) {
+        const descEl = document.getElementById('cdesc-' + id);
+        descInput.value = (links[id + '_desc'] != null ? links[id + '_desc'] : (descEl ? descEl.textContent : ''));
+      }
+      const badgeInput = document.getElementById('badge-' + id);
+      if (badgeInput) {
+        const badgeEl = document.getElementById('badgetext-' + id);
+        badgeInput.value = (links[id + '_badge'] != null ? links[id + '_badge'] : (badgeEl ? badgeEl.textContent : ''));
+      }
     }
   }
 
@@ -493,6 +534,32 @@
       const nugasaBtn = document.getElementById('btn-nugasa');
       if (nugasaBtn) nugasaBtn.href = nugasaUrl || '#';
       fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ id: id + '_nugasa', url: nugasaUrl }) }).catch(()=>{});
+    }
+
+    // 제목 / 설명 / 배지 저장 및 반영
+    const titleInput = document.getElementById('title-' + id);
+    if (titleInput) {
+      const v = titleInput.value.trim();
+      links[id + '_label'] = v;
+      const labelEl = document.getElementById('label-' + id);
+      if (labelEl && v) labelEl.textContent = v;
+      fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ id: id + '_label', url: v }) }).catch(()=>{});
+    }
+    const descInput = document.getElementById('desc-' + id);
+    if (descInput) {
+      const v = descInput.value.trim();
+      links[id + '_desc'] = v;
+      const descEl = document.getElementById('cdesc-' + id);
+      if (descEl && v) descEl.textContent = v;
+      fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ id: id + '_desc', url: v }) }).catch(()=>{});
+    }
+    const badgeInput = document.getElementById('badge-' + id);
+    if (badgeInput) {
+      const v = badgeInput.value.trim();
+      links[id + '_badge'] = v;
+      const badgeEl = document.getElementById('badgetext-' + id);
+      if (badgeEl && v) badgeEl.textContent = v;
+      fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ id: id + '_badge', url: v }) }).catch(()=>{});
     }
 
     btn.innerText = "저장중...";
