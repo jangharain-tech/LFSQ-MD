@@ -109,6 +109,20 @@
   .config-panel input { width: 100%; padding: 8px; margin-bottom: 10px; background: #000; border: 1px solid #444; color: #fff; border-radius: 4px; font-size: 12px; }
   .config-panel button { width: 100%; padding: 8px; background: var(--mint); border: none; border-radius: 4px; font-weight: bold; cursor: pointer; color: #1a1f0a; }
 
+  /* 카드 누끼 이미지 레이어 (04,05번) */
+  .card-img-layer {
+    position: absolute;
+    right: 14px;
+    bottom: 14px;
+    top: 38%;            /* 상단 여백 확보 → 위쪽 텍스트/번호와 안 겹침 */
+    width: 46%;
+    max-width: 46%;
+    object-fit: contain;        /* 비율 유지, 잘림 없음 */
+    object-position: right bottom;
+    pointer-events: none;
+    z-index: 0;
+  }
+
   @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 </head>
@@ -221,8 +235,8 @@
         <div class="agenda-card has-link" id="card-ip" onclick="openImagePopup()" style="background-color:#ffffff; background-image:none; background-size:35%; background-position:85% bottom; background-repeat:no-repeat; overflow:hidden;">
             <div class="config-toggle" onclick="toggleConfig(event,'ip')">⚙</div>
             <div class="config-panel" id="config-ip"><label>제목</label><input type="text" id="title-ip" placeholder="제목"><label>설명</label><input type="text" id="desc-ip" placeholder="설명"><label>URL 설정</label><input type="url" id="url-ip" placeholder="https://..."><label style="margin-top:6px;display:block;">누끼 이미지 (PNG)</label><input type="file" id="img-ip" accept="image/png,image/*" onchange="uploadCardImage(event,'ip')" style="padding:6px 4px;font-size:11px;"><div id="imgstatus-ip" style="font-size:10px;color:#7a9a00;margin-bottom:8px;min-height:12px;"></div><button onclick="saveLink(event,'ip')">저장</button></div>
-            <div class="card-number">04</div>
-            <div><div class="card-label" id="label-ip">Review</div><div class="card-desc" id="cdesc-ip">IP & 제품별 상세 리뷰</div></div>
+            <div class="card-number" style="position:relative;z-index:1;">04</div>
+            <div style="position:relative;z-index:1;"><div class="card-label" id="label-ip">Review</div><div class="card-desc" id="cdesc-ip">IP & 제품별 상세 리뷰</div></div>
         </div>
         <div class="agenda-card" id="card-ownip" onclick="openOwnipPopup()" style="background-color:#c8cac8; background-image:url('https://lh3.googleusercontent.com/d/11_TpOv5oVJjqSvSxQWWhUluulR9O22ql'); background-size:35%; background-position:85% bottom; background-repeat:no-repeat; overflow:hidden;">
             <div class="config-toggle" onclick="toggleConfig(event,'ownip')">⚙</div>
@@ -235,11 +249,11 @@
               <label style="margin-top:6px;display:block;">누끼 이미지 (PNG)</label><input type="file" id="img-ownip" accept="image/png,image/*" onchange="uploadCardImage(event,'ownip')" style="padding:6px 4px;font-size:11px;"><div id="imgstatus-ownip" style="font-size:10px;color:#7a9a00;margin-bottom:8px;min-height:12px;"></div>
               <button onclick="saveLink(event,'ownip')">저장</button>
             </div>
-            <div>
+            <div style="position:relative;z-index:1;">
               <div class="card-number">05</div>
               <a id="btn-nugasa" href="https://doeun-ai.github.io/nugasapopup" target="_blank" onclick="event.stopPropagation(); event.stopImmediatePropagation();" style="display:inline-block;margin-top:8px;padding:6px 14px;background:#1a1f0a;color:#c8e832;border-radius:6px;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;text-decoration:none;letter-spacing:0.06em;transition:background 0.2s;" onmouseover="this.style.background='#2e3a10'" onmouseout="this.style.background='#1a1f0a'">누가사</a>
             </div>
-            <div><div id="badgetext-ownip" style="font-size:11px;font-weight:700;color:#7a9a00;background:rgba(168,196,26,0.12);display:inline-block;padding:3px 8px;border-radius:4px;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px;">OWN IP 전략</div><div class="card-label" id="label-ownip">LFSQ IP</div><div class="card-desc" id="cdesc-ownip">전략IP 전개현황</div></div>
+            <div style="position:relative;z-index:1;"><div id="badgetext-ownip" style="font-size:11px;font-weight:700;color:#7a9a00;background:rgba(168,196,26,0.12);display:inline-block;padding:3px 8px;border-radius:4px;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px;">OWN IP 전략</div><div class="card-label" id="label-ownip">LFSQ IP</div><div class="card-desc" id="cdesc-ownip">전략IP 전개현황</div></div>
         </div>
         <div class="agenda-card" id="card-brand" onclick="handleCardClick('brand')" style="background-color:#c8cac8; background-image:url('https://lh3.googleusercontent.com/d/1S9MDdfQoN9g5RquigTKRoQYyaC4GGhvP'); background-size:cover; background-position:center; background-repeat:no-repeat; overflow:hidden; position:relative;">
             <div style="position:absolute;inset:0;background:rgba(200,202,200,0.45);border-radius:10px;pointer-events:none;"></div>
@@ -404,22 +418,27 @@
   function applyCardImage(id, fileId) {
     const card = document.getElementById('card-' + id);
     if (!card || !fileId) return;
+    // 기존 background 방식 잔재 제거
+    card.style.backgroundImage = 'none';
     // 두 가지 표시 URL을 순서대로 시도 (드라이브 신규 파일 호환)
     const candidates = [
       'https://lh3.googleusercontent.com/d/' + fileId,
       'https://drive.google.com/thumbnail?id=' + fileId + '&sz=w1000'
     ];
+    // 카드 안에 이미지 레이어 준비 (없으면 생성)
+    let imgEl = card.querySelector('.card-img-layer');
+    if (!imgEl) {
+      imgEl = document.createElement('img');
+      imgEl.className = 'card-img-layer';
+      imgEl.alt = '';
+      card.appendChild(imgEl);
+    }
+    card.style.overflow = 'hidden';
     function tryUrl(idx) {
-      if (idx >= candidates.length) return; // 모두 실패해도 일단 첫번째로 시도해둠
+      if (idx >= candidates.length) return;
       const url = candidates[idx];
       const test = new Image();
-      test.onload = () => {
-        card.style.backgroundImage = "url('" + url + "')";
-        card.style.backgroundSize = '35%';
-        card.style.backgroundPosition = '85% bottom';
-        card.style.backgroundRepeat = 'no-repeat';
-        card.style.overflow = 'hidden';
-      };
+      test.onload = () => { imgEl.src = url; };
       test.onerror = () => tryUrl(idx + 1);
       test.src = url;
     }
