@@ -169,6 +169,18 @@
 
 <!-- (04번 팝업 모달 제거됨: 04번은 이제 URL 이동 방식) -->
 
+<!-- 06번 카드 URL 팝업 (iframe) -->
+<div id="brandPopup" onclick="closeBrandPopup()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
+  <div onclick="event.stopPropagation()" style="position:relative;width:90vw;height:88vh;max-width:1400px;background:#fff;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.6);overflow:hidden;">
+    <div style="position:absolute;top:0;left:0;right:0;height:42px;background:#1a1f0a;display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:0 12px;z-index:2;">
+      <a id="brandPopupOpen" href="#" target="_blank" style="color:#c8e832;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;text-decoration:none;padding:5px 10px;border:1px solid #c8e832;border-radius:5px;">새 탭에서 열기 ↗</a>
+      <button onclick="closeBrandPopup()" style="width:28px;height:28px;border-radius:50%;background:#c8e832;border:none;font-size:16px;font-weight:900;cursor:pointer;color:#1a1f0a;line-height:1;">×</button>
+    </div>
+    <iframe id="brandPopupFrame" src="" style="position:absolute;top:42px;left:0;width:100%;height:calc(100% - 42px);border:none;" referrerpolicy="no-referrer"></iframe>
+  </div>
+</div>
+
+
 <div class="slides-wrap">
   <div class="slides-inner" id="slidesInner">
 
@@ -250,7 +262,7 @@
             </div>
             <div style="position:relative;z-index:1;"><div id="badgetext-ownip" style="font-size:11px;font-weight:700;color:#7a9a00;background:rgba(168,196,26,0.12);display:inline-block;padding:3px 8px;border-radius:4px;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px;">OWN IP 전략</div><div class="card-label" id="label-ownip">LFSQ IP</div><div class="card-desc" id="cdesc-ownip">전략IP 전개현황</div></div>
         </div>
-        <div class="agenda-card" id="card-brand" onclick="handleCardClick('brand')" style="background-color:#c8cac8; background-image:url('https://lh3.googleusercontent.com/d/1S9MDdfQoN9g5RquigTKRoQYyaC4GGhvP'); background-size:cover; background-position:center; background-repeat:no-repeat; overflow:hidden; position:relative;">
+        <div class="agenda-card" id="card-brand" onclick="openBrandPopup()" style="background-color:#c8cac8; background-image:url('https://lh3.googleusercontent.com/d/1S9MDdfQoN9g5RquigTKRoQYyaC4GGhvP'); background-size:cover; background-position:center; background-repeat:no-repeat; overflow:hidden; position:relative;">
             <div style="position:absolute;inset:0;background:rgba(200,202,200,0.45);border-radius:10px;pointer-events:none;"></div>
             <div class="config-toggle" onclick="toggleConfig(event,'brand')">⚙</div>
             <div class="config-panel" id="config-brand"><label>배지</label><input type="text" id="badge-brand" placeholder="배지"><label>제목</label><input type="text" id="title-brand" placeholder="제목"><label>설명</label><input type="text" id="desc-brand" placeholder="설명"><label>URL 설정</label><input type="url" id="url-brand" placeholder="https://..."><button onclick="saveLink(event,'brand')">저장</button></div>
@@ -291,9 +303,23 @@
     document.getElementById('ownipPopup').style.display = 'none';
   }
 
-  // ESC 키로 닫기 (05번 팝업)
+  // 06번 카드: 입력된 URL을 팝업(iframe)으로 띄움
+  function openBrandPopup() {
+    if (document.getElementById('config-brand').classList.contains('open')) return;
+    const url = links['brand'];
+    if (!url) { alert("설정된 링크가 없습니다. ⚙를 눌러 설정해주세요."); return; }
+    document.getElementById('brandPopupFrame').src = url;
+    document.getElementById('brandPopupOpen').href = url;
+    document.getElementById('brandPopup').style.display = 'flex';
+  }
+  function closeBrandPopup() {
+    document.getElementById('brandPopup').style.display = 'none';
+    document.getElementById('brandPopupFrame').src = ''; // 정지
+  }
+
+  // ESC 키로 닫기 (05·06번 팝업)
   window.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { closeOwnipPopup(); }
+    if (e.key === 'Escape') { closeOwnipPopup(); closeBrandPopup(); }
   });
 
   function editTitleLine(line) {
