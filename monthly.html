@@ -170,7 +170,7 @@
 <!-- 이미지 팝업 모달 -->
 <div id="imagePopup" onclick="closeImagePopup()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
   <div onclick="event.stopPropagation()" style="position:relative;max-width:90vw;max-height:90vh;">
-    <img src="https://lh3.googleusercontent.com/d/1CMhM-6pCaHKGR9aOsGWDsJ40Ic9QX9aj" style="max-width:90vw;max-height:85vh;object-fit:contain;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.6);" />
+    <img id="popupImg" src="https://lh3.googleusercontent.com/d/1CMhM-6pCaHKGR9aOsGWDsJ40Ic9QX9aj" style="max-width:90vw;max-height:85vh;object-fit:contain;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.6);" />
     <button onclick="closeImagePopup()" style="position:absolute;top:-16px;right:-16px;width:36px;height:36px;border-radius:50%;background:#c8e832;border:none;font-size:18px;font-weight:900;cursor:pointer;color:#1a1f0a;line-height:1;">×</button>
   </div>
 </div>
@@ -225,16 +225,16 @@
         </div>
         <div class="agenda-card" id="card-buying" onclick="handleCardClick('buying')">
             <div class="config-toggle" onclick="toggleConfig(event,'buying')">⚙</div>
-            <div class="config-panel" id="config-buying"><label>제목</label><input type="text" id="title-buying" placeholder="제목"><label>설명</label><input type="text" id="desc-buying" placeholder="설명"><label>URL 설정</label><input type="url" id="url-buying" placeholder="https://..."><button onclick="saveLink(event,'buying')">저장</button></div>
+            <div class="config-panel" id="config-buying"><label>제목</label><input type="text" id="title-buying" placeholder="제목"><label>설명</label><input type="text" id="desc-buying" placeholder="설명"><label>카드 URL</label><input type="url" id="url-buying" placeholder="https://..."><label style="margin-top:6px;display:block;">출시계획 버튼 URL</label><input type="url" id="url-buying-btn" placeholder="https://..."><button onclick="saveLink(event,'buying')">저장</button></div>
             <div class="card-number">03</div>
             <div style="display:flex; justify-content:space-between; align-items:flex-end;">
               <div><div class="card-label" id="label-buying">Buying</div><div class="card-desc" id="cdesc-buying">사입계획 및 현황</div></div>
-              <a href="https://jangharain-tech.github.io/LFSQ-MD/product-dashboard.html" target="_blank" onclick="event.stopPropagation()" style="flex-shrink:0;padding:6px 12px;background:#b8d016;border-radius:6px;font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:700;color:#1a1f0a;text-decoration:none;letter-spacing:0.05em;white-space:nowrap;transition:background 0.2s;" onmouseover="this.style.background='#cae820'" onmouseout="this.style.background='#b8d016'">출시계획</a>
+              <a id="btn-buying" href="https://jangharain-tech.github.io/LFSQ-MD/product-dashboard.html" target="_blank" onclick="event.stopPropagation()" style="flex-shrink:0;padding:6px 12px;background:#b8d016;border-radius:6px;font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:700;color:#1a1f0a;text-decoration:none;letter-spacing:0.05em;white-space:nowrap;transition:background 0.2s;" onmouseover="this.style.background='#cae820'" onmouseout="this.style.background='#b8d016'">출시계획</a>
             </div>
         </div>
         <div class="agenda-card has-link" id="card-ip" onclick="openImagePopup()" style="background-color:#ffffff; background-image:none; background-size:35%; background-position:85% bottom; background-repeat:no-repeat; overflow:hidden;">
             <div class="config-toggle" onclick="toggleConfig(event,'ip')">⚙</div>
-            <div class="config-panel" id="config-ip"><label>제목</label><input type="text" id="title-ip" placeholder="제목"><label>설명</label><input type="text" id="desc-ip" placeholder="설명"><label>URL 설정</label><input type="url" id="url-ip" placeholder="https://..."><label style="margin-top:6px;display:block;">누끼 이미지 (PNG)</label><input type="file" id="img-ip" accept="image/png,image/*" onchange="uploadCardImage(event,'ip')" style="padding:6px 4px;font-size:11px;"><div id="imgstatus-ip" style="font-size:10px;color:#7a9a00;margin-bottom:8px;min-height:12px;"></div><button onclick="saveLink(event,'ip')">저장</button></div>
+            <div class="config-panel" id="config-ip"><label>제목</label><input type="text" id="title-ip" placeholder="제목"><label>설명</label><input type="text" id="desc-ip" placeholder="설명"><label>URL 설정</label><input type="url" id="url-ip" placeholder="https://..."><label style="margin-top:6px;display:block;">누끼 이미지 (PNG)</label><input type="file" id="img-ip" accept="image/png,image/*" onchange="uploadCardImage(event,'ip')" style="padding:6px 4px;font-size:11px;"><div id="imgstatus-ip" style="font-size:10px;color:#7a9a00;margin-bottom:8px;min-height:12px;"></div><label style="margin-top:6px;display:block;">클릭 시 팝업 이미지</label><input type="file" id="img-ip-popup" accept="image/*" onchange="uploadPopupImage(event,'ip')" style="padding:6px 4px;font-size:11px;"><div id="imgstatus-ip-popup" style="font-size:10px;color:#7a9a00;margin-bottom:8px;min-height:12px;"></div><button onclick="saveLink(event,'ip')">저장</button></div>
             <div class="card-number" style="position:relative;z-index:1;">04</div>
             <div style="position:relative;z-index:1;"><div class="card-label" id="label-ip">Review</div><div class="card-desc" id="cdesc-ip">IP & 제품별 상세 리뷰</div></div>
         </div>
@@ -411,7 +411,16 @@
       if (links[id + '_img']) {
         applyCardImage(id, links[id + '_img']);
       }
+      // 출시계획 등 보조 버튼 URL 복원
+      if (links[id + '_btn']) {
+        const btnEl = document.getElementById('btn-' + id);
+        if (btnEl) btnEl.href = links[id + '_btn'];
+      }
     });
+    // 04번 클릭 팝업 이미지 복원
+    if (links['ip_popup']) {
+      applyPopupImage(links['ip_popup']);
+    }
   }
 
   // fileId를 카드 배경(우측 하단 누끼 스타일)에 적용
@@ -486,6 +495,66 @@
     } catch(err) {
       if (statusEl) { statusEl.style.color = '#d66'; statusEl.textContent = '업로드 실패'; }
     }
+  }
+
+  // 클릭 팝업용 이미지 업로드 (04번 카드 클릭 시 뜨는 이미지)
+  async function uploadPopupImage(e, id) {
+    e.stopPropagation();
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const statusEl = document.getElementById('imgstatus-' + id + '-popup');
+    if (statusEl) { statusEl.style.color = '#7a9a00'; statusEl.textContent = '업로드 중...'; }
+    try {
+      const base64 = await fileToBase64(file);
+      const prevId = links[id + '_popup'] || '';
+
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({ id: id + '_popup', image: base64, mimeType: file.type || 'image/png' })
+      }).catch(()=>{});
+
+      let newId = '';
+      for (let i = 0; i < 12; i++) {
+        await sleep(2000);
+        try {
+          const res = await fetch(SCRIPT_URL + '?t=' + Date.now());
+          const data = await res.json();
+          const v = data && data[id + '_popup'];
+          if (v && v !== prevId) { newId = v; break; }
+        } catch(err) {}
+        if (statusEl) statusEl.textContent = '업로드 중...' + ((i + 1) * 2) + 's';
+      }
+
+      if (newId) {
+        links[id + '_popup'] = newId;
+        try { localStorage.setItem('lfsq_links', JSON.stringify(links)); } catch(err) {}
+        applyPopupImage(newId);
+        if (statusEl) { statusEl.style.color = '#7a9a00'; statusEl.textContent = '✓ 업로드 완료'; }
+      } else {
+        if (statusEl) { statusEl.style.color = '#d66'; statusEl.textContent = '실패: 잠시 후 새로고침'; }
+      }
+    } catch(err) {
+      if (statusEl) { statusEl.style.color = '#d66'; statusEl.textContent = '업로드 실패'; }
+    }
+  }
+
+  // 팝업 이미지 src 교체 (드라이브 표시 URL 폴백 포함)
+  function applyPopupImage(fileId) {
+    const img = document.getElementById('popupImg');
+    if (!img || !fileId) return;
+    const candidates = [
+      'https://lh3.googleusercontent.com/d/' + fileId,
+      'https://drive.google.com/thumbnail?id=' + fileId + '&sz=w1600'
+    ];
+    function tryUrl(idx) {
+      if (idx >= candidates.length) return;
+      const url = candidates[idx];
+      const test = new Image();
+      test.onload = () => { img.src = url; };
+      test.onerror = () => tryUrl(idx + 1);
+      test.src = url;
+    }
+    tryUrl(0);
   }
 
   function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
@@ -620,6 +689,11 @@
       document.getElementById('url-' + id).focus();
       const nugasaInput = document.getElementById('url-' + id + '-nugasa');
       if (nugasaInput) nugasaInput.value = links[id + '_nugasa'] || '';
+      const btnInput = document.getElementById('url-' + id + '-btn');
+      if (btnInput) {
+        const btnEl = document.getElementById('btn-' + id);
+        btnInput.value = (links[id + '_btn'] != null ? links[id + '_btn'] : (btnEl ? btnEl.getAttribute('href') : ''));
+      }
       // 제목 / 설명 / 배지 현재값 채우기
       const titleInput = document.getElementById('title-' + id);
       if (titleInput) {
@@ -642,6 +716,12 @@
         statusEl.style.color = '#7a9a00';
         statusEl.textContent = links[id + '_img'] ? '✓ 등록된 이미지 있음 (교체하려면 선택)' : '';
       }
+      // 팝업 이미지 상태 안내 (04번)
+      const popupStatusEl = document.getElementById('imgstatus-' + id + '-popup');
+      if (popupStatusEl) {
+        popupStatusEl.style.color = '#7a9a00';
+        popupStatusEl.textContent = links[id + '_popup'] ? '✓ 등록된 팝업 이미지 있음' : '';
+      }
     } else {
       // 같은 버튼 재클릭으로 닫힐 때 overflow 복원
       if (card) { card.style.overflow = 'hidden'; card.style.zIndex = ''; }
@@ -662,6 +742,16 @@
       const nugasaBtn = document.getElementById('btn-nugasa');
       if (nugasaBtn) nugasaBtn.href = nugasaUrl || '#';
       fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ id: id + '_nugasa', url: nugasaUrl }) }).catch(()=>{});
+    }
+
+    // 출시계획 버튼 URL 추가 저장 (buying 전용)
+    const btnInput = document.getElementById('url-' + id + '-btn');
+    if (btnInput) {
+      const btnUrl = btnInput.value.trim();
+      links[id + '_btn'] = btnUrl;
+      const btnEl = document.getElementById('btn-' + id);
+      if (btnEl && btnUrl) btnEl.href = btnUrl;
+      fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ id: id + '_btn', url: btnUrl }) }).catch(()=>{});
     }
 
     // 제목 / 설명 / 배지 저장 및 반영
