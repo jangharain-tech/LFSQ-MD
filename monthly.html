@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LFSQ MD Monthly Meet — 2026.05</title>
+<title>LFSQ MD Monthly Meet — 2026.04</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -167,13 +167,7 @@
   </div>
 </div>
 
-<!-- 이미지 팝업 모달 -->
-<div id="imagePopup" onclick="closeImagePopup()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
-  <div onclick="event.stopPropagation()" style="position:relative;max-width:90vw;max-height:90vh;">
-    <img id="popupImg" src="https://lh3.googleusercontent.com/d/1CMhM-6pCaHKGR9aOsGWDsJ40Ic9QX9aj" style="max-width:90vw;max-height:85vh;object-fit:contain;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.6);" />
-    <button onclick="closeImagePopup()" style="position:absolute;top:-16px;right:-16px;width:36px;height:36px;border-radius:50%;background:#c8e832;border:none;font-size:18px;font-weight:900;cursor:pointer;color:#1a1f0a;line-height:1;">×</button>
-  </div>
-</div>
+<!-- (04번 팝업 모달 제거됨: 04번은 이제 URL 이동 방식) -->
 
 <div class="slides-wrap">
   <div class="slides-inner" id="slidesInner">
@@ -201,8 +195,8 @@
         <!-- 대제목 영역 -->
         <div class="agenda-title-area">
           <div class="agenda-main-title">
-            <span id="mainTitle1" onclick="editTitleLine(1)" title="클릭하여 수정" style="cursor:pointer;display:block;transition:opacity 0.2s;" onmouseover="this.style.opacity='0.6'" onmouseout="this.style.opacity='1'">IP & BRAND 자산화</span>
-            <span id="mainTitle2" onclick="editTitleLine(2)" title="클릭하여 수정" style="cursor:pointer;display:block;transition:opacity 0.2s;" onmouseover="this.style.opacity='0.6'" onmouseout="this.style.opacity='1'">운영업무 효율</span>
+            <span id="mainTitle1" onclick="editTitleLine(1)" title="클릭하여 수정" style="cursor:pointer;display:block;transition:opacity 0.2s;" onmouseover="this.style.opacity='0.6'" onmouseout="this.style.opacity='1'">IP & BRAND</span>
+            <span id="mainTitle2" onclick="editTitleLine(2)" title="클릭하여 수정" style="cursor:pointer;display:block;transition:opacity 0.2s;" onmouseover="this.style.opacity='0.6'" onmouseout="this.style.opacity='1'">자산화의 시작</span>
           </div>
           <div class="agenda-sub-title" id="subTitle" onclick="editSubTitle()" title="클릭하여 수정">전략IP 누가사 &amp; OWN Brand 리빈느</div>
         </div>
@@ -232,9 +226,9 @@
               <a id="btn-buying" href="https://jangharain-tech.github.io/LFSQ-MD/product-dashboard.html" target="_blank" onclick="event.stopPropagation()" style="flex-shrink:0;padding:6px 12px;background:#b8d016;border-radius:6px;font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:700;color:#1a1f0a;text-decoration:none;letter-spacing:0.05em;white-space:nowrap;transition:background 0.2s;" onmouseover="this.style.background='#cae820'" onmouseout="this.style.background='#b8d016'">출시계획</a>
             </div>
         </div>
-        <div class="agenda-card has-link" id="card-ip" onclick="openImagePopup()" style="background-color:#ffffff; background-image:none; background-size:35%; background-position:85% bottom; background-repeat:no-repeat; overflow:hidden;">
+        <div class="agenda-card has-link" id="card-ip" onclick="handleCardClick('ip')" style="background-color:#ffffff; background-image:none; background-size:35%; background-position:85% bottom; background-repeat:no-repeat; overflow:hidden;">
             <div class="config-toggle" onclick="toggleConfig(event,'ip')">⚙</div>
-            <div class="config-panel" id="config-ip"><label>제목</label><input type="text" id="title-ip" placeholder="제목"><label>설명</label><input type="text" id="desc-ip" placeholder="설명"><label>URL 설정</label><input type="url" id="url-ip" placeholder="https://..."><label style="margin-top:6px;display:block;">누끼 이미지 (PNG)</label><input type="file" id="img-ip" accept="image/png,image/*" onchange="uploadCardImage(event,'ip')" style="padding:6px 4px;font-size:11px;"><div id="imgstatus-ip" style="font-size:10px;color:#7a9a00;margin-bottom:8px;min-height:12px;"></div><label style="margin-top:6px;display:block;">클릭 시 팝업 이미지</label><input type="file" id="img-ip-popup" accept="image/*" onchange="uploadPopupImage(event,'ip')" style="padding:6px 4px;font-size:11px;"><div id="imgstatus-ip-popup" style="font-size:10px;color:#7a9a00;margin-bottom:8px;min-height:12px;"></div><button onclick="saveLink(event,'ip')">저장</button></div>
+            <div class="config-panel" id="config-ip"><label>제목</label><input type="text" id="title-ip" placeholder="제목"><label>설명</label><input type="text" id="desc-ip" placeholder="설명"><label>URL 설정</label><input type="url" id="url-ip" placeholder="https://..."><label style="margin-top:6px;display:block;">누끼 이미지 (PNG)</label><input type="file" id="img-ip" accept="image/png,image/*" onchange="uploadCardImage(event,'ip')" style="padding:6px 4px;font-size:11px;"><div id="imgstatus-ip" style="font-size:10px;color:#7a9a00;margin-bottom:8px;min-height:12px;"></div><button onclick="saveLink(event,'ip')">저장</button></div>
             <div class="card-number" style="position:relative;z-index:1;">04</div>
             <div style="position:relative;z-index:1;"><div class="card-label" id="label-ip">Review</div><div class="card-desc" id="cdesc-ip">IP & 제품별 상세 리뷰</div></div>
         </div>
@@ -297,16 +291,9 @@
     document.getElementById('ownipPopup').style.display = 'none';
   }
 
-  function openImagePopup() {
-    const el = document.getElementById('imagePopup');
-    el.style.display = 'flex';
-  }
-  function closeImagePopup() {
-    document.getElementById('imagePopup').style.display = 'none';
-  }
-  // ESC 키로 닫기
+  // ESC 키로 닫기 (05번 팝업)
   window.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { closeImagePopup(); closeOwnipPopup(); }
+    if (e.key === 'Escape') { closeOwnipPopup(); }
   });
 
   function editTitleLine(line) {
@@ -424,8 +411,7 @@
         if (btnEl) btnEl.href = links[id + '_btn'];
       }
     });
-    // 04·05번 클릭 팝업 이미지 복원
-    if (links['ip_popup']) applyPopupImage('ip', links['ip_popup']);
+    // 05번 클릭 팝업 이미지 복원
     if (links['ownip_popup']) applyPopupImage('ownip', links['ownip_popup']);
   }
 
@@ -547,7 +533,7 @@
   // 팝업 이미지 src 교체 (드라이브 표시 URL 폴백 포함)
   function applyPopupImage(id, fileId) {
     // id에 따라 대상 팝업 이미지 요소 선택
-    const targetMap = { 'ip': 'popupImg', 'ownip': 'ownipPopupImg' };
+    const targetMap = { 'ownip': 'ownipPopupImg' };
     const imgId = targetMap[id];
     if (!imgId) return;
     const img = document.getElementById(imgId);
