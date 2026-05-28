@@ -162,7 +162,7 @@
 <!-- 05번 이미지 팝업 -->
 <div id="ownipPopup" onclick="closeOwnipPopup()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
   <div onclick="event.stopPropagation()" style="position:relative;max-width:90vw;max-height:90vh;">
-    <img src="https://lh3.googleusercontent.com/d/1MwER_4OudvcajkNznwUHJkxbQENyenCJ" style="max-width:90vw;max-height:85vh;object-fit:contain;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.6);" />
+    <img id="ownipPopupImg" src="" style="max-width:90vw;max-height:85vh;object-fit:contain;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.6);" />
     <button onclick="closeOwnipPopup()" style="position:absolute;top:-16px;right:-16px;width:36px;height:36px;border-radius:50%;background:#c8e832;border:none;font-size:18px;font-weight:900;cursor:pointer;color:#1a1f0a;line-height:1;">×</button>
   </div>
 </div>
@@ -247,6 +247,7 @@
               <label>카드 URL</label><input type="url" id="url-ownip" placeholder="https://...">
               <label style="margin-top:6px;display:block;">누가사 URL</label><input type="url" id="url-ownip-nugasa" placeholder="https://...">
               <label style="margin-top:6px;display:block;">누끼 이미지 (PNG)</label><input type="file" id="img-ownip" accept="image/png,image/*" onchange="uploadCardImage(event,'ownip')" style="padding:6px 4px;font-size:11px;"><div id="imgstatus-ownip" style="font-size:10px;color:#7a9a00;margin-bottom:8px;min-height:12px;"></div>
+              <label style="margin-top:6px;display:block;">클릭 시 팝업 이미지</label><input type="file" id="img-ownip-popup" accept="image/*" onchange="uploadPopupImage(event,'ownip')" style="padding:6px 4px;font-size:11px;"><div id="imgstatus-ownip-popup" style="font-size:10px;color:#7a9a00;margin-bottom:8px;min-height:12px;"></div>
               <button onclick="saveLink(event,'ownip')">저장</button>
             </div>
             <div style="position:relative;z-index:1;">
@@ -284,6 +285,9 @@
     }
   }
   function openOwnipPopup() {
+    const img = document.getElementById('ownipPopupImg');
+    // 등록된 팝업 이미지가 없으면 팝업을 띄우지 않음
+    if (!img || !img.src) return;
     document.getElementById('ownipPopup').style.display = 'flex';
   }
   function closeOwnipPopup() {
@@ -417,10 +421,9 @@
         if (btnEl) btnEl.href = links[id + '_btn'];
       }
     });
-    // 04번 클릭 팝업 이미지 복원
-    if (links['ip_popup']) {
-      applyPopupImage(links['ip_popup']);
-    }
+    // 04·05번 클릭 팝업 이미지 복원
+    if (links['ip_popup']) applyPopupImage('ip', links['ip_popup']);
+    if (links['ownip_popup']) applyPopupImage('ownip', links['ownip_popup']);
   }
 
   // fileId를 카드 배경(우측 하단 누끼 스타일)에 적용
@@ -528,7 +531,7 @@
       if (newId) {
         links[id + '_popup'] = newId;
         try { localStorage.setItem('lfsq_links', JSON.stringify(links)); } catch(err) {}
-        applyPopupImage(newId);
+        applyPopupImage(id, newId);
         if (statusEl) { statusEl.style.color = '#7a9a00'; statusEl.textContent = '✓ 업로드 완료'; }
       } else {
         if (statusEl) { statusEl.style.color = '#d66'; statusEl.textContent = '실패: 잠시 후 새로고침'; }
@@ -539,8 +542,12 @@
   }
 
   // 팝업 이미지 src 교체 (드라이브 표시 URL 폴백 포함)
-  function applyPopupImage(fileId) {
-    const img = document.getElementById('popupImg');
+  function applyPopupImage(id, fileId) {
+    // id에 따라 대상 팝업 이미지 요소 선택
+    const targetMap = { 'ip': 'popupImg', 'ownip': 'ownipPopupImg' };
+    const imgId = targetMap[id];
+    if (!imgId) return;
+    const img = document.getElementById(imgId);
     if (!img || !fileId) return;
     const candidates = [
       'https://lh3.googleusercontent.com/d/' + fileId,
