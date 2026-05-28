@@ -194,7 +194,7 @@
     <section id="slide2">
       <div class="agenda-header">
         <div class="agenda-supertitle">MD Monthly Agenda</div>
-        <div style="color:#555">2026 · 04</div>
+        <div id="heroDate2" style="color:#555">2026 · 04</div>
       </div>
 
       <div class="agenda-body">
@@ -280,8 +280,11 @@
     const el = document.getElementById('heroDate');
     const val = prompt('날짜 수정:', el.textContent);
     if (val !== null && val.trim()) {
-      el.textContent = val.trim();
-      saveTitleToSheet('hero_date', val.trim());
+      const v = val.trim();
+      el.textContent = v;
+      const el2 = document.getElementById('heroDate2');
+      if (el2) el2.textContent = v;
+      saveTitleToSheet('hero_date', v);
     }
   }
   function openOwnipPopup() {
@@ -595,7 +598,11 @@
       // 시트 데이터 localStorage에 백업
       try { localStorage.setItem('lfsq_links', JSON.stringify(links)); } catch(e) {}
 
-      if (links['hero_date']) document.getElementById('heroDate').textContent = links['hero_date'];
+      if (links['hero_date']) {
+        document.getElementById('heroDate').textContent = links['hero_date'];
+        const el2 = document.getElementById('heroDate2');
+        if (el2) el2.textContent = links['hero_date'];
+      }
       // 제목 적용
       if (links['agenda_title1']) document.getElementById('mainTitle1').textContent = links['agenda_title1'];
       if (links['agenda_title2']) document.getElementById('mainTitle2').textContent = links['agenda_title2'];
@@ -620,6 +627,11 @@
       applyCardTexts();
     } catch(e) {
       // 시트 로드 실패 → localStorage 백업으로 UI 복원
+      if (links['hero_date']) {
+        document.getElementById('heroDate').textContent = links['hero_date'];
+        const el2 = document.getElementById('heroDate2');
+        if (el2) el2.textContent = links['hero_date'];
+      }
       applyBg(links['hero_bg'] || '');
       if (links['ownip_nugasa']) {
         const btn = document.getElementById('btn-nugasa');
