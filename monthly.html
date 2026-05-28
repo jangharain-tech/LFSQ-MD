@@ -112,11 +112,11 @@
   /* 카드 누끼 이미지 레이어 (04,05번) */
   .card-img-layer {
     position: absolute;
-    right: 14px;
-    bottom: 14px;
-    top: 38%;            /* 상단 여백 확보 → 위쪽 텍스트/번호와 안 겹침 */
-    width: 46%;
-    max-width: 46%;
+    right: 5%;
+    bottom: 12px;
+    height: 55%;          /* 카드 높이의 55%까지만 → 위쪽 여백 확보 */
+    max-width: 42%;       /* 가로로 넓은 이미지도 카드 안에 */
+    width: auto;
     object-fit: contain;        /* 비율 유지, 잘림 없음 */
     object-position: right bottom;
     pointer-events: none;
