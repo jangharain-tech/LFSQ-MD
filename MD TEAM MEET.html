@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MD Team Meeting</title>
+<style>
+  :root{
+    --black:#0d0d0d;
+    --green:#3ec853;
+    --gray-bg:#f1f1f1;
+    --line-blue:#2d6079;
+    --text-dark:#1a1a1a;
+    --text-mid:#666;
+    --white:#ffffff;
+    --radius:0px;
+    --gap:18px;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+    background:#e7e7e7;
+    color:var(--text-dark);
+    padding-bottom:80px;
+  }
+
+  /* ===== Header ===== */
+  header.top{
+    background:var(--black);
+    color:var(--white);
+    padding:18px 28px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  header.top h1{
+    margin:0;
+    font-size:26px;
+    font-weight:600;
+    letter-spacing:0.5px;
+  }
+  header.top .actions{
+    display:flex;
+    gap:10px;
+  }
+  header.top button{
+    background:transparent;
+    border:1px solid #555;
+    color:#ddd;
+    padding:8px 14px;
+    font-size:13px;
+    border-radius:4px;
+    cursor:pointer;
+    transition:.15s;
+  }
+  header.top button:hover{
+    background:var(--green);
+    border-color:var(--green);
+    color:#0d0d0d;
+  }
+
+  /* ===== Top section: Year notice + Calendar ===== */
+  .top-section{
+    display:grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap:0;
+    background:var(--black);
+  }
+  @media (max-width: 900px){
+    .top-section{grid-template-columns: 1fr;}
+  }
+
+  .notice-board{
+    background:var(--gray-bg);
+    padding:24px 28px;
+  }
+  .notice-board .year-label{
+    font-size:24px;
+    font-weight:700;
+    margin:0 0 18px 0;
+  }
+  .notice-line{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    border-bottom:1.5px solid var(--line-blue);
+    padding:8px 2px;
+  }
+  .notice-line input{
+    flex:1;
+    border:none;
+    background:transparent;
+    font-size:15px;
+    font-weight:700;
+    font-family:inherit;
+    color:var(--text-dark);
+    padding:4px 2px;
+  }
+  .notice-line input::placeholder{
+    color:#aaa;
+    font-weight:600;
+  }
+  .notice-line input:focus{outline:none;}
+  .notice-line.empty input{font-weight:400;}
+  .notice-add{
+    margin-top:10px;
+    background:none;
+    border:1px dashed #999;
+    color:#777;
+    padding:8px;
+    width:100%;
+    cursor:pointer;
+    border-radius:4px;
+    font-size:13px;
+  }
+  .notice-add:hover{border-color:var(--line-blue); color:var(--line-blue);}
+
+  .calendar-panel{
+    background:var(--green);
+    color:#073910;
+    padding:24px 28px;
+    display:flex;
+    flex-direction:column;
+  }
+  .calendar-panel h2{
+    margin:0 0 4px 0;
+    font-size:20px;
+    text-align:center;
+  }
+  .calendar-panel .desc{
+    text-align:center;
+    font-size:13px;
+    opacity:.85;
+    margin-bottom:18px;
+  }
+  .cal-grid{
+    display:grid;
+    grid-template-columns: repeat(7,1fr);
+    gap:4px;
+    font-size:12px;
+    margin-bottom:14px;
+  }
+  .cal-grid .dow{
+    text-align:center;
+    font-weight:700;
+    padding:4px 0;
+    opacity:.8;
+  }
+  .cal-day{
+    background:rgba(255,255,255,0.35);
+    border-radius:4px;
+    min-height:46px;
+    padding:3px 4px;
+    font-size:11px;
+    position:relative;
+    cursor:pointer;
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+  }
+  .cal-day.empty{background:transparent; cursor:default;}
+  .cal-day .num{font-weight:700;}
+  .cal-day .tag{
+    background:#0d0d0d;
+    color:#fff;
+    border-radius:3px;
+    padding:1px 3px;
+    font-size:9px;
+    line-height:1.3;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .cal-day .tag.vacation{background:#1d6fb8;}
+  .cal-day .tag.meeting{background:#b8451d;}
+  .cal-legend{
+    display:flex;
+    gap:14px;
+    justify-content:center;
+    font-size:12px;
+    margin-top:auto;
+    padding-top:10px;
+  }
+  .cal-legend span{display:flex; align-items:center; gap:5px;}
+  .legend-dot{width:10px;height:10px;border-radius:2px;display:inline-block;}
+  .legend-dot.vacation{background:#1d6fb8;}
+  .legend-dot.meeting{background:#b8451d;}
+
+  /* ===== Member board ===== */
+  #member-list{
+    display:flex;
+    flex-direction:column;
+    gap:0;
+  }
+  .member-card{
+    background:var(--white);
+    border-bottom:6px solid var(--black);
+    padding:26px 28px;
+    display:flex;
+    gap:30px;
+    flex-wrap:wrap;
+  }
+
+  .member-side{
+    width:230px;
+    flex-shrink:0;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  .member-id-row{
+    display:flex;
+    align-items:center;
+    gap:14px;
+  }
+  .avatar{
+    width:90px;
+    height:90px;
+    border-radius:50%;
+    background:#29b6e8;
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    font-size:11px;
+    line-height:1.4;
+    flex-shrink:0;
+    position:relative;
+    overflow:hidden;
+    cursor:pointer;
+    border:none;
+    padding:0;
+  }
+  .avatar img{
+    width:100%;height:100%;object-fit:cover;
+  }
+  .avatar input[type=file]{display:none;}
+  .member-name{
+    font-size:22px;
+    font-weight:800;
+    border:none;
+    background:transparent;
+    font-family:inherit;
+    width:100%;
+    color:var(--text-dark);
+  }
+  .member-name:focus{outline:none; border-bottom:1.5px solid var(--line-blue);}
+
+  .mission-block{
+    border:1px solid #ccc;
+    padding:12px;
+  }
+  .mission-block h4{
+    margin:0 0 8px 0;
+    font-size:15px;
+    font-weight:700;
+  }
+  .mission-month{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:12px;
+    font-weight:700;
+    margin-bottom:8px;
+  }
+  .mission-month input{
+    border:none;
+    background:transparent;
+    font-weight:700;
+    font-size:12px;
+    width:80px;
+    font-family:inherit;
+  }
+  .mission-month input:focus{outline:none;}
+  .mission-item{
+    border-bottom:1px solid #999;
+    padding:6px 2px;
+    margin-bottom:4px;
+  }
+  .mission-item input{
+    border:none;
+    background:transparent;
+    width:100%;
+    font-size:13px;
+    font-family:inherit;
+  }
+  .mission-item input:focus{outline:none;}
+  .small-add{
+    background:none;
+    border:1px dashed #bbb;
+    color:#999;
+    width:100%;
+    padding:5px;
+    font-size:12px;
+    cursor:pointer;
+    border-radius:3px;
+    margin-top:4px;
+  }
+  .small-add:hover{border-color:var(--line-blue); color:var(--line-blue);}
+
+  /* ===== Weekly share box ===== */
+  .weekly-box{
+    flex:1;
+    min-width:300px;
+    border:1.5px solid var(--black);
+    padding:22px 26px;
+    position:relative;
+  }
+  /* speech-bubble pointer */
+  .member-side{position:relative;}
+  .weekly-box::before{
+    content:"";
+    position:absolute;
+    left:-26px;
+    top:54px;
+    width:0;height:0;
+    border-top:14px solid transparent;
+    border-bottom:14px solid transparent;
+    border-right:14px solid var(--black);
+  }
+  .weekly-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    margin-bottom:16px;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .weekly-header h3{
+    margin:0;
+    font-size:24px;
+    font-weight:800;
+  }
+  .weekly-header input.weekly-date{
+    border:none;
+    background:transparent;
+    font-size:13px;
+    font-weight:700;
+    text-align:right;
+    font-family:inherit;
+    color:var(--text-dark);
+  }
+  .weekly-header input.weekly-date:focus{outline:none;}
+  .weekly-line{
+    border-bottom:1.5px solid var(--line-blue);
+    padding:9px 2px;
+    margin-bottom:2px;
+  }
+  .weekly-line input{
+    border:none;
+    background:transparent;
+    width:100%;
+    font-size:14px;
+    font-family:inherit;
+    color:var(--text-dark);
+    padding:2px;
+  }
+  .weekly-line input:focus{outline:none;}
+  .weekly-line.bold input{font-weight:700;}
+  .weekly-add{
+    margin-top:8px;
+    background:none;
+    border:1px dashed #ccc;
+    color:#999;
+    padding:6px;
+    width:100%;
+    cursor:pointer;
+    border-radius:3px;
+    font-size:12px;
+  }
+  .weekly-add:hover{border-color:var(--line-blue); color:var(--line-blue);}
+
+  /* ===== Member card controls (move/delete) ===== */
+  .card-controls{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    margin-left:auto;
+  }
+  .card-controls button{
+    background:#f1f1f1;
+    border:1px solid #ccc;
+    width:30px;
+    height:30px;
+    cursor:pointer;
+    font-size:14px;
+    border-radius:4px;
+    line-height:1;
+    color:#555;
+  }
+  .card-controls button:hover{
+    background:var(--green);
+    border-color:var(--green);
+    color:#0d0d0d;
+  }
+  .card-controls button.danger:hover{
+    background:#e25555;
+    border-color:#e25555;
+    color:#fff;
+  }
+
+  /* ===== Add member ===== */
+  .add-member-bar{
+    background:var(--gray-bg);
+    text-align:center;
+    padding:30px;
+    border-top:6px solid var(--black);
+    cursor:pointer;
+  }
+  .add-member-bar span{
+    font-size:30px;
+    color:#999;
+    font-weight:300;
+    letter-spacing:2px;
+    transition:.15s;
+  }
+  .add-member-bar:hover span{color:var(--line-blue);}
+
+  /* ===== Save status ===== */
+  .save-status{
+    position:fixed;
+    bottom:18px;
+    right:18px;
+    background:var(--black);
+    color:#fff;
+    padding:10px 18px;
+    border-radius:30px;
+    font-size:13px;
+    opacity:0;
+    transition:opacity .3s;
+    z-index:50;
+  }
+  .save-status.show{opacity:1;}
+
+  /* ===== Day editor modal ===== */
+  .modal-overlay{
+    position:fixed; inset:0;
+    background:rgba(0,0,0,0.5);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:100;
+  }
+  .modal-overlay.show{display:flex;}
+  .modal-box{
+    background:#fff;
+    width:320px;
+    padding:22px;
+    border-radius:6px;
+  }
+  .modal-box h3{margin:0 0 14px 0; font-size:16px;}
+  .modal-row{margin-bottom:12px;}
+  .modal-row label{font-size:12px; font-weight:700; display:block; margin-bottom:4px;}
+  .modal-row input, .modal-row select{
+    width:100%; padding:8px; border:1px solid #ccc; border-radius:4px; font-family:inherit; font-size:13px;
+  }
+  .modal-actions{display:flex; gap:8px; justify-content:flex-end; margin-top:16px;}
+  .modal-actions button{
+    padding:8px 14px; border-radius:4px; border:1px solid #ccc; background:#fff; cursor:pointer; font-size:13px;
+  }
+  .modal-actions button.primary{background:var(--black); color:#fff; border-color:var(--black);}
+  .modal-tag-list{display:flex; flex-direction:column; gap:6px; margin-bottom:10px;}
+  .modal-tag-list .existing-tag{
+    display:flex; align-items:center; gap:6px; font-size:12px; background:#f5f5f5; padding:6px 8px; border-radius:4px;
+  }
+  .modal-tag-list .existing-tag .x{cursor:pointer; color:#c00; font-weight:700;}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <h1>MD Team Meeting</h1>
+  <div class="actions">
+    <button id="btn-save">저장</button>
+    <button id="btn-reload">새로고침</button>
+  </div>
+</header>
+
+<section class="top-section">
+  <div class="notice-board">
+    <p class="year-label" id="year-label" contenteditable="true">&lt; 2026Y &gt;</p>
+    <div id="notice-lines"></div>
+    <button class="notice-add" id="add-notice">+ 항목 추가</button>
+  </div>
+
+  <div class="calendar-panel">
+    <h2>캘린더</h2>
+    <p class="desc">휴가 및 이슈 체크 가능한 캘린더 기능</p>
+    <div id="cal-month-label" style="text-align:center;font-weight:700;margin-bottom:8px;"></div>
+    <div class="cal-grid" id="cal-grid"></div>
+    <div class="cal-legend">
+      <span><i class="legend-dot vacation"></i> 휴가</span>
+      <span><i class="legend-dot meeting"></i> 주요 회의</span>
+    </div>
+  </div>
+</section>
+
+<div id="member-list"></div>
+
+<div class="add-member-bar" id="add-member">
+  <span>(+) ADD MEMBER</span>
+</div>
+
+<div class="save-status" id="save-status">저장됨</div>
+
+<!-- Day edit modal -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal-box">
+    <h3 id="modal-date-title">일정 추가</h3>
+    <div class="modal-tag-list" id="modal-existing"></div>
+    <div class="modal-row">
+      <label>이름 / 내용</label>
+      <input type="text" id="modal-input-text" placeholder="예: 홍길동 휴가, 분기 회의">
+    </div>
+    <div class="modal-row">
+      <label>종류</label>
+      <select id="modal-input-type">
+        <option value="vacation">휴가</option>
+        <option value="meeting">주요 회의</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button id="modal-close">닫기</button>
+      <button class="primary" id="modal-add">추가</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   MD Team Meeting - Frontend logic
+   -----------------------------------------------------
+   데이터 저장 구조 (DATA 객체)를 JSON으로 직렬화하여
+   Google Apps Script Web App(GAS)에 전송/조회합니다.
+
+   ===== 연동 방법 (Google Apps Script) =====
+   1) Google Sheets 새 시트 생성 (예: "MD_Meeting_DB")
+   2) 확장프로그램 > Apps Script 에서 아래와 같은 doGet/doPost 함수를 작성
+      - doGet(): 시트의 JSON 데이터를 반환
+      - doPost(e): e.postData.contents (JSON 문자열)을 시트에 저장
+   3) 배포 > 새 배포 > 웹앱으로 배포 (액세스 권한: 모든 사용자)
+   4) 발급된 웹앱 URL을 아래 SCRIPT_URL 에 붙여넣기
+   5) 이미지 업로드는 Drive API(또는 GAS의 DriveApp)를 통해
+      base64로 전송 -> Drive에 저장 -> 공개 URL 반환하는 방식으로 확장 가능
+   ========================================================= */
+
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwkXzN8ZUCnTXXTmpVjc21zV86J8bo13ta-w6iXQvaRK-LQmTggWplD6k-FT0NnwuX9Eg/exec"; // <- 배포 후 이 부분만 교체
+
+// ---------- 기본 데이터 구조 ----------
+let DATA = {
+  year: "< 2026Y >",
+  notices: [
+    {text:""},
+    {text:""}
+  ],
+  calendar: {
+    monthLabel: "2026.06",
+    events: {
+      // "2026-06-16": [{type:"vacation", text:"홍길동 휴가"}]
+    }
+  },
+  members: [
+    {
+      id: "m1",
+      name: "홍길동",
+      avatar: "",
+      missionMonth: "2026.05",
+      missions: ["", ""],
+      weeklyDate: "2026.06.16",
+      weeklyItems: ["", "", "", "", ""]
+    },
+    {
+      id: "m2",
+      name: "홍길동",
+      avatar: "",
+      missionMonth: "2026.05",
+      missions: ["", ""],
+      weeklyDate: "2026.06.16",
+      weeklyItems: ["", "", "", "", ""]
+    }
+  ]
+};
+
+// ---------- 로드 ----------
+async function loadData(){
+  // GAS 연동 전: 로컬 메모리의 기본값 사용
+  if(SCRIPT_URL.startsWith("YOUR_")){
+    render();
+    return;
+  }
+  try{
+    const res = await fetch(SCRIPT_URL);
+    const json = await res.json();
+    if(json && json.members){
+      DATA = json;
+    }
+  }catch(err){
+    console.error("불러오기 실패:", err);
+  }
+  render();
+}
+
+// ---------- 저장 ----------
+async function saveData(){
+  showSaveStatus("저장 중...");
+  if(SCRIPT_URL.startsWith("YOUR_")){
+    // GAS 미연동 상태 - 콘솔에만 출력 (실제 운영시 위 SCRIPT_URL 설정 필요)
+    console.log("SAVE (local only):", DATA);
+    setTimeout(()=>showSaveStatus("저장됨 (로컬, GAS 미연동)"), 300);
+    return;
+  }
+  try{
+    await fetch(SCRIPT_URL, {
+      method:"POST",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body: JSON.stringify(DATA)
+    });
+    showSaveStatus("저장됨");
+  }catch(err){
+    console.error("저장 실패:", err);
+    showSaveStatus("저장 실패");
+  }
+}
+
+function showSaveStatus(msg){
+  const el = document.getElementById("save-status");
+  el.textContent = msg;
+  el.classList.add("show");
+  setTimeout(()=>el.classList.remove("show"), 1800);
+}
+
+// 자동 저장 (입력 후 일정 시간 뒤)
+let saveTimer = null;
+function scheduleSave(){
+  if(saveTimer) clearTimeout(saveTimer);
+  saveTimer = setTimeout(saveData, 800);
+}
+
+// ---------- 렌더링 ----------
+function render(){
+  renderNotices();
+  renderCalendar();
+  renderMembers();
+}
+
+// --- Notice board ---
+function renderNotices(){
+  document.getElementById("year-label").textContent = DATA.year;
+  const wrap = document.getElementById("notice-lines");
+  wrap.innerHTML = "";
+  DATA.notices.forEach((item, idx)=>{
+    const row = document.createElement("div");
+    row.className = "notice-line" + (item.text ? "" : " empty");
+    const input = document.createElement("input");
+    input.type="text";
+    input.placeholder="TEXT TEXT TEXT";
+    input.value = item.text;
+    input.addEventListener("input", ()=>{
+      DATA.notices[idx].text = input.value;
+      row.className = "notice-line" + (input.value ? "" : " empty");
+      scheduleSave();
+    });
+    row.appendChild(input);
+    wrap.appendChild(row);
+  });
+}
+document.getElementById("add-notice").addEventListener("click", ()=>{
+  DATA.notices.push({text:""});
+  renderNotices();
+  scheduleSave();
+});
+document.getElementById("year-label").addEventListener("input", (e)=>{
+  DATA.year = e.target.textContent;
+  scheduleSave();
+});
+
+// --- Calendar ---
+let calCurrentDate = new Date(2026, 5, 1); // 2026-06
+
+function renderCalendar(){
+  const label = document.getElementById("cal-month-label");
+  const y = calCurrentDate.getFullYear();
+  const m = calCurrentDate.getMonth(); // 0-based
+  label.textContent = `${y}.${String(m+1).padStart(2,'0')}`;
+
+  const grid = document.getElementById("cal-grid");
+  grid.innerHTML = "";
+
+  const dows = ["일","월","화","수","목","금","토"];
+  dows.forEach(d=>{
+    const el = document.createElement("div");
+    el.className = "dow";
+    el.textContent = d;
+    grid.appendChild(el);
+  });
+
+  const firstDay = new Date(y, m, 1).getDay();
+  const lastDate = new Date(y, m+1, 0).getDate();
+
+  for(let i=0;i<firstDay;i++){
+    const el = document.createElement("div");
+    el.className = "cal-day empty";
+    grid.appendChild(el);
+  }
+
+  for(let d=1; d<=lastDate; d++){
+    const dateKey = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const cell = document.createElement("div");
+    cell.className = "cal-day";
+    cell.dataset.date = dateKey;
+
+    const num = document.createElement("div");
+    num.className = "num";
+    num.textContent = d;
+    cell.appendChild(num);
+
+    const events = DATA.calendar.events[dateKey] || [];
+    events.forEach(ev=>{
+      const tag = document.createElement("div");
+      tag.className = "tag " + (ev.type === "meeting" ? "meeting" : "vacation");
+      tag.textContent = ev.text;
+      cell.appendChild(tag);
+    });
+
+    cell.addEventListener("click", ()=>openDayModal(dateKey));
+    grid.appendChild(cell);
+  }
+}
+
+// --- Day modal ---
+let modalDateKey = null;
+function openDayModal(dateKey){
+  modalDateKey = dateKey;
+  document.getElementById("modal-date-title").textContent = dateKey + " 일정";
+  document.getElementById("modal-input-text").value = "";
+  document.getElementById("modal-input-type").value = "vacation";
+
+  const existingWrap = document.getElementById("modal-existing");
+  existingWrap.innerHTML = "";
+  const events = DATA.calendar.events[dateKey] || [];
+  events.forEach((ev, idx)=>{
+    const row = document.createElement("div");
+    row.className = "existing-tag";
+    row.innerHTML = `<span>${ev.type === "meeting" ? "🟧 회의" : "🟦 휴가"} - ${escapeHtml(ev.text)}</span>`;
+    const x = document.createElement("span");
+    x.className = "x";
+    x.textContent = "✕";
+    x.addEventListener("click", ()=>{
+      DATA.calendar.events[dateKey].splice(idx,1);
+      if(DATA.calendar.events[dateKey].length === 0) delete DATA.calendar.events[dateKey];
+      openDayModal(dateKey);
+      renderCalendar();
+      scheduleSave();
+    });
+    row.appendChild(x);
+    existingWrap.appendChild(row);
+  });
+
+  document.getElementById("modal-overlay").classList.add("show");
+}
+function escapeHtml(str){
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
+}
+document.getElementById("modal-close").addEventListener("click", ()=>{
+  document.getElementById("modal-overlay").classList.remove("show");
+});
+document.getElementById("modal-add").addEventListener("click", ()=>{
+  const text = document.getElementById("modal-input-text").value.trim();
+  const type = document.getElementById("modal-input-type").value;
+  if(!text) return;
+  if(!DATA.calendar.events[modalDateKey]) DATA.calendar.events[modalDateKey] = [];
+  DATA.calendar.events[modalDateKey].push({type, text});
+  document.getElementById("modal-overlay").classList.remove("show");
+  renderCalendar();
+  scheduleSave();
+});
+
+// --- Members ---
+function renderMembers(){
+  const list = document.getElementById("member-list");
+  list.innerHTML = "";
+
+  DATA.members.forEach((member, idx)=>{
+    const card = document.createElement("div");
+    card.className = "member-card";
+
+    // ===== Left side =====
+    const side = document.createElement("div");
+    side.className = "member-side";
+
+    const idRow = document.createElement("div");
+    idRow.className = "member-id-row";
+
+    // avatar
+    const avatarLabel = document.createElement("label");
+    avatarLabel.className = "avatar";
+    if(member.avatar){
+      avatarLabel.innerHTML = `<img src="${member.avatar}" alt="사진">`;
+    }else{
+      avatarLabel.innerHTML = `<span>사진<br>(변경가능하게)</span>`;
+    }
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = "image/*";
+    fileInput.addEventListener("change", (e)=>{
+      const file = e.target.files[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev)=>{
+        member.avatar = ev.target.result; // base64 (운영시 Drive 업로드 후 URL 교체 권장)
+        avatarLabel.innerHTML = `<img src="${member.avatar}" alt="사진">`;
+        avatarLabel.appendChild(fileInput);
+        scheduleSave();
+      };
+      reader.readAsDataURL(file);
+    });
+    avatarLabel.appendChild(fileInput);
+    idRow.appendChild(avatarLabel);
+
+    // name
+    const nameInput = document.createElement("input");
+    nameInput.className = "member-name";
+    nameInput.type = "text";
+    nameInput.value = member.name;
+    nameInput.addEventListener("input", ()=>{
+      member.name = nameInput.value;
+      scheduleSave();
+    });
+    idRow.appendChild(nameInput);
+
+    side.appendChild(idRow);
+
+    // mission block
+    const missionBlock = document.createElement("div");
+    missionBlock.className = "mission-block";
+    const missionTitle = document.createElement("h4");
+    missionTitle.textContent = "Monthly Mission";
+    missionBlock.appendChild(missionTitle);
+
+    const monthRow = document.createElement("div");
+    monthRow.className = "mission-month";
+    monthRow.innerHTML = `<span>&lt;</span>`;
+    const monthInput = document.createElement("input");
+    monthInput.type = "text";
+    monthInput.value = member.missionMonth;
+    monthInput.addEventListener("input", ()=>{
+      member.missionMonth = monthInput.value;
+      scheduleSave();
+    });
+    monthRow.appendChild(monthInput);
+    const closeBracket = document.createElement("span");
+    closeBracket.textContent = "​>";
+    monthRow.appendChild(closeBracket);
+    missionBlock.appendChild(monthRow);
+
+    member.missions.forEach((m, mIdx)=>{
+      const item = document.createElement("div");
+      item.className = "mission-item";
+      const input = document.createElement("input");
+      input.type = "text";
+      input.placeholder = "TEXT TEXT TEXT";
+      input.value = m;
+      input.addEventListener("input", ()=>{
+        member.missions[mIdx] = input.value;
+        scheduleSave();
+      });
+      item.appendChild(input);
+      missionBlock.appendChild(item);
+    });
+    const missionAdd = document.createElement("button");
+    missionAdd.className = "small-add";
+    missionAdd.textContent = "+ 미션 추가";
+    missionAdd.addEventListener("click", ()=>{
+      member.missions.push("");
+      renderMembers();
+      scheduleSave();
+    });
+    missionBlock.appendChild(missionAdd);
+
+    side.appendChild(missionBlock);
+    card.appendChild(side);
+
+    // ===== Weekly box =====
+    const weekly = document.createElement("div");
+    weekly.className = "weekly-box";
+
+    const header = document.createElement("div");
+    header.className = "weekly-header";
+    const h3 = document.createElement("h3");
+    h3.textContent = "Weekly Share";
+    header.appendChild(h3);
+
+    const dateInput = document.createElement("input");
+    dateInput.className = "weekly-date";
+    dateInput.type = "text";
+    dateInput.value = `< ${member.weeklyDate} >`;
+    dateInput.addEventListener("focus", ()=>{
+      dateInput.value = member.weeklyDate;
+    });
+    dateInput.addEventListener("blur", ()=>{
+      member.weeklyDate = dateInput.value;
+      dateInput.value = `< ${member.weeklyDate} >`;
+      scheduleSave();
+    });
+    header.appendChild(dateInput);
+    weekly.appendChild(header);
+
+    member.weeklyItems.forEach((w, wIdx)=>{
+      const line = document.createElement("div");
+      line.className = "weekly-line" + (wIdx === 0 ? " bold" : "");
+      const input = document.createElement("input");
+      input.type = "text";
+      input.placeholder = "TEXT TEXT TEXT";
+      input.value = w;
+      input.addEventListener("input", ()=>{
+        member.weeklyItems[wIdx] = input.value;
+        scheduleSave();
+      });
+      line.appendChild(input);
+      weekly.appendChild(line);
+    });
+    const weeklyAdd = document.createElement("button");
+    weeklyAdd.className = "weekly-add";
+    weeklyAdd.textContent = "+ 줄 추가";
+    weeklyAdd.addEventListener("click", ()=>{
+      member.weeklyItems.push("");
+      renderMembers();
+      scheduleSave();
+    });
+    weekly.appendChild(weeklyAdd);
+
+    card.appendChild(weekly);
+
+    // ===== Controls (move up/down, delete) =====
+    const controls = document.createElement("div");
+    controls.className = "card-controls";
+
+    const upBtn = document.createElement("button");
+    upBtn.textContent = "▲";
+    upBtn.title = "위로 이동";
+    upBtn.disabled = idx === 0;
+    upBtn.addEventListener("click", ()=>{
+      if(idx === 0) return;
+      [DATA.members[idx-1], DATA.members[idx]] = [DATA.members[idx], DATA.members[idx-1]];
+      renderMembers();
+      scheduleSave();
+    });
+    controls.appendChild(upBtn);
+
+    const downBtn = document.createElement("button");
+    downBtn.textContent = "▼";
+    downBtn.title = "아래로 이동";
+    downBtn.disabled = idx === DATA.members.length-1;
+    downBtn.addEventListener("click", ()=>{
+      if(idx === DATA.members.length-1) return;
+      [DATA.members[idx+1], DATA.members[idx]] = [DATA.members[idx], DATA.members[idx+1]];
+      renderMembers();
+      scheduleSave();
+    });
+    controls.appendChild(downBtn);
+
+    const delBtn = document.createElement("button");
+    delBtn.textContent = "✕";
+    delBtn.title = "삭제";
+    delBtn.className = "danger";
+    delBtn.addEventListener("click", ()=>{
+      if(!confirm(`${member.name} 카드를 삭제할까요?`)) return;
+      DATA.members.splice(idx,1);
+      renderMembers();
+      scheduleSave();
+    });
+    controls.appendChild(delBtn);
+
+    card.appendChild(controls);
+
+    list.appendChild(card);
+  });
+}
+
+// --- Add member ---
+document.getElementById("add-member").addEventListener("click", ()=>{
+  const newId = "m" + (Date.now());
+  DATA.members.push({
+    id: newId,
+    name: "이름 입력",
+    avatar: "",
+    missionMonth: "2026.06",
+    missions: ["", ""],
+    weeklyDate: "2026.06.16",
+    weeklyItems: ["", "", "", "", ""]
+  });
+  renderMembers();
+  scheduleSave();
+});
+
+// --- Top buttons ---
+document.getElementById("btn-save").addEventListener("click", saveData);
+document.getElementById("btn-reload").addEventListener("click", loadData);
+
+// --- Init ---
+loadData();
+</script>
+</body>
+</html>
