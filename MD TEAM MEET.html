@@ -34,6 +34,8 @@
     display:flex;
     align-items:center;
     justify-content:space-between;
+    flex-wrap:wrap;
+    gap:12px;
   }
   header.top h1{
     margin:0;
@@ -41,25 +43,62 @@
     font-weight:600;
     letter-spacing:0.5px;
   }
-  header.top .actions{
+  .meeting-date-bar{
     display:flex;
+    align-items:center;
     gap:10px;
   }
-  header.top button{
+  .meeting-date-bar .label{
+    font-size:13px;
+    color:#aaa;
+    font-weight:600;
+  }
+  .meeting-date-bar .date-display{
+    font-size:16px;
+    font-weight:700;
+    color:#fff;
+    min-width:110px;
+    text-align:center;
+  }
+  .meeting-date-bar button{
     background:transparent;
     border:1px solid #555;
     color:#ddd;
-    padding:8px 14px;
+    width:30px;
+    height:30px;
     font-size:13px;
     border-radius:4px;
     cursor:pointer;
     transition:.15s;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    line-height:1;
   }
-  header.top button:hover{
+  .meeting-date-bar button:hover{
     background:var(--green);
     border-color:var(--green);
     color:#0d0d0d;
   }
+  .meeting-date-bar button:disabled{
+    opacity:.3;
+    cursor:default;
+  }
+  .meeting-date-bar button:disabled:hover{
+    background:transparent;
+    border-color:#555;
+    color:#ddd;
+  }
+  .meeting-date-bar button.add-date{
+    font-weight:700;
+    font-size:16px;
+  }
+  .meeting-date-bar button.del-date:hover{
+    background:#e25555;
+    border-color:#e25555;
+    color:#fff;
+  }
+
 
   /* ===== Top section: Year notice + Calendar ===== */
   .top-section{
@@ -118,9 +157,8 @@
   .notice-add:hover{border-color:var(--line-blue); color:var(--line-blue);}
 
   .calendar-panel{
-    background:var(--gray-bg);
-    color:var(--text-dark);
-    border:2px solid var(--black);
+    background:#3a3a3a;
+    color:#f1f1f1;
     padding:24px 28px;
     display:flex;
     flex-direction:column;
@@ -129,12 +167,16 @@
     margin:0 0 4px 0;
     font-size:20px;
     text-align:center;
+    color:#fff;
   }
   .calendar-panel .desc{
     text-align:center;
     font-size:13px;
-    opacity:.85;
+    opacity:.7;
     margin-bottom:18px;
+  }
+  #cal-month-label{
+    color:#fff;
   }
   .cal-grid{
     display:grid;
@@ -147,11 +189,11 @@
     text-align:center;
     font-weight:700;
     padding:4px 0;
-    opacity:.8;
+    opacity:.6;
+    color:#fff;
   }
   .cal-day{
-    background:var(--white);
-    border:1px solid #ddd;
+    background:#4d4d4d;
     border-radius:4px;
     min-height:46px;
     padding:3px 4px;
@@ -161,22 +203,29 @@
     display:flex;
     flex-direction:column;
     gap:2px;
+    color:#fff;
+    overflow:visible;
   }
-  .cal-day.empty{background:transparent; border:none; cursor:default;}
+  .cal-day.empty{background:transparent; cursor:default;}
   .cal-day .num{font-weight:700;}
   .cal-day .tag{
-    background:#0d0d0d;
     color:#fff;
     border-radius:3px;
-    padding:1px 3px;
+    padding:1px 4px;
     font-size:9px;
-    line-height:1.3;
+    line-height:1.4;
     white-space:nowrap;
     overflow:hidden;
     text-overflow:ellipsis;
+    position:relative;
+    z-index:1;
   }
-  .cal-day .tag.vacation{background:#1d6fb8;}
-  .cal-day .tag.meeting{background:#b8451d;}
+  .cal-day .tag.range-start{border-radius:3px 0 0 3px; margin-right:-4px;}
+  .cal-day .tag.range-end{border-radius:0 3px 3px 0; margin-left:-4px;}
+  .cal-day .tag.range-mid{border-radius:0; margin-left:-4px; margin-right:-4px;}
+  .cal-day .tag.range-single{border-radius:3px;}
+  .cal-day .tag.vacation{background:#5b8ad1;}
+  .cal-day .tag.meeting{background:#d18a4d;}
   .cal-legend{
     display:flex;
     gap:14px;
@@ -184,11 +233,12 @@
     font-size:12px;
     margin-top:auto;
     padding-top:10px;
+    color:#ddd;
   }
   .cal-legend span{display:flex; align-items:center; gap:5px;}
   .legend-dot{width:10px;height:10px;border-radius:2px;display:inline-block;}
-  .legend-dot.vacation{background:#1d6fb8;}
-  .legend-dot.meeting{background:#b8451d;}
+  .legend-dot.vacation{background:#5b8ad1;}
+  .legend-dot.meeting{background:#d18a4d;}
 
   /* ===== Member board ===== */
   #member-list{
@@ -382,55 +432,12 @@
     font-size:24px;
     font-weight:800;
   }
-  .weekly-header input.weekly-date{
-    border:none;
-    background:transparent;
+  .weekly-header .weekly-date{
     font-size:13px;
     font-weight:700;
     text-align:right;
-    font-family:inherit;
     color:var(--text-dark);
-    width:120px;
   }
-  .weekly-header input.weekly-date:focus{outline:none;}
-  .weekly-date-controls{
-    display:flex;
-    align-items:center;
-    gap:4px;
-  }
-  .weekly-date-controls .nav-btn{
-    border:none;
-    background:#eee;
-    width:22px;
-    height:22px;
-    border-radius:3px;
-    cursor:pointer;
-    font-size:12px;
-    line-height:1;
-    color:#555;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-  }
-  .weekly-date-controls .nav-btn:hover{background:var(--green); color:#0d0d0d;}
-  .weekly-date-controls .nav-btn:disabled{opacity:.35; cursor:default;}
-  .weekly-date-controls .nav-btn:disabled:hover{background:#eee; color:#555;}
-  .weekly-date-controls .add-btn{
-    border:none;
-    background:var(--black);
-    color:#fff;
-    width:22px;
-    height:22px;
-    border-radius:3px;
-    cursor:pointer;
-    font-size:14px;
-    line-height:1;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-weight:700;
-  }
-  .weekly-date-controls .add-btn:hover{background:var(--green); color:#0d0d0d;}
   .weekly-line{
     border-bottom:1.5px solid var(--line-blue);
     padding:9px 2px;
@@ -544,6 +551,12 @@
   .modal-row input, .modal-row select{
     width:100%; padding:8px; border:1px solid #ccc; border-radius:4px; font-family:inherit; font-size:13px;
   }
+  .modal-row-pair{
+    display:flex; gap:10px; margin-bottom:12px;
+  }
+  .modal-row-pair .modal-row{
+    flex:1; margin-bottom:0;
+  }
   .modal-actions{display:flex; gap:8px; justify-content:flex-end; margin-top:16px;}
   .modal-actions button{
     padding:8px 14px; border-radius:4px; border:1px solid #ccc; background:#fff; cursor:pointer; font-size:13px;
@@ -560,9 +573,13 @@
 
 <header class="top">
   <h1>MD Team Meeting</h1>
-  <div class="actions">
-    <button id="btn-save">저장</button>
-    <button id="btn-reload">새로고침</button>
+  <div class="meeting-date-bar">
+    <span class="label">미팅 기준일</span>
+    <button id="meet-prev" class="nav-date" title="이전 미팅일">◀</button>
+    <span class="date-display" id="meet-date-display">-</span>
+    <button id="meet-next" class="nav-date" title="다음 미팅일">▶</button>
+    <button id="meet-add" class="add-date" title="새 미팅일 추가">+</button>
+    <button id="meet-del" class="del-date" title="현재 미팅일 삭제">✕</button>
   </div>
 </header>
 
@@ -601,6 +618,16 @@
     <div class="modal-row">
       <label>이름 / 내용</label>
       <input type="text" id="modal-input-text" placeholder="예: 홍길동 휴가, 분기 회의">
+    </div>
+    <div class="modal-row-pair">
+      <div class="modal-row">
+        <label>시작일</label>
+        <input type="date" id="modal-input-start">
+      </div>
+      <div class="modal-row">
+        <label>종료일</label>
+        <input type="date" id="modal-input-end">
+      </div>
     </div>
     <div class="modal-row">
       <label>종류</label>
@@ -645,10 +672,12 @@ let DATA = {
   ],
   calendar: {
     monthLabel: "2026.06",
-    events: {
-      // "2026-06-16": [{type:"vacation", text:"홍길동 휴가"}]
-    }
+    events: []
+    // {id, type:"vacation"|"meeting", text:"홍길동 휴가", start:"2026-06-15", end:"2026-06-19"}
   },
+  // ===== 전역 미팅 기준일 =====
+  meetingDates: ["2026.06.16"],
+  currentMeetingDate: "2026.06.16",
   members: [
     {
       id: "m1",
@@ -660,8 +689,7 @@ let DATA = {
         "2026.05": ["", ""],
         "2026.06": ["", ""]
       },
-      // Weekly Share: 날짜별 아카이브
-      weeklyCurrentDate: "2026.06.16",
+      // Weekly Share: 미팅 기준일별 아카이브
       weeklyArchive: {
         "2026.06.16": ["", "", "", "", ""]
       }
@@ -675,7 +703,6 @@ let DATA = {
         "2026.05": ["", ""],
         "2026.06": ["", ""]
       },
-      weeklyCurrentDate: "2026.06.16",
       weeklyArchive: {
         "2026.06.16": ["", "", "", "", ""]
       }
@@ -694,8 +721,8 @@ function shiftMonth(yyyymm, delta){
 function dateKeyToSortable(str){
   return str.replace(/\./g, "");
 }
-function getSortedWeeklyDates(member){
-  return Object.keys(member.weeklyArchive).sort((a,b)=>{
+function getSortedMeetingDates(){
+  return [...DATA.meetingDates].sort((a,b)=>{
     return dateKeyToSortable(a).localeCompare(dateKeyToSortable(b));
   });
 }
@@ -703,6 +730,8 @@ function getSortedWeeklyDates(member){
 // ---------- 마이그레이션: 옛 구조 -> 새 구조 ----------
 function migrateData(json){
   if(!json || !json.members) return json;
+
+  const allDateKeys = new Set();
 
   json.members.forEach(member=>{
     // 옛 Monthly Mission 구조 (missionMonth / missions) -> missionArchive
@@ -721,23 +750,66 @@ function migrateData(json){
 
     // 옛 Weekly Share 구조 (weeklyDate / weeklyItems) -> weeklyArchive
     if(member.weeklyArchive === undefined){
-      const date = member.weeklyDate || "2026.06.16";
-      member.weeklyCurrentDate = date;
+      const date = member.weeklyDate || member.weeklyCurrentDate || "2026.06.16";
       member.weeklyArchive = {
         [date]: member.weeklyItems || ["", "", "", "", ""]
       };
       delete member.weeklyDate;
       delete member.weeklyItems;
     }
-    if(member.weeklyCurrentDate === undefined){
-      member.weeklyCurrentDate = Object.keys(member.weeklyArchive)[0] || "2026.06.16";
-    }
+    // 멤버별 weeklyCurrentDate는 더 이상 사용하지 않음 (전역 currentMeetingDate로 통합)
+    delete member.weeklyCurrentDate;
+
+    Object.keys(member.weeklyArchive).forEach(d=>allDateKeys.add(d));
   });
+
+  // 전역 미팅 기준일 목록 생성/보강
+  if(!Array.isArray(json.meetingDates)){
+    json.meetingDates = [];
+  }
+  allDateKeys.forEach(d=>{
+    if(!json.meetingDates.includes(d)) json.meetingDates.push(d);
+  });
+  if(json.meetingDates.length === 0){
+    json.meetingDates.push("2026.06.16");
+  }
+  json.meetingDates.sort((a,b)=> dateKeyToSortable(a).localeCompare(dateKeyToSortable(b)));
+
+  if(!json.currentMeetingDate || !json.meetingDates.includes(json.currentMeetingDate)){
+    json.currentMeetingDate = json.meetingDates[json.meetingDates.length-1];
+  }
+
+  // 모든 멤버에게 현재 미팅일 키가 없으면 빈 항목 생성
+  json.members.forEach(member=>{
+    json.meetingDates.forEach(d=>{
+      if(!member.weeklyArchive[d]){
+        member.weeklyArchive[d] = ["", "", "", "", ""];
+      }
+    });
+  });
+
+  // 옛 캘린더 이벤트 구조 (날짜키 객체) -> 범위 이벤트 배열
+  if(json.calendar && json.calendar.events && !Array.isArray(json.calendar.events)){
+    const oldEvents = json.calendar.events;
+    const newEvents = [];
+    Object.keys(oldEvents).forEach(dateKey=>{
+      (oldEvents[dateKey] || []).forEach(ev=>{
+        newEvents.push({
+          id: "ev" + Date.now() + Math.random().toString(16).slice(2),
+          type: ev.type,
+          text: ev.text,
+          start: dateKey,
+          end: dateKey
+        });
+      });
+    });
+    json.calendar.events = newEvents;
+  }
+  if(!json.calendar) json.calendar = { monthLabel:"2026.06", events: [] };
+  if(!json.calendar.events) json.calendar.events = [];
 
   return json;
 }
-
-// ---------- 로드 ----------
 async function loadData(){
   // GAS 연동 전: 로컬 메모리의 기본값 사용
   if(SCRIPT_URL.startsWith("YOUR_")){
@@ -796,6 +868,7 @@ function scheduleSave(){
 
 // ---------- 렌더링 ----------
 function render(){
+  renderMeetingDateBar();
   renderNotices();
   renderCalendar();
   renderMembers();
@@ -863,6 +936,7 @@ function renderCalendar(){
 
   for(let d=1; d<=lastDate; d++){
     const dateKey = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const dow = (firstDay + (d-1)) % 7; // 0=일 ... 6=토, 이 셀의 요일 위치
     const cell = document.createElement("div");
     cell.className = "cal-day";
     cell.dataset.date = dateKey;
@@ -872,17 +946,37 @@ function renderCalendar(){
     num.textContent = d;
     cell.appendChild(num);
 
-    const events = DATA.calendar.events[dateKey] || [];
+    const events = getEventsForDate(dateKey);
     events.forEach(ev=>{
       const tag = document.createElement("div");
-      tag.className = "tag " + (ev.type === "meeting" ? "meeting" : "vacation");
-      tag.textContent = ev.text;
+      const isStartOfRange = ev.start === dateKey;
+      const isEndOfRange = ev.end === dateKey;
+      // 주(week)가 바뀌면 이어붙이지 않고 그 줄의 시작/끝으로 처리
+      const isRowStart = isStartOfRange || dow === 0;
+      const isRowEnd = isEndOfRange || dow === 6;
+
+      let posClass;
+      if(isRowStart && isRowEnd) posClass = "range-single";
+      else if(isRowStart) posClass = "range-start";
+      else if(isRowEnd) posClass = "range-end";
+      else posClass = "range-mid";
+
+      tag.className = "tag " + (ev.type === "meeting" ? "meeting" : "vacation") + " " + posClass;
+      // 텍스트는 범위 시작일(또는 그 줄의 첫 칸)에만 표시
+      tag.textContent = (isStartOfRange || dow === 0) ? ev.text : "\u00A0";
       cell.appendChild(tag);
     });
 
     cell.addEventListener("click", ()=>openDayModal(dateKey));
     grid.appendChild(cell);
   }
+}
+
+// 특정 날짜(YYYY-MM-DD)가 포함된 이벤트 목록 반환 (시작일 기준 정렬)
+function getEventsForDate(dateKey){
+  return DATA.calendar.events
+    .filter(ev => ev.start <= dateKey && dateKey <= ev.end)
+    .sort((a,b)=> a.start.localeCompare(b.start));
 }
 
 // --- Day modal ---
@@ -892,20 +986,32 @@ function openDayModal(dateKey){
   document.getElementById("modal-date-title").textContent = dateKey + " 일정";
   document.getElementById("modal-input-text").value = "";
   document.getElementById("modal-input-type").value = "vacation";
+  document.getElementById("modal-input-start").value = dateKey;
+  document.getElementById("modal-input-end").value = dateKey;
 
   const existingWrap = document.getElementById("modal-existing");
   existingWrap.innerHTML = "";
-  const events = DATA.calendar.events[dateKey] || [];
-  events.forEach((ev, idx)=>{
+  const events = getEventsForDate(dateKey);
+
+  if(events.length === 0){
+    const empty = document.createElement("div");
+    empty.style.fontSize = "12px";
+    empty.style.color = "#999";
+    empty.textContent = "등록된 일정이 없습니다.";
+    existingWrap.appendChild(empty);
+  }
+
+  events.forEach((ev)=>{
     const row = document.createElement("div");
     row.className = "existing-tag";
-    row.innerHTML = `<span>${ev.type === "meeting" ? "🟧 회의" : "🟦 휴가"} - ${escapeHtml(ev.text)}</span>`;
+    const rangeLabel = ev.start === ev.end ? ev.start : `${ev.start} ~ ${ev.end}`;
+    row.innerHTML = `<span>${ev.type === "meeting" ? "🟧 회의" : "🟦 휴가"} - ${escapeHtml(ev.text)} (${rangeLabel})</span>`;
     const x = document.createElement("span");
     x.className = "x";
     x.textContent = "✕";
     x.addEventListener("click", ()=>{
-      DATA.calendar.events[dateKey].splice(idx,1);
-      if(DATA.calendar.events[dateKey].length === 0) delete DATA.calendar.events[dateKey];
+      const realIdx = DATA.calendar.events.indexOf(ev);
+      if(realIdx > -1) DATA.calendar.events.splice(realIdx,1);
       openDayModal(dateKey);
       renderCalendar();
       scheduleSave();
@@ -927,9 +1033,20 @@ document.getElementById("modal-close").addEventListener("click", ()=>{
 document.getElementById("modal-add").addEventListener("click", ()=>{
   const text = document.getElementById("modal-input-text").value.trim();
   const type = document.getElementById("modal-input-type").value;
+  let start = document.getElementById("modal-input-start").value;
+  let end = document.getElementById("modal-input-end").value;
   if(!text) return;
-  if(!DATA.calendar.events[modalDateKey]) DATA.calendar.events[modalDateKey] = [];
-  DATA.calendar.events[modalDateKey].push({type, text});
+  if(!start) start = modalDateKey;
+  if(!end) end = start;
+  if(end < start){ [start, end] = [end, start]; } // 역순 입력 시 자동 보정
+
+  DATA.calendar.events.push({
+    id: "ev" + Date.now(),
+    type,
+    text,
+    start,
+    end
+  });
   document.getElementById("modal-overlay").classList.remove("show");
   renderCalendar();
   scheduleSave();
@@ -1083,74 +1200,19 @@ function renderMembers(){
     h3.textContent = "Weekly Share";
     header.appendChild(h3);
 
-    // 현재 날짜에 아카이브가 없으면 생성
-    if(!member.weeklyArchive[member.weeklyCurrentDate]){
-      member.weeklyArchive[member.weeklyCurrentDate] = ["", "", "", "", ""];
+    // 현재 미팅 기준일에 아카이브가 없으면 생성
+    if(!member.weeklyArchive[DATA.currentMeetingDate]){
+      member.weeklyArchive[DATA.currentMeetingDate] = ["", "", "", "", ""];
     }
-    const sortedDates = getSortedWeeklyDates(member);
-    const curIdx = sortedDates.indexOf(member.weeklyCurrentDate);
-    const currentWeeklyItems = member.weeklyArchive[member.weeklyCurrentDate];
-
-    const dateControls = document.createElement("div");
-    dateControls.className = "weekly-date-controls";
-
-    const wPrevBtn = document.createElement("button");
-    wPrevBtn.className = "nav-btn";
-    wPrevBtn.textContent = "◀";
-    wPrevBtn.title = "이전 회의";
-    wPrevBtn.disabled = curIdx <= 0;
-    wPrevBtn.addEventListener("click", ()=>{
-      if(curIdx > 0){
-        member.weeklyCurrentDate = sortedDates[curIdx-1];
-        renderMembers();
-      }
-    });
-    dateControls.appendChild(wPrevBtn);
+    const currentWeeklyItems = member.weeklyArchive[DATA.currentMeetingDate];
 
     const dateLabel = document.createElement("span");
     dateLabel.className = "weekly-date";
     dateLabel.style.fontSize = "13px";
     dateLabel.style.fontWeight = "700";
-    dateLabel.textContent = `< ${member.weeklyCurrentDate} >`;
-    dateControls.appendChild(dateLabel);
+    dateLabel.textContent = `< ${DATA.currentMeetingDate} >`;
+    header.appendChild(dateLabel);
 
-    const wNextBtn = document.createElement("button");
-    wNextBtn.className = "nav-btn";
-    wNextBtn.textContent = "▶";
-    wNextBtn.title = "다음 회의";
-    wNextBtn.disabled = curIdx >= sortedDates.length-1;
-    wNextBtn.addEventListener("click", ()=>{
-      if(curIdx < sortedDates.length-1){
-        member.weeklyCurrentDate = sortedDates[curIdx+1];
-        renderMembers();
-      }
-    });
-    dateControls.appendChild(wNextBtn);
-
-    const wAddBtn = document.createElement("button");
-    wAddBtn.className = "add-btn";
-    wAddBtn.textContent = "+";
-    wAddBtn.title = "새 회의 날짜 추가";
-    wAddBtn.addEventListener("click", ()=>{
-      const today = new Date();
-      const defaultDate = `${today.getFullYear()}.${String(today.getMonth()+1).padStart(2,'0')}.${String(today.getDate()).padStart(2,'0')}`;
-      const input = prompt("새 회의 날짜를 입력하세요 (예: 2026.06.23)", defaultDate);
-      if(!input) return;
-      const trimmed = input.trim();
-      if(!/^\d{4}\.\d{2}\.\d{2}$/.test(trimmed)){
-        alert("형식이 올바르지 않습니다. 예: 2026.06.23");
-        return;
-      }
-      if(!member.weeklyArchive[trimmed]){
-        member.weeklyArchive[trimmed] = ["", "", "", "", ""];
-      }
-      member.weeklyCurrentDate = trimmed;
-      renderMembers();
-      scheduleSave();
-    });
-    dateControls.appendChild(wAddBtn);
-
-    header.appendChild(dateControls);
     weekly.appendChild(header);
 
     currentWeeklyItems.forEach((w, wIdx)=>{
@@ -1237,23 +1299,99 @@ document.getElementById("add-member").addEventListener("click", ()=>{
   const newId = "m" + (Date.now());
   const now = new Date();
   const curMonth = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}`;
-  const curDate = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')}`;
+
+  const weeklyArchive = {};
+  DATA.meetingDates.forEach(d=>{
+    weeklyArchive[d] = ["", "", "", "", ""];
+  });
+
   DATA.members.push({
     id: newId,
     name: "이름 입력",
     avatar: "",
     missionCurrentMonth: curMonth,
     missionArchive: { [curMonth]: ["", ""] },
-    weeklyCurrentDate: curDate,
-    weeklyArchive: { [curDate]: ["", "", "", "", ""] }
+    weeklyArchive: weeklyArchive
   });
   renderMembers();
   scheduleSave();
 });
 
-// --- Top buttons ---
-document.getElementById("btn-save").addEventListener("click", saveData);
-document.getElementById("btn-reload").addEventListener("click", loadData);
+// --- 미팅 기준일 컨트롤 ---
+function renderMeetingDateBar(){
+  const display = document.getElementById("meet-date-display");
+  const prevBtn = document.getElementById("meet-prev");
+  const nextBtn = document.getElementById("meet-next");
+  const delBtn = document.getElementById("meet-del");
+
+  const sorted = getSortedMeetingDates();
+  const curIdx = sorted.indexOf(DATA.currentMeetingDate);
+
+  display.textContent = `< ${DATA.currentMeetingDate} >`;
+  prevBtn.disabled = curIdx <= 0;
+  nextBtn.disabled = curIdx >= sorted.length - 1;
+  delBtn.disabled = sorted.length <= 1;
+}
+
+document.getElementById("meet-prev").addEventListener("click", ()=>{
+  const sorted = getSortedMeetingDates();
+  const curIdx = sorted.indexOf(DATA.currentMeetingDate);
+  if(curIdx > 0){
+    DATA.currentMeetingDate = sorted[curIdx-1];
+    render();
+  }
+});
+
+document.getElementById("meet-next").addEventListener("click", ()=>{
+  const sorted = getSortedMeetingDates();
+  const curIdx = sorted.indexOf(DATA.currentMeetingDate);
+  if(curIdx < sorted.length-1){
+    DATA.currentMeetingDate = sorted[curIdx+1];
+    render();
+  }
+});
+
+document.getElementById("meet-add").addEventListener("click", ()=>{
+  const today = new Date();
+  const defaultDate = `${today.getFullYear()}.${String(today.getMonth()+1).padStart(2,'0')}.${String(today.getDate()).padStart(2,'0')}`;
+  const input = prompt("새 미팅 기준일을 입력하세요 (예: 2026.06.23)", defaultDate);
+  if(!input) return;
+  const trimmed = input.trim();
+  if(!/^\d{4}\.\d{2}\.\d{2}$/.test(trimmed)){
+    alert("형식이 올바르지 않습니다. 예: 2026.06.23");
+    return;
+  }
+  if(!DATA.meetingDates.includes(trimmed)){
+    DATA.meetingDates.push(trimmed);
+  }
+  // 모든 멤버에 해당 날짜의 빈 Weekly Share 항목 생성
+  DATA.members.forEach(member=>{
+    if(!member.weeklyArchive[trimmed]){
+      member.weeklyArchive[trimmed] = ["", "", "", "", ""];
+    }
+  });
+  DATA.currentMeetingDate = trimmed;
+  render();
+  scheduleSave();
+});
+
+document.getElementById("meet-del").addEventListener("click", ()=>{
+  const sorted = getSortedMeetingDates();
+  if(sorted.length <= 1) return;
+  if(!confirm(`미팅 기준일 ${DATA.currentMeetingDate} 을(를) 삭제할까요?\n모든 멤버의 해당 날짜 Weekly Share 내용도 삭제됩니다.`)) return;
+
+  const target = DATA.currentMeetingDate;
+  DATA.meetingDates = DATA.meetingDates.filter(d=>d !== target);
+  DATA.members.forEach(member=>{
+    delete member.weeklyArchive[target];
+  });
+
+  const newSorted = getSortedMeetingDates();
+  DATA.currentMeetingDate = newSorted[newSorted.length-1];
+
+  render();
+  scheduleSave();
+});
 
 // --- Init ---
 loadData();
