@@ -118,8 +118,9 @@
   .notice-add:hover{border-color:var(--line-blue); color:var(--line-blue);}
 
   .calendar-panel{
-    background:var(--green);
-    color:#073910;
+    background:var(--gray-bg);
+    color:var(--text-dark);
+    border:2px solid var(--black);
     padding:24px 28px;
     display:flex;
     flex-direction:column;
@@ -149,7 +150,8 @@
     opacity:.8;
   }
   .cal-day{
-    background:rgba(255,255,255,0.35);
+    background:var(--white);
+    border:1px solid #ddd;
     border-radius:4px;
     min-height:46px;
     padding:3px 4px;
@@ -160,7 +162,7 @@
     flex-direction:column;
     gap:2px;
   }
-  .cal-day.empty{background:transparent; cursor:default;}
+  .cal-day.empty{background:transparent; border:none; cursor:default;}
   .cal-day .num{font-weight:700;}
   .cal-day .tag{
     background:#0d0d0d;
@@ -234,8 +236,9 @@
     width:90px;
     height:90px;
     border-radius:50%;
-    background:#29b6e8;
-    color:#fff;
+    background:var(--white);
+    border:1.5px solid #ccc;
+    color:#999;
     display:flex;
     align-items:center;
     justify-content:center;
@@ -246,7 +249,6 @@
     position:relative;
     overflow:hidden;
     cursor:pointer;
-    border:none;
     padding:0;
   }
   .avatar img{
@@ -958,7 +960,7 @@ function renderMembers(){
     if(member.avatar){
       avatarLabel.innerHTML = `<img src="${member.avatar}" alt="사진">`;
     }else{
-      avatarLabel.innerHTML = `<span>사진<br>(변경가능하게)</span>`;
+      avatarLabel.innerHTML = `<span>사진</span>`;
     }
     const fileInput = document.createElement("input");
     fileInput.type = "file";
