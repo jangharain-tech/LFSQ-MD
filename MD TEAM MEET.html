@@ -683,6 +683,43 @@ function getSortedWeeklyDates(member){
   });
 }
 
+// ---------- 마이그레이션: 옛 구조 -> 새 구조 ----------
+function migrateData(json){
+  if(!json || !json.members) return json;
+
+  json.members.forEach(member=>{
+    // 옛 Monthly Mission 구조 (missionMonth / missions) -> missionArchive
+    if(member.missionArchive === undefined){
+      const month = member.missionMonth || "2026.06";
+      member.missionCurrentMonth = month;
+      member.missionArchive = {
+        [month]: member.missions || ["", ""]
+      };
+      delete member.missionMonth;
+      delete member.missions;
+    }
+    if(member.missionCurrentMonth === undefined){
+      member.missionCurrentMonth = Object.keys(member.missionArchive)[0] || "2026.06";
+    }
+
+    // 옛 Weekly Share 구조 (weeklyDate / weeklyItems) -> weeklyArchive
+    if(member.weeklyArchive === undefined){
+      const date = member.weeklyDate || "2026.06.16";
+      member.weeklyCurrentDate = date;
+      member.weeklyArchive = {
+        [date]: member.weeklyItems || ["", "", "", "", ""]
+      };
+      delete member.weeklyDate;
+      delete member.weeklyItems;
+    }
+    if(member.weeklyCurrentDate === undefined){
+      member.weeklyCurrentDate = Object.keys(member.weeklyArchive)[0] || "2026.06.16";
+    }
+  });
+
+  return json;
+}
+
 // ---------- 로드 ----------
 async function loadData(){
   // GAS 연동 전: 로컬 메모리의 기본값 사용
@@ -694,7 +731,9 @@ async function loadData(){
     const res = await fetch(SCRIPT_URL);
     const json = await res.json();
     if(json && json.members){
-      DATA = json;
+      DATA = migrateData(json);
+      // 마이그레이션된 구조를 다시 저장해 다음부터는 변환 불필요
+      saveData();
     }
   }catch(err){
     console.error("불러오기 실패:", err);
