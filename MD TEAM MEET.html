@@ -261,20 +261,38 @@
   .mission-month{
     display:flex;
     align-items:center;
+    justify-content:space-between;
     gap:6px;
     font-size:12px;
     font-weight:700;
     margin-bottom:8px;
   }
-  .mission-month input{
-    border:none;
-    background:transparent;
-    font-weight:700;
-    font-size:12px;
-    width:80px;
-    font-family:inherit;
+  .mission-month .month-label-wrap{
+    display:flex;
+    align-items:center;
+    gap:4px;
   }
-  .mission-month input:focus{outline:none;}
+  .mission-month .month-text{
+    font-size:12px;
+    font-weight:700;
+  }
+  .mission-month .nav-btn{
+    border:none;
+    background:#eee;
+    width:20px;
+    height:20px;
+    border-radius:3px;
+    cursor:pointer;
+    font-size:11px;
+    line-height:1;
+    color:#555;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .mission-month .nav-btn:hover{background:var(--green); color:#0d0d0d;}
+  .mission-month .nav-btn:disabled{opacity:.35; cursor:default;}
+  .mission-month .nav-btn:disabled:hover{background:#eee; color:#555;}
   .mission-item{
     border-bottom:1px solid #999;
     padding:6px 2px;
@@ -300,6 +318,19 @@
     margin-top:4px;
   }
   .small-add:hover{border-color:var(--line-blue); color:var(--line-blue);}
+  .block-save{
+    margin-top:8px;
+    background:var(--black);
+    border:1px solid var(--black);
+    color:#fff;
+    width:100%;
+    padding:7px;
+    font-size:12px;
+    cursor:pointer;
+    border-radius:3px;
+    font-weight:700;
+  }
+  .block-save:hover{background:var(--green); border-color:var(--green); color:#0d0d0d;}
 
   /* ===== Weekly share box ===== */
   .weekly-box{
@@ -342,8 +373,47 @@
     text-align:right;
     font-family:inherit;
     color:var(--text-dark);
+    width:120px;
   }
   .weekly-header input.weekly-date:focus{outline:none;}
+  .weekly-date-controls{
+    display:flex;
+    align-items:center;
+    gap:4px;
+  }
+  .weekly-date-controls .nav-btn{
+    border:none;
+    background:#eee;
+    width:22px;
+    height:22px;
+    border-radius:3px;
+    cursor:pointer;
+    font-size:12px;
+    line-height:1;
+    color:#555;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .weekly-date-controls .nav-btn:hover{background:var(--green); color:#0d0d0d;}
+  .weekly-date-controls .nav-btn:disabled{opacity:.35; cursor:default;}
+  .weekly-date-controls .nav-btn:disabled:hover{background:#eee; color:#555;}
+  .weekly-date-controls .add-btn{
+    border:none;
+    background:var(--black);
+    color:#fff;
+    width:22px;
+    height:22px;
+    border-radius:3px;
+    cursor:pointer;
+    font-size:14px;
+    line-height:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:700;
+  }
+  .weekly-date-controls .add-btn:hover{background:var(--green); color:#0d0d0d;}
   .weekly-line{
     border-bottom:1.5px solid var(--line-blue);
     padding:9px 2px;
@@ -567,22 +637,51 @@ let DATA = {
       id: "m1",
       name: "홍길동",
       avatar: "",
-      missionMonth: "2026.05",
-      missions: ["", ""],
-      weeklyDate: "2026.06.16",
-      weeklyItems: ["", "", "", "", ""]
+      // Monthly Mission: 월별 아카이브
+      missionCurrentMonth: "2026.06",
+      missionArchive: {
+        "2026.05": ["", ""],
+        "2026.06": ["", ""]
+      },
+      // Weekly Share: 날짜별 아카이브
+      weeklyCurrentDate: "2026.06.16",
+      weeklyArchive: {
+        "2026.06.16": ["", "", "", "", ""]
+      }
     },
     {
       id: "m2",
       name: "홍길동",
       avatar: "",
-      missionMonth: "2026.05",
-      missions: ["", ""],
-      weeklyDate: "2026.06.16",
-      weeklyItems: ["", "", "", "", ""]
+      missionCurrentMonth: "2026.06",
+      missionArchive: {
+        "2026.05": ["", ""],
+        "2026.06": ["", ""]
+      },
+      weeklyCurrentDate: "2026.06.16",
+      weeklyArchive: {
+        "2026.06.16": ["", "", "", "", ""]
+      }
     }
   ]
 };
+
+// ---------- 유틸: YYYY.MM 월 이동 ----------
+function shiftMonth(yyyymm, delta){
+  const [y, m] = yyyymm.split(".").map(Number);
+  const d = new Date(y, m - 1 + delta, 1);
+  return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}`;
+}
+
+// ---------- 유틸: YYYY.MM.DD 날짜 비교/정렬 ----------
+function dateKeyToSortable(str){
+  return str.replace(/\./g, "");
+}
+function getSortedWeeklyDates(member){
+  return Object.keys(member.weeklyArchive).sort((a,b)=>{
+    return dateKeyToSortable(a).localeCompare(dateKeyToSortable(b));
+  });
+}
 
 // ---------- 로드 ----------
 async function loadData(){
@@ -842,23 +941,47 @@ function renderMembers(){
     missionTitle.textContent = "Monthly Mission";
     missionBlock.appendChild(missionTitle);
 
+    // 현재 월에 아카이브가 없으면 생성
+    if(!member.missionArchive[member.missionCurrentMonth]){
+      member.missionArchive[member.missionCurrentMonth] = ["", ""];
+    }
+    const currentMissions = member.missionArchive[member.missionCurrentMonth];
+
     const monthRow = document.createElement("div");
     monthRow.className = "mission-month";
-    monthRow.innerHTML = `<span>&lt;</span>`;
-    const monthInput = document.createElement("input");
-    monthInput.type = "text";
-    monthInput.value = member.missionMonth;
-    monthInput.addEventListener("input", ()=>{
-      member.missionMonth = monthInput.value;
-      scheduleSave();
+
+    const labelWrap = document.createElement("div");
+    labelWrap.className = "month-label-wrap";
+
+    const prevBtn = document.createElement("button");
+    prevBtn.className = "nav-btn";
+    prevBtn.textContent = "◀";
+    prevBtn.title = "전월";
+    prevBtn.addEventListener("click", ()=>{
+      member.missionCurrentMonth = shiftMonth(member.missionCurrentMonth, -1);
+      renderMembers();
     });
-    monthRow.appendChild(monthInput);
-    const closeBracket = document.createElement("span");
-    closeBracket.textContent = "​>";
-    monthRow.appendChild(closeBracket);
+    labelWrap.appendChild(prevBtn);
+
+    const monthText = document.createElement("span");
+    monthText.className = "month-text";
+    monthText.textContent = `< ${member.missionCurrentMonth} >`;
+    labelWrap.appendChild(monthText);
+
+    const nextBtn = document.createElement("button");
+    nextBtn.className = "nav-btn";
+    nextBtn.textContent = "▶";
+    nextBtn.title = "익월";
+    nextBtn.addEventListener("click", ()=>{
+      member.missionCurrentMonth = shiftMonth(member.missionCurrentMonth, 1);
+      renderMembers();
+    });
+    labelWrap.appendChild(nextBtn);
+
+    monthRow.appendChild(labelWrap);
     missionBlock.appendChild(monthRow);
 
-    member.missions.forEach((m, mIdx)=>{
+    currentMissions.forEach((m, mIdx)=>{
       const item = document.createElement("div");
       item.className = "mission-item";
       const input = document.createElement("input");
@@ -866,8 +989,7 @@ function renderMembers(){
       input.placeholder = "TEXT TEXT TEXT";
       input.value = m;
       input.addEventListener("input", ()=>{
-        member.missions[mIdx] = input.value;
-        scheduleSave();
+        currentMissions[mIdx] = input.value;
       });
       item.appendChild(input);
       missionBlock.appendChild(item);
@@ -876,11 +998,18 @@ function renderMembers(){
     missionAdd.className = "small-add";
     missionAdd.textContent = "+ 미션 추가";
     missionAdd.addEventListener("click", ()=>{
-      member.missions.push("");
+      currentMissions.push("");
       renderMembers();
-      scheduleSave();
     });
     missionBlock.appendChild(missionAdd);
+
+    const missionSave = document.createElement("button");
+    missionSave.className = "block-save";
+    missionSave.textContent = "내용 저장";
+    missionSave.addEventListener("click", ()=>{
+      saveData();
+    });
+    missionBlock.appendChild(missionSave);
 
     side.appendChild(missionBlock);
     card.appendChild(side);
@@ -895,22 +1024,77 @@ function renderMembers(){
     h3.textContent = "Weekly Share";
     header.appendChild(h3);
 
-    const dateInput = document.createElement("input");
-    dateInput.className = "weekly-date";
-    dateInput.type = "text";
-    dateInput.value = `< ${member.weeklyDate} >`;
-    dateInput.addEventListener("focus", ()=>{
-      dateInput.value = member.weeklyDate;
+    // 현재 날짜에 아카이브가 없으면 생성
+    if(!member.weeklyArchive[member.weeklyCurrentDate]){
+      member.weeklyArchive[member.weeklyCurrentDate] = ["", "", "", "", ""];
+    }
+    const sortedDates = getSortedWeeklyDates(member);
+    const curIdx = sortedDates.indexOf(member.weeklyCurrentDate);
+    const currentWeeklyItems = member.weeklyArchive[member.weeklyCurrentDate];
+
+    const dateControls = document.createElement("div");
+    dateControls.className = "weekly-date-controls";
+
+    const wPrevBtn = document.createElement("button");
+    wPrevBtn.className = "nav-btn";
+    wPrevBtn.textContent = "◀";
+    wPrevBtn.title = "이전 회의";
+    wPrevBtn.disabled = curIdx <= 0;
+    wPrevBtn.addEventListener("click", ()=>{
+      if(curIdx > 0){
+        member.weeklyCurrentDate = sortedDates[curIdx-1];
+        renderMembers();
+      }
     });
-    dateInput.addEventListener("blur", ()=>{
-      member.weeklyDate = dateInput.value;
-      dateInput.value = `< ${member.weeklyDate} >`;
+    dateControls.appendChild(wPrevBtn);
+
+    const dateLabel = document.createElement("span");
+    dateLabel.className = "weekly-date";
+    dateLabel.style.fontSize = "13px";
+    dateLabel.style.fontWeight = "700";
+    dateLabel.textContent = `< ${member.weeklyCurrentDate} >`;
+    dateControls.appendChild(dateLabel);
+
+    const wNextBtn = document.createElement("button");
+    wNextBtn.className = "nav-btn";
+    wNextBtn.textContent = "▶";
+    wNextBtn.title = "다음 회의";
+    wNextBtn.disabled = curIdx >= sortedDates.length-1;
+    wNextBtn.addEventListener("click", ()=>{
+      if(curIdx < sortedDates.length-1){
+        member.weeklyCurrentDate = sortedDates[curIdx+1];
+        renderMembers();
+      }
+    });
+    dateControls.appendChild(wNextBtn);
+
+    const wAddBtn = document.createElement("button");
+    wAddBtn.className = "add-btn";
+    wAddBtn.textContent = "+";
+    wAddBtn.title = "새 회의 날짜 추가";
+    wAddBtn.addEventListener("click", ()=>{
+      const today = new Date();
+      const defaultDate = `${today.getFullYear()}.${String(today.getMonth()+1).padStart(2,'0')}.${String(today.getDate()).padStart(2,'0')}`;
+      const input = prompt("새 회의 날짜를 입력하세요 (예: 2026.06.23)", defaultDate);
+      if(!input) return;
+      const trimmed = input.trim();
+      if(!/^\d{4}\.\d{2}\.\d{2}$/.test(trimmed)){
+        alert("형식이 올바르지 않습니다. 예: 2026.06.23");
+        return;
+      }
+      if(!member.weeklyArchive[trimmed]){
+        member.weeklyArchive[trimmed] = ["", "", "", "", ""];
+      }
+      member.weeklyCurrentDate = trimmed;
+      renderMembers();
       scheduleSave();
     });
-    header.appendChild(dateInput);
+    dateControls.appendChild(wAddBtn);
+
+    header.appendChild(dateControls);
     weekly.appendChild(header);
 
-    member.weeklyItems.forEach((w, wIdx)=>{
+    currentWeeklyItems.forEach((w, wIdx)=>{
       const line = document.createElement("div");
       line.className = "weekly-line" + (wIdx === 0 ? " bold" : "");
       const input = document.createElement("input");
@@ -918,8 +1102,7 @@ function renderMembers(){
       input.placeholder = "TEXT TEXT TEXT";
       input.value = w;
       input.addEventListener("input", ()=>{
-        member.weeklyItems[wIdx] = input.value;
-        scheduleSave();
+        currentWeeklyItems[wIdx] = input.value;
       });
       line.appendChild(input);
       weekly.appendChild(line);
@@ -928,11 +1111,18 @@ function renderMembers(){
     weeklyAdd.className = "weekly-add";
     weeklyAdd.textContent = "+ 줄 추가";
     weeklyAdd.addEventListener("click", ()=>{
-      member.weeklyItems.push("");
+      currentWeeklyItems.push("");
       renderMembers();
-      scheduleSave();
     });
     weekly.appendChild(weeklyAdd);
+
+    const weeklySave = document.createElement("button");
+    weeklySave.className = "block-save";
+    weeklySave.textContent = "내용 저장";
+    weeklySave.addEventListener("click", ()=>{
+      saveData();
+    });
+    weekly.appendChild(weeklySave);
 
     card.appendChild(weekly);
 
@@ -985,14 +1175,17 @@ function renderMembers(){
 // --- Add member ---
 document.getElementById("add-member").addEventListener("click", ()=>{
   const newId = "m" + (Date.now());
+  const now = new Date();
+  const curMonth = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}`;
+  const curDate = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')}`;
   DATA.members.push({
     id: newId,
     name: "이름 입력",
     avatar: "",
-    missionMonth: "2026.06",
-    missions: ["", ""],
-    weeklyDate: "2026.06.16",
-    weeklyItems: ["", "", "", "", ""]
+    missionCurrentMonth: curMonth,
+    missionArchive: { [curMonth]: ["", ""] },
+    weeklyCurrentDate: curDate,
+    weeklyArchive: { [curDate]: ["", "", "", "", ""] }
   });
   renderMembers();
   scheduleSave();
