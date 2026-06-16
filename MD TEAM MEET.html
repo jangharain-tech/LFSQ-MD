@@ -10,16 +10,24 @@
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css" />
 <style>
   :root{
-    /* ===== 키컬러 3개 ===== */
-    --ink:#2b2d3a;        /* 1. 잉크 네이비 - 헤더/포인트 텍스트 */
-    --sage:#6fae8c;       /* 2. 세이지 그린 - 강조/액션 */
-    --cream:#f6f4ef;      /* 3. 웜 크림 - 배경 */
+    /* ===== 키컬러 ===== */
+    --ink:#2b2d3a;        /* 1. 잉크 네이비 - 헤더/이름탭/구조적 요소 */
+    --sage:#6fae8c;       /* 2. 세이지 그린 - 추가/확인 등 긍정적 액션 */
+    --cream:#f6f4ef;      /* 3. 웜 크림 - 배경/내부 박스 */
+    --coral:#e0735c;      /* 4. 코랄 - 미팅 기준일/Weekly 날짜 등 "현재 시점" 강조 */
+    --amber:#d9a44a;      /* 5. 앰버 - Monthly Mission 포인트 */
+    --sky:#5f8fc4;         /* 보조: 오늘 날짜(캘린더) 전용 강조 */
 
     /* 파생 톤 (키컬러 기반 음영, 색상 추가 아님) */
     --ink-soft:#454858;
     --ink-faint:#9a9ba8;
     --sage-soft:#e3f0e8;
     --sage-deep:#4f8d6c;
+    --coral-soft:#fbe6e1;
+    --coral-deep:#c75a44;
+    --amber-soft:#faeed7;
+    --amber-deep:#b8842f;
+    --sky-soft:#e2ecf6;
     --cream-deep:#ece9e1;
     --line:#e3e0d8;
     --text-dark:#2b2d3a;
@@ -80,7 +88,7 @@
   .meeting-date-bar .date-display{
     font-size:14px;
     font-weight:700;
-    color:#fff;
+    color:#f4a896;
     min-width:108px;
     text-align:center;
     white-space:nowrap;
@@ -233,10 +241,10 @@
   .cal-day.empty{background:transparent; cursor:default;}
   .cal-day.empty:hover{background:transparent;}
   .cal-day.today{
-    background:var(--sage);
-    box-shadow:0 0 0 2px rgba(111,174,140,0.4);
+    background:var(--sky);
+    box-shadow:0 0 0 2px rgba(95,143,196,0.4);
   }
-  .cal-day.today:hover{background:var(--sage-deep);}
+  .cal-day.today:hover{background:#4f7eb0;}
   .cal-day.today .num{color:#fff; opacity:1;}
   .cal-day .num{font-weight:600; opacity:.85;}
   .cal-day .tag{
@@ -255,8 +263,8 @@
   .cal-day .tag.range-end{border-radius:0 6px 6px 0; margin-left:-5px;}
   .cal-day .tag.range-mid{border-radius:0; margin-left:-5px; margin-right:-5px;}
   .cal-day .tag.range-single{border-radius:6px;}
-  .cal-day .tag.vacation{background:#6f8fc9;}
-  .cal-day .tag.issue{background:#d18a4d;}
+  .cal-day .tag.vacation{background:var(--sky);}
+  .cal-day .tag.issue{background:var(--coral);}
   .cal-day .tag.birthday{background:#c97fb0;}
   .cal-legend{
     display:flex;
@@ -269,8 +277,8 @@
   }
   .cal-legend span{display:flex; align-items:center; gap:5px;}
   .legend-dot{width:9px;height:9px;border-radius:3px;display:inline-block;}
-  .legend-dot.vacation{background:#6f8fc9;}
-  .legend-dot.issue{background:#d18a4d;}
+  .legend-dot.vacation{background:var(--sky);}
+  .legend-dot.issue{background:var(--coral);}
   .legend-dot.birthday{background:#c97fb0;}
 
   /* ===== Member board ===== */
@@ -285,12 +293,30 @@
   }
   .member-card{
     background:var(--white);
-    padding:26px 28px;
+    padding:34px 28px 26px;
     display:flex;
     flex-direction:column;
     gap:18px;
     border-radius:var(--radius-lg);
+    position:relative;
   }
+  .member-name-tab{
+    position:absolute;
+    top:-14px;
+    left:24px;
+    background:var(--ink);
+    color:#fff;
+    padding:6px 16px;
+    border-radius:999px;
+    box-shadow:0 3px 8px rgba(43,45,58,0.25);
+    z-index:2;
+    font-family:inherit;
+    font-size:14px;
+    font-weight:700;
+    white-space:nowrap;
+    cursor:text;
+  }
+  .member-name-tab:focus{outline:none; box-shadow:0 0 0 2px var(--sage);}
   .member-card-body{
     display:flex;
     gap:24px;
@@ -298,7 +324,7 @@
   }
 
   .member-side{
-    width:190px;
+    width:200px;
     flex-shrink:0;
     display:flex;
     flex-direction:column;
@@ -311,9 +337,9 @@
     gap:10px;
   }
   .avatar{
-    width:64px;
-    height:64px;
-    border-radius:var(--radius-sm);
+    width:96px;
+    height:96px;
+    border-radius:var(--radius-md);
     background:var(--cream);
     border:1.5px solid var(--line);
     color:var(--text-mid);
@@ -321,7 +347,7 @@
     align-items:center;
     justify-content:center;
     text-align:center;
-    font-size:11px;
+    font-size:12px;
     font-weight:600;
     line-height:1.4;
     flex-shrink:0;
@@ -342,12 +368,14 @@
     flex:1;
     position:relative;
     min-width:0;
+    align-self:stretch;
+    display:flex;
   }
   .mini-bubble-wrap::before{
     content:"";
     position:absolute;
     left:-6px;
-    top:14px;
+    top:20px;
     width:12px;
     height:12px;
     background:var(--cream);
@@ -361,6 +389,7 @@
     padding:8px 10px;
     position:relative;
     z-index:1;
+    width:100%;
   }
   .mini-bubble textarea{
     border:none;
@@ -371,36 +400,23 @@
     font-size:11px;
     line-height:1.4;
     color:var(--text-dark);
-    height:48px;
+    height:80px;
     padding:0;
   }
   .mini-bubble textarea::placeholder{color:#bdb9ae;}
   .mini-bubble textarea:focus{outline:none;}
 
-  .member-name{
-    font-size:15px;
-    font-weight:700;
-    border:none;
-    background:transparent;
-    font-family:inherit;
-    width:100%;
-    color:var(--text-dark);
-    border-radius:var(--radius-sm);
-    padding:4px 6px;
-    transition:.15s;
-  }
-  .member-name:focus{outline:none; background:var(--cream);}
-
   .mission-block{
-    background:var(--cream);
+    background:var(--amber-soft);
     border-radius:var(--radius-md);
     padding:14px 14px 12px;
+    border:1px solid rgba(217,164,74,0.25);
   }
   .mission-block h4{
     margin:0 0 10px 0;
     font-size:14px;
     font-weight:700;
-    color:var(--ink);
+    color:var(--amber-deep);
   }
   .mission-month{
     display:flex;
@@ -419,7 +435,7 @@
   .mission-month .month-text{
     font-size:12px;
     font-weight:700;
-    color:var(--ink-soft);
+    color:var(--amber-deep);
   }
   .mission-month .nav-btn{
     border:none;
@@ -436,7 +452,7 @@
     justify-content:center;
     transition:.15s;
   }
-  .mission-month .nav-btn:hover{background:var(--sage); color:#fff;}
+  .mission-month .nav-btn:hover{background:var(--amber); color:#fff;}
   .mission-month .nav-btn:disabled{opacity:.3; cursor:default;}
   .mission-month .nav-btn:disabled:hover{background:var(--white); color:var(--text-mid);}
   .mission-item{
@@ -481,12 +497,16 @@
     transition:.15s;
   }
   .block-save:hover{background:var(--sage-deep);}
+  .block-save.mission{background:var(--amber-deep);}
+  .block-save.mission:hover{background:var(--amber);}
+  .block-save.weekly{background:var(--coral-deep);}
+  .block-save.weekly:hover{background:var(--coral);}
 
   /* ===== Weekly share box ===== */
   .weekly-box{
     flex:1;
     min-width:240px;
-    background:var(--cream);
+    background:var(--coral-soft);
     border-radius:var(--radius-md);
     padding:20px 22px;
     position:relative;
@@ -499,7 +519,7 @@
     top:42px;
     width:18px;
     height:18px;
-    background:var(--cream);
+    background:var(--coral-soft);
     border-radius:4px;
     transform:rotate(45deg);
   }
@@ -519,16 +539,21 @@
     color:var(--ink);
   }
   .weekly-header .weekly-date{
-    font-size:12px;
+    font-size:13px;
     font-weight:700;
     text-align:right;
-    color:var(--sage-deep);
-    background:var(--sage-soft);
-    padding:4px 10px;
+    color:#fff;
+    background:var(--coral);
+    padding:6px 14px;
     border-radius:999px;
     white-space:nowrap;
+    letter-spacing:0.2px;
+    box-shadow:0 2px 6px rgba(224,115,92,0.35);
   }
   .weekly-line{
+    display:flex;
+    align-items:center;
+    gap:6px;
     border-bottom:1.5px solid var(--line);
     padding:9px 2px;
     margin-bottom:2px;
@@ -536,6 +561,7 @@
   .weekly-line input{
     border:none;
     background:transparent;
+    flex:1;
     width:100%;
     font-size:14px;
     font-family:inherit;
@@ -544,6 +570,20 @@
   }
   .weekly-line input:focus{outline:none;}
   .weekly-line.bold input{font-weight:700;}
+  .weekly-line .line-del{
+    flex-shrink:0;
+    border:none;
+    background:transparent;
+    color:var(--ink-faint);
+    width:20px;
+    height:20px;
+    border-radius:999px;
+    cursor:pointer;
+    font-size:11px;
+    line-height:1;
+    transition:.15s;
+  }
+  .weekly-line .line-del:hover{background:var(--danger); color:#fff;}
   .weekly-add{
     margin-top:8px;
     background:none;
@@ -664,7 +704,7 @@
     display:flex; align-items:center; gap:6px; font-size:12px; background:var(--cream); padding:7px 10px; border-radius:var(--radius-sm); color:var(--text-dark);
   }
   .modal-tag-list .existing-tag .x{cursor:pointer; color:var(--danger); font-weight:700;}
-  .modal-tag-list .existing-tag .edit{cursor:pointer; color:var(--sage-deep); font-weight:700;}
+  .modal-tag-list .existing-tag .edit{cursor:pointer; color:var(--amber-deep); font-weight:700;}
 </style>
 </head>
 <body>
@@ -812,6 +852,7 @@ let DATA = {
 
 const MEETING_WEEK_START = "2026-06-15"; // 운영 시작 주차 (월요일)
 const MEETING_WEEK_MAX_FUTURE = 3;        // 오늘 기준 향후 이동 가능한 최대 주차 수
+const WEEKLY_FIXED_LINES = 5;             // Weekly Share 기본 고정 줄 수 (이 이후 줄만 삭제 가능)
 
 // ---------- 유틸: 주차(월요일) 관련 ----------
 function parseISODate(str){
@@ -1283,6 +1324,17 @@ function renderMembers(){
     const card = document.createElement("div");
     card.className = "member-card";
 
+    // ===== 이름 탭 (카드 좌측 상단에 튀어나오는 형태) =====
+    const nameTab = document.createElement("div");
+    nameTab.className = "member-name-tab";
+    nameTab.contentEditable = "true";
+    nameTab.textContent = member.name;
+    nameTab.addEventListener("input", ()=>{
+      member.name = nameTab.textContent;
+      scheduleSave();
+    });
+    card.appendChild(nameTab);
+
     const body = document.createElement("div");
     body.className = "member-card-body";
 
@@ -1336,17 +1388,6 @@ function renderMembers(){
     idRow.appendChild(bubbleWrap);
 
     side.appendChild(idRow);
-
-    // name (사진 아래, 작게)
-    const nameInput = document.createElement("input");
-    nameInput.className = "member-name";
-    nameInput.type = "text";
-    nameInput.value = member.name;
-    nameInput.addEventListener("input", ()=>{
-      member.name = nameInput.value;
-      scheduleSave();
-    });
-    side.appendChild(nameInput);
 
     // mission block
     const missionBlock = document.createElement("div");
@@ -1418,7 +1459,7 @@ function renderMembers(){
     missionBlock.appendChild(missionAdd);
 
     const missionSave = document.createElement("button");
-    missionSave.className = "block-save";
+    missionSave.className = "block-save mission";
     missionSave.textContent = "내용 저장";
     missionSave.addEventListener("click", ()=>{
       saveData();
@@ -1462,6 +1503,21 @@ function renderMembers(){
         currentWeeklyItems[wIdx] = input.value;
       });
       line.appendChild(input);
+
+      // 기본 고정 줄(WEEKLY_FIXED_LINES개) 이후, 직접 추가한 줄만 삭제 가능
+      if(wIdx >= WEEKLY_FIXED_LINES){
+        const delBtn = document.createElement("button");
+        delBtn.className = "line-del";
+        delBtn.textContent = "✕";
+        delBtn.title = "이 줄 삭제";
+        delBtn.addEventListener("click", ()=>{
+          currentWeeklyItems.splice(wIdx, 1);
+          renderMembers();
+          scheduleSave();
+        });
+        line.appendChild(delBtn);
+      }
+
       weekly.appendChild(line);
     });
     const weeklyAdd = document.createElement("button");
@@ -1474,7 +1530,7 @@ function renderMembers(){
     weekly.appendChild(weeklyAdd);
 
     const weeklySave = document.createElement("button");
-    weeklySave.className = "block-save";
+    weeklySave.className = "block-save weekly";
     weeklySave.textContent = "내용 저장";
     weeklySave.addEventListener("click", ()=>{
       saveData();
