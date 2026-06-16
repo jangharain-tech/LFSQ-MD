@@ -4,70 +4,95 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MD Team Meeting</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css" />
 <style>
   :root{
-    --black:#0d0d0d;
-    --green:#3ec853;
-    --gray-bg:#f1f1f1;
-    --line-blue:#2d6079;
-    --text-dark:#1a1a1a;
-    --text-mid:#666;
+    /* ===== 키컬러 3개 ===== */
+    --ink:#2b2d3a;        /* 1. 잉크 네이비 - 헤더/포인트 텍스트 */
+    --sage:#6fae8c;       /* 2. 세이지 그린 - 강조/액션 */
+    --cream:#f6f4ef;      /* 3. 웜 크림 - 배경 */
+
+    /* 파생 톤 (키컬러 기반 음영, 색상 추가 아님) */
+    --ink-soft:#454858;
+    --ink-faint:#9a9ba8;
+    --sage-soft:#e3f0e8;
+    --sage-deep:#4f8d6c;
+    --cream-deep:#ece9e1;
+    --line:#e3e0d8;
+    --text-dark:#2b2d3a;
+    --text-mid:#8b8b93;
     --white:#ffffff;
-    --radius:0px;
+    --danger:#d9745f;
+
+    --radius-lg:22px;
+    --radius-md:16px;
+    --radius-sm:10px;
     --gap:18px;
   }
 
   *{box-sizing:border-box;}
   body{
     margin:0;
-    font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
-    background:#e7e7e7;
+    font-family:'Pretendard','Poppins','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+    background:var(--cream-deep);
     color:var(--text-dark);
-    padding-bottom:80px;
+    padding:0 16px 80px;
+    -webkit-font-smoothing:antialiased;
   }
 
   /* ===== Header ===== */
   header.top{
-    background:var(--black);
+    background:var(--ink);
     color:var(--white);
-    padding:18px 28px;
+    padding:20px 26px;
     display:flex;
     align-items:center;
     justify-content:space-between;
     flex-wrap:wrap;
     gap:12px;
+    border-radius:var(--radius-lg);
+    margin-top:16px;
   }
   header.top h1{
     margin:0;
-    font-size:26px;
+    font-family:'Poppins','Pretendard',sans-serif;
+    font-size:23px;
     font-weight:600;
-    letter-spacing:0.5px;
+    letter-spacing:0.2px;
   }
   .meeting-date-bar{
     display:flex;
     align-items:center;
-    gap:10px;
+    gap:8px;
+    background:rgba(255,255,255,0.07);
+    padding:6px 8px;
+    border-radius:999px;
   }
   .meeting-date-bar .label{
-    font-size:13px;
-    color:#aaa;
+    font-size:12px;
+    color:var(--ink-faint);
     font-weight:600;
+    padding-left:8px;
   }
   .meeting-date-bar .date-display{
-    font-size:16px;
+    font-size:14px;
     font-weight:700;
     color:#fff;
-    min-width:110px;
+    min-width:108px;
     text-align:center;
+    white-space:nowrap;
   }
   .meeting-date-bar button{
     background:transparent;
-    border:1px solid #555;
-    color:#ddd;
-    width:30px;
-    height:30px;
+    border:none;
+    color:#cfcfd6;
+    width:28px;
+    height:28px;
     font-size:13px;
-    border-radius:4px;
+    border-radius:999px;
     cursor:pointer;
     transition:.15s;
     display:flex;
@@ -76,9 +101,8 @@
     line-height:1;
   }
   .meeting-date-bar button:hover{
-    background:var(--green);
-    border-color:var(--green);
-    color:#0d0d0d;
+    background:var(--sage);
+    color:var(--ink);
   }
   .meeting-date-bar button:disabled{
     opacity:.3;
@@ -86,97 +110,95 @@
   }
   .meeting-date-bar button:disabled:hover{
     background:transparent;
-    border-color:#555;
-    color:#ddd;
+    color:#cfcfd6;
   }
-  .meeting-date-bar button.add-date{
-    font-weight:700;
-    font-size:16px;
-  }
-  .meeting-date-bar button.del-date:hover{
-    background:#e25555;
-    border-color:#e25555;
-    color:#fff;
-  }
-
 
   /* ===== Top section: Year notice + Calendar ===== */
   .top-section{
     display:grid;
     grid-template-columns: 1.6fr 1fr;
-    gap:0;
-    background:var(--black);
+    gap:16px;
+    margin-top:16px;
   }
   @media (max-width: 900px){
     .top-section{grid-template-columns: 1fr;}
   }
 
   .notice-board{
-    background:var(--gray-bg);
-    padding:24px 28px;
+    background:var(--white);
+    padding:26px 28px;
+    border-radius:var(--radius-lg);
   }
   .notice-board .year-label{
-    font-size:24px;
+    font-family:'Poppins','Pretendard',sans-serif;
+    font-size:22px;
     font-weight:700;
     margin:0 0 18px 0;
+    color:var(--ink);
   }
   .notice-line{
     display:flex;
     align-items:baseline;
     gap:10px;
-    border-bottom:1.5px solid var(--line-blue);
-    padding:8px 2px;
+    border-bottom:1.5px solid var(--line);
+    padding:9px 2px;
   }
   .notice-line input{
     flex:1;
     border:none;
     background:transparent;
     font-size:15px;
-    font-weight:700;
+    font-weight:600;
     font-family:inherit;
     color:var(--text-dark);
     padding:4px 2px;
   }
   .notice-line input::placeholder{
-    color:#aaa;
-    font-weight:600;
+    color:#c2bfb5;
+    font-weight:500;
   }
   .notice-line input:focus{outline:none;}
   .notice-line.empty input{font-weight:400;}
   .notice-add{
-    margin-top:10px;
+    margin-top:12px;
     background:none;
-    border:1px dashed #999;
-    color:#777;
-    padding:8px;
+    border:1.5px dashed var(--line);
+    color:var(--text-mid);
+    padding:9px;
     width:100%;
     cursor:pointer;
-    border-radius:4px;
+    border-radius:var(--radius-sm);
     font-size:13px;
+    font-weight:600;
+    transition:.15s;
   }
-  .notice-add:hover{border-color:var(--line-blue); color:var(--line-blue);}
+  .notice-add:hover{border-color:var(--sage); color:var(--sage-deep); background:var(--sage-soft);}
 
   .calendar-panel{
-    background:#3a3a3a;
+    background:var(--ink);
     color:#f1f1f1;
-    padding:24px 28px;
+    padding:26px 28px;
     display:flex;
     flex-direction:column;
+    border-radius:var(--radius-lg);
   }
   .calendar-panel h2{
     margin:0 0 4px 0;
-    font-size:20px;
+    font-family:'Poppins','Pretendard',sans-serif;
+    font-size:18px;
+    font-weight:600;
     text-align:center;
     color:#fff;
   }
   .calendar-panel .desc{
     text-align:center;
-    font-size:13px;
-    opacity:.7;
+    font-size:12px;
+    opacity:.55;
     margin-bottom:18px;
   }
   #cal-month-label{
     color:#fff;
+    font-weight:600;
   }
   .cal-grid{
     display:grid;
@@ -187,16 +209,16 @@
   }
   .cal-grid .dow{
     text-align:center;
-    font-weight:700;
+    font-weight:600;
     padding:4px 0;
-    opacity:.6;
+    opacity:.5;
     color:#fff;
   }
   .cal-day{
-    background:#4d4d4d;
-    border-radius:4px;
+    background:var(--ink-soft);
+    border-radius:8px;
     min-height:46px;
-    padding:3px 4px;
+    padding:4px 5px;
     font-size:11px;
     position:relative;
     cursor:pointer;
@@ -205,13 +227,22 @@
     gap:2px;
     color:#fff;
     overflow:visible;
+    transition:.12s;
   }
+  .cal-day:hover{background:#54576a;}
   .cal-day.empty{background:transparent; cursor:default;}
-  .cal-day .num{font-weight:700;}
+  .cal-day.empty:hover{background:transparent;}
+  .cal-day.today{
+    background:var(--sage);
+    box-shadow:0 0 0 2px rgba(111,174,140,0.4);
+  }
+  .cal-day.today:hover{background:var(--sage-deep);}
+  .cal-day.today .num{color:#fff; opacity:1;}
+  .cal-day .num{font-weight:600; opacity:.85;}
   .cal-day .tag{
     color:#fff;
-    border-radius:3px;
-    padding:1px 4px;
+    border-radius:6px;
+    padding:1px 5px;
     font-size:9px;
     line-height:1.4;
     white-space:nowrap;
@@ -220,12 +251,13 @@
     position:relative;
     z-index:1;
   }
-  .cal-day .tag.range-start{border-radius:3px 0 0 3px; margin-right:-4px;}
-  .cal-day .tag.range-end{border-radius:0 3px 3px 0; margin-left:-4px;}
-  .cal-day .tag.range-mid{border-radius:0; margin-left:-4px; margin-right:-4px;}
-  .cal-day .tag.range-single{border-radius:3px;}
-  .cal-day .tag.vacation{background:#5b8ad1;}
-  .cal-day .tag.meeting{background:#d18a4d;}
+  .cal-day .tag.range-start{border-radius:6px 0 0 6px; margin-right:-5px;}
+  .cal-day .tag.range-end{border-radius:0 6px 6px 0; margin-left:-5px;}
+  .cal-day .tag.range-mid{border-radius:0; margin-left:-5px; margin-right:-5px;}
+  .cal-day .tag.range-single{border-radius:6px;}
+  .cal-day .tag.vacation{background:#6f8fc9;}
+  .cal-day .tag.issue{background:#d18a4d;}
+  .cal-day .tag.birthday{background:#c97fb0;}
   .cal-legend{
     display:flex;
     gap:14px;
@@ -233,40 +265,35 @@
     font-size:12px;
     margin-top:auto;
     padding-top:10px;
-    color:#ddd;
+    color:#cfcfd6;
   }
   .cal-legend span{display:flex; align-items:center; gap:5px;}
-  .legend-dot{width:10px;height:10px;border-radius:2px;display:inline-block;}
-  .legend-dot.vacation{background:#5b8ad1;}
-  .legend-dot.meeting{background:#d18a4d;}
+  .legend-dot{width:9px;height:9px;border-radius:3px;display:inline-block;}
+  .legend-dot.vacation{background:#6f8fc9;}
+  .legend-dot.issue{background:#d18a4d;}
+  .legend-dot.birthday{background:#c97fb0;}
 
   /* ===== Member board ===== */
   #member-list{
     display:grid;
     grid-template-columns: 1fr 1fr;
-    gap:0;
+    gap:16px;
+    margin-top:16px;
   }
   @media (max-width: 900px){
     #member-list{grid-template-columns: 1fr;}
   }
   .member-card{
     background:var(--white);
-    border-bottom:6px solid var(--black);
-    border-right:6px solid var(--black);
     padding:26px 28px;
     display:flex;
     flex-direction:column;
-    gap:20px;
-  }
-  #member-list .member-card:nth-child(2n){
-    border-right:none;
-  }
-  @media (max-width: 900px){
-    .member-card{border-right:none;}
+    gap:18px;
+    border-radius:var(--radius-lg);
   }
   .member-card-body{
     display:flex;
-    gap:30px;
+    gap:24px;
     flex-wrap:wrap;
   }
 
@@ -276,54 +303,104 @@
     display:flex;
     flex-direction:column;
     gap:14px;
+    position:relative;
   }
   .member-id-row{
     display:flex;
-    align-items:center;
-    gap:14px;
+    align-items:flex-start;
+    gap:10px;
   }
   .avatar{
-    width:90px;
-    height:90px;
-    border-radius:50%;
-    background:var(--white);
-    border:1.5px solid #ccc;
-    color:#999;
+    width:64px;
+    height:64px;
+    border-radius:var(--radius-sm);
+    background:var(--cream);
+    border:1.5px solid var(--line);
+    color:var(--text-mid);
     display:flex;
     align-items:center;
     justify-content:center;
     text-align:center;
     font-size:11px;
+    font-weight:600;
     line-height:1.4;
     flex-shrink:0;
     position:relative;
     overflow:hidden;
     cursor:pointer;
     padding:0;
+    transition:.15s;
   }
+  .avatar:hover{border-color:var(--sage); color:var(--sage-deep); background:var(--sage-soft);}
   .avatar img{
     width:100%;height:100%;object-fit:cover;
   }
   .avatar input[type=file]{display:none;}
+
+  /* 사진 옆 작은 말풍선 (개인 메모) */
+  .mini-bubble-wrap{
+    flex:1;
+    position:relative;
+    min-width:0;
+  }
+  .mini-bubble-wrap::before{
+    content:"";
+    position:absolute;
+    left:-6px;
+    top:14px;
+    width:12px;
+    height:12px;
+    background:var(--cream);
+    border-radius:3px;
+    transform:rotate(45deg);
+    z-index:0;
+  }
+  .mini-bubble{
+    background:var(--cream);
+    border-radius:var(--radius-sm);
+    padding:8px 10px;
+    position:relative;
+    z-index:1;
+  }
+  .mini-bubble textarea{
+    border:none;
+    background:transparent;
+    width:100%;
+    resize:none;
+    font-family:inherit;
+    font-size:11px;
+    line-height:1.4;
+    color:var(--text-dark);
+    height:48px;
+    padding:0;
+  }
+  .mini-bubble textarea::placeholder{color:#bdb9ae;}
+  .mini-bubble textarea:focus{outline:none;}
+
   .member-name{
-    font-size:22px;
-    font-weight:800;
+    font-size:15px;
+    font-weight:700;
     border:none;
     background:transparent;
     font-family:inherit;
     width:100%;
     color:var(--text-dark);
+    border-radius:var(--radius-sm);
+    padding:4px 6px;
+    transition:.15s;
   }
-  .member-name:focus{outline:none; border-bottom:1.5px solid var(--line-blue);}
+  .member-name:focus{outline:none; background:var(--cream);}
 
   .mission-block{
-    border:1px solid #ccc;
-    padding:12px;
+    background:var(--cream);
+    border-radius:var(--radius-md);
+    padding:14px 14px 12px;
   }
   .mission-block h4{
-    margin:0 0 8px 0;
-    font-size:15px;
+    margin:0 0 10px 0;
+    font-size:14px;
     font-weight:700;
+    color:var(--ink);
   }
   .mission-month{
     display:flex;
@@ -342,26 +419,28 @@
   .mission-month .month-text{
     font-size:12px;
     font-weight:700;
+    color:var(--ink-soft);
   }
   .mission-month .nav-btn{
     border:none;
-    background:#eee;
+    background:var(--white);
     width:20px;
     height:20px;
-    border-radius:3px;
+    border-radius:999px;
     cursor:pointer;
-    font-size:11px;
+    font-size:10px;
     line-height:1;
-    color:#555;
+    color:var(--text-mid);
     display:flex;
     align-items:center;
     justify-content:center;
+    transition:.15s;
   }
-  .mission-month .nav-btn:hover{background:var(--green); color:#0d0d0d;}
-  .mission-month .nav-btn:disabled{opacity:.35; cursor:default;}
-  .mission-month .nav-btn:disabled:hover{background:#eee; color:#555;}
+  .mission-month .nav-btn:hover{background:var(--sage); color:#fff;}
+  .mission-month .nav-btn:disabled{opacity:.3; cursor:default;}
+  .mission-month .nav-btn:disabled:hover{background:var(--white); color:var(--text-mid);}
   .mission-item{
-    border-bottom:1px solid #999;
+    border-bottom:1.5px solid var(--line);
     padding:6px 2px;
     margin-bottom:4px;
   }
@@ -371,53 +450,58 @@
     width:100%;
     font-size:13px;
     font-family:inherit;
+    color:var(--text-dark);
   }
   .mission-item input:focus{outline:none;}
   .small-add{
     background:none;
-    border:1px dashed #bbb;
-    color:#999;
+    border:1.5px dashed var(--line);
+    color:var(--text-mid);
     width:100%;
-    padding:5px;
+    padding:6px;
     font-size:12px;
+    font-weight:600;
     cursor:pointer;
-    border-radius:3px;
-    margin-top:4px;
+    border-radius:var(--radius-sm);
+    margin-top:6px;
+    transition:.15s;
   }
-  .small-add:hover{border-color:var(--line-blue); color:var(--line-blue);}
+  .small-add:hover{border-color:var(--sage); color:var(--sage-deep); background:var(--sage-soft);}
   .block-save{
     margin-top:8px;
-    background:var(--black);
-    border:1px solid var(--black);
+    background:var(--ink);
+    border:none;
     color:#fff;
     width:100%;
-    padding:7px;
+    padding:8px;
     font-size:12px;
     cursor:pointer;
-    border-radius:3px;
-    font-weight:700;
+    border-radius:var(--radius-sm);
+    font-weight:600;
+    transition:.15s;
   }
-  .block-save:hover{background:var(--green); border-color:var(--green); color:#0d0d0d;}
+  .block-save:hover{background:var(--sage-deep);}
 
   /* ===== Weekly share box ===== */
   .weekly-box{
     flex:1;
     min-width:240px;
-    border:1.5px solid var(--black);
+    background:var(--cream);
+    border-radius:var(--radius-md);
     padding:20px 22px;
     position:relative;
   }
   /* speech-bubble pointer */
-  .member-side{position:relative;}
   .weekly-box::before{
     content:"";
     position:absolute;
-    left:-22px;
-    top:54px;
-    width:0;height:0;
-    border-top:14px solid transparent;
-    border-bottom:14px solid transparent;
-    border-right:14px solid var(--black);
+    left:-9px;
+    top:42px;
+    width:18px;
+    height:18px;
+    background:var(--cream);
+    border-radius:4px;
+    transform:rotate(45deg);
   }
   .weekly-header{
     display:flex;
@@ -429,17 +513,23 @@
   }
   .weekly-header h3{
     margin:0;
-    font-size:24px;
-    font-weight:800;
+    font-family:'Poppins','Pretendard',sans-serif;
+    font-size:20px;
+    font-weight:700;
+    color:var(--ink);
   }
   .weekly-header .weekly-date{
-    font-size:13px;
+    font-size:12px;
     font-weight:700;
     text-align:right;
-    color:var(--text-dark);
+    color:var(--sage-deep);
+    background:var(--sage-soft);
+    padding:4px 10px;
+    border-radius:999px;
+    white-space:nowrap;
   }
   .weekly-line{
-    border-bottom:1.5px solid var(--line-blue);
+    border-bottom:1.5px solid var(--line);
     padding:9px 2px;
     margin-bottom:2px;
   }
@@ -457,15 +547,17 @@
   .weekly-add{
     margin-top:8px;
     background:none;
-    border:1px dashed #ccc;
-    color:#999;
-    padding:6px;
+    border:1.5px dashed var(--line);
+    color:var(--text-mid);
+    padding:7px;
     width:100%;
     cursor:pointer;
-    border-radius:3px;
+    border-radius:var(--radius-sm);
     font-size:12px;
+    font-weight:600;
+    transition:.15s;
   }
-  .weekly-add:hover{border-color:var(--line-blue); color:var(--line-blue);}
+  .weekly-add:hover{border-color:var(--sage); color:var(--sage-deep); background:var(--sage-soft);}
 
   /* ===== Member card controls (move/delete) ===== */
   .card-controls{
@@ -475,53 +567,55 @@
     justify-content:flex-end;
   }
   .card-controls button{
-    background:#f1f1f1;
-    border:1px solid #ccc;
+    background:var(--cream);
+    border:none;
     width:30px;
     height:30px;
     cursor:pointer;
-    font-size:14px;
-    border-radius:4px;
+    font-size:13px;
+    border-radius:999px;
     line-height:1;
-    color:#555;
+    color:var(--text-mid);
+    transition:.15s;
   }
   .card-controls button:hover{
-    background:var(--green);
-    border-color:var(--green);
-    color:#0d0d0d;
+    background:var(--sage);
+    color:#fff;
   }
   .card-controls button.danger:hover{
-    background:#e25555;
-    border-color:#e25555;
+    background:var(--danger);
     color:#fff;
   }
 
   /* ===== Add member ===== */
   .add-member-bar{
-    background:var(--gray-bg);
+    background:var(--white);
     text-align:center;
-    padding:30px;
-    border-top:6px solid var(--black);
+    padding:26px;
     cursor:pointer;
-  }
-  .add-member-bar span{
-    font-size:30px;
-    color:#999;
-    font-weight:300;
-    letter-spacing:2px;
+    border-radius:var(--radius-lg);
+    margin-top:16px;
     transition:.15s;
   }
-  .add-member-bar:hover span{color:var(--line-blue);}
+  .add-member-bar:hover{background:var(--sage-soft);}
+  .add-member-bar span{
+    font-size:16px;
+    color:var(--text-mid);
+    font-weight:600;
+    letter-spacing:0.5px;
+    transition:.15s;
+  }
+  .add-member-bar:hover span{color:var(--sage-deep);}
 
   /* ===== Save status ===== */
   .save-status{
     position:fixed;
     bottom:18px;
     right:18px;
-    background:var(--black);
+    background:var(--ink);
     color:#fff;
     padding:10px 18px;
-    border-radius:30px;
+    border-radius:999px;
     font-size:13px;
     opacity:0;
     transition:opacity .3s;
@@ -532,7 +626,7 @@
   /* ===== Day editor modal ===== */
   .modal-overlay{
     position:fixed; inset:0;
-    background:rgba(0,0,0,0.5);
+    background:rgba(43,45,58,0.45);
     display:none;
     align-items:center;
     justify-content:center;
@@ -542,15 +636,16 @@
   .modal-box{
     background:#fff;
     width:320px;
-    padding:22px;
-    border-radius:6px;
+    padding:24px;
+    border-radius:var(--radius-lg);
   }
-  .modal-box h3{margin:0 0 14px 0; font-size:16px;}
+  .modal-box h3{margin:0 0 14px 0; font-size:16px; font-weight:700; color:var(--ink);}
   .modal-row{margin-bottom:12px;}
-  .modal-row label{font-size:12px; font-weight:700; display:block; margin-bottom:4px;}
+  .modal-row label{font-size:12px; font-weight:600; color:var(--text-mid); display:block; margin-bottom:5px;}
   .modal-row input, .modal-row select{
-    width:100%; padding:8px; border:1px solid #ccc; border-radius:4px; font-family:inherit; font-size:13px;
+    width:100%; padding:9px 10px; border:1.5px solid var(--line); border-radius:var(--radius-sm); font-family:inherit; font-size:13px; color:var(--text-dark);
   }
+  .modal-row input:focus, .modal-row select:focus{outline:none; border-color:var(--sage);}
   .modal-row-pair{
     display:flex; gap:10px; margin-bottom:12px;
   }
@@ -559,14 +654,17 @@
   }
   .modal-actions{display:flex; gap:8px; justify-content:flex-end; margin-top:16px;}
   .modal-actions button{
-    padding:8px 14px; border-radius:4px; border:1px solid #ccc; background:#fff; cursor:pointer; font-size:13px;
+    padding:9px 16px; border-radius:999px; border:1.5px solid var(--line); background:#fff; cursor:pointer; font-size:13px; font-weight:600; color:var(--text-mid); transition:.15s;
   }
-  .modal-actions button.primary{background:var(--black); color:#fff; border-color:var(--black);}
+  .modal-actions button:hover{border-color:var(--text-mid);}
+  .modal-actions button.primary{background:var(--ink); color:#fff; border-color:var(--ink);}
+  .modal-actions button.primary:hover{background:var(--sage-deep); border-color:var(--sage-deep);}
   .modal-tag-list{display:flex; flex-direction:column; gap:6px; margin-bottom:10px;}
   .modal-tag-list .existing-tag{
-    display:flex; align-items:center; gap:6px; font-size:12px; background:#f5f5f5; padding:6px 8px; border-radius:4px;
+    display:flex; align-items:center; gap:6px; font-size:12px; background:var(--cream); padding:7px 10px; border-radius:var(--radius-sm); color:var(--text-dark);
   }
-  .modal-tag-list .existing-tag .x{cursor:pointer; color:#c00; font-weight:700;}
+  .modal-tag-list .existing-tag .x{cursor:pointer; color:var(--danger); font-weight:700;}
+  .modal-tag-list .existing-tag .edit{cursor:pointer; color:var(--sage-deep); font-weight:700;}
 </style>
 </head>
 <body>
@@ -575,11 +673,9 @@
   <h1>MD Team Meeting</h1>
   <div class="meeting-date-bar">
     <span class="label">미팅 기준일</span>
-    <button id="meet-prev" class="nav-date" title="이전 미팅일">◀</button>
+    <button id="meet-prev" class="nav-date" title="이전 주차">◀</button>
     <span class="date-display" id="meet-date-display">-</span>
-    <button id="meet-next" class="nav-date" title="다음 미팅일">▶</button>
-    <button id="meet-add" class="add-date" title="새 미팅일 추가">+</button>
-    <button id="meet-del" class="del-date" title="현재 미팅일 삭제">✕</button>
+    <button id="meet-next" class="nav-date" title="다음 주차">▶</button>
   </div>
 </header>
 
@@ -592,12 +688,13 @@
 
   <div class="calendar-panel">
     <h2>캘린더</h2>
-    <p class="desc">휴가 및 이슈 체크 가능한 캘린더 기능</p>
+    <p class="desc">휴가·이슈·생일 체크 가능한 캘린더 기능</p>
     <div id="cal-month-label" style="text-align:center;font-weight:700;margin-bottom:8px;"></div>
     <div class="cal-grid" id="cal-grid"></div>
     <div class="cal-legend">
       <span><i class="legend-dot vacation"></i> 휴가</span>
-      <span><i class="legend-dot meeting"></i> 주요 회의</span>
+      <span><i class="legend-dot issue"></i> 이슈</span>
+      <span><i class="legend-dot birthday"></i> 생일</span>
     </div>
   </div>
 </section>
@@ -617,7 +714,7 @@
     <div class="modal-tag-list" id="modal-existing"></div>
     <div class="modal-row">
       <label>이름 / 내용</label>
-      <input type="text" id="modal-input-text" placeholder="예: 홍길동 휴가, 분기 회의">
+      <input type="text" id="modal-input-text" placeholder="예: 홍길동 휴가">
     </div>
     <div class="modal-row-pair">
       <div class="modal-row">
@@ -633,10 +730,12 @@
       <label>종류</label>
       <select id="modal-input-type">
         <option value="vacation">휴가</option>
-        <option value="meeting">주요 회의</option>
+        <option value="issue">이슈</option>
+        <option value="birthday">생일</option>
       </select>
     </div>
     <div class="modal-actions">
+      <button id="modal-cancel-edit" style="display:none;">취소</button>
       <button id="modal-close">닫기</button>
       <button class="primary" id="modal-add">추가</button>
     </div>
@@ -673,42 +772,79 @@ let DATA = {
   calendar: {
     monthLabel: "2026.06",
     events: []
-    // {id, type:"vacation"|"meeting", text:"홍길동 휴가", start:"2026-06-15", end:"2026-06-19"}
+    // {id, type:"vacation"|"issue"|"birthday", text:"홍길동 휴가", start:"2026-06-15", end:"2026-06-19"}
   },
-  // ===== 전역 미팅 기준일 =====
-  meetingDates: ["2026.06.16"],
-  currentMeetingDate: "2026.06.16",
+  // ===== 전역 미팅 기준일 (주차의 월요일, ISO 형식 YYYY-MM-DD) =====
+  currentMeetingWeek: "2026-06-15",
   members: [
     {
       id: "m1",
       name: "홍길동",
       avatar: "",
+      memo: "",
       // Monthly Mission: 월별 아카이브
       missionCurrentMonth: "2026.06",
       missionArchive: {
         "2026.05": ["", ""],
         "2026.06": ["", ""]
       },
-      // Weekly Share: 미팅 기준일별 아카이브
+      // Weekly Share: 주차(월요일 ISO)별 아카이브
       weeklyArchive: {
-        "2026.06.16": ["", "", "", "", ""]
+        "2026-06-15": ["", "", "", "", ""]
       }
     },
     {
       id: "m2",
       name: "홍길동",
       avatar: "",
+      memo: "",
       missionCurrentMonth: "2026.06",
       missionArchive: {
         "2026.05": ["", ""],
         "2026.06": ["", ""]
       },
       weeklyArchive: {
-        "2026.06.16": ["", "", "", "", ""]
+        "2026-06-15": ["", "", "", "", ""]
       }
     }
   ]
 };
+
+const MEETING_WEEK_START = "2026-06-15"; // 운영 시작 주차 (월요일)
+const MEETING_WEEK_MAX_FUTURE = 3;        // 오늘 기준 향후 이동 가능한 최대 주차 수
+
+// ---------- 유틸: 주차(월요일) 관련 ----------
+function parseISODate(str){
+  const [y,m,d] = str.split("-").map(Number);
+  return new Date(y, m-1, d);
+}
+function formatISODate(d){
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+// 주어진 날짜가 속한 주의 월요일(ISO) 반환
+function getMondayOf(d){
+  const day = d.getDay(); // 0=일 ... 6=토
+  const diff = day === 0 ? -6 : 1 - day; // 월요일까지의 offset
+  const monday = new Date(d);
+  monday.setDate(d.getDate() + diff);
+  return formatISODate(monday);
+}
+// 월요일(ISO) 기준 n주 이동
+function shiftWeek(mondayISO, delta){
+  const d = parseISODate(mondayISO);
+  d.setDate(d.getDate() + delta*7);
+  return formatISODate(d);
+}
+// "6월 15일 주차" 형태 라벨 생성
+function weekLabel(mondayISO){
+  const d = parseISODate(mondayISO);
+  return `${d.getMonth()+1}월 ${d.getDate()}일 주차`;
+}
+// 오늘 기준 이동 가능한 가장 미래 주차(월요일 ISO)
+function getMaxFutureWeek(){
+  const thisMonday = getMondayOf(new Date());
+  return shiftWeek(thisMonday, MEETING_WEEK_MAX_FUTURE);
+}
 
 // ---------- 유틸: YYYY.MM 월 이동 ----------
 function shiftMonth(yyyymm, delta){
@@ -717,21 +853,21 @@ function shiftMonth(yyyymm, delta){
   return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}`;
 }
 
-// ---------- 유틸: YYYY.MM.DD 날짜 비교/정렬 ----------
-function dateKeyToSortable(str){
-  return str.replace(/\./g, "");
-}
-function getSortedMeetingDates(){
-  return [...DATA.meetingDates].sort((a,b)=>{
-    return dateKeyToSortable(a).localeCompare(dateKeyToSortable(b));
-  });
+// ---------- 유틸: YYYY.MM.DD 옛 형식 -> ISO 변환 (마이그레이션용) ----------
+function dotDateToISO(str){
+  // "2026.06.16" -> "2026-06-16"
+  const parts = str.split(".");
+  if(parts.length !== 3) return null;
+  const [y,m,d] = parts.map(Number);
+  if(!y || !m || !d) return null;
+  return formatISODate(new Date(y, m-1, d));
 }
 
 // ---------- 마이그레이션: 옛 구조 -> 새 구조 ----------
 function migrateData(json){
   if(!json || !json.members) return json;
 
-  const allDateKeys = new Set();
+  const allWeekKeys = new Set();
 
   json.members.forEach(member=>{
     // 옛 Monthly Mission 구조 (missionMonth / missions) -> missionArchive
@@ -757,35 +893,54 @@ function migrateData(json){
       delete member.weeklyDate;
       delete member.weeklyItems;
     }
-    // 멤버별 weeklyCurrentDate는 더 이상 사용하지 않음 (전역 currentMeetingDate로 통합)
     delete member.weeklyCurrentDate;
 
-    Object.keys(member.weeklyArchive).forEach(d=>allDateKeys.add(d));
-  });
+    if(member.memo === undefined) member.memo = "";
 
-  // 전역 미팅 기준일 목록 생성/보강
-  if(!Array.isArray(json.meetingDates)){
-    json.meetingDates = [];
-  }
-  allDateKeys.forEach(d=>{
-    if(!json.meetingDates.includes(d)) json.meetingDates.push(d);
-  });
-  if(json.meetingDates.length === 0){
-    json.meetingDates.push("2026.06.16");
-  }
-  json.meetingDates.sort((a,b)=> dateKeyToSortable(a).localeCompare(dateKeyToSortable(b)));
-
-  if(!json.currentMeetingDate || !json.meetingDates.includes(json.currentMeetingDate)){
-    json.currentMeetingDate = json.meetingDates[json.meetingDates.length-1];
-  }
-
-  // 모든 멤버에게 현재 미팅일 키가 없으면 빈 항목 생성
-  json.members.forEach(member=>{
-    json.meetingDates.forEach(d=>{
-      if(!member.weeklyArchive[d]){
-        member.weeklyArchive[d] = ["", "", "", "", ""];
+    // weeklyArchive의 키가 "YYYY.MM.DD" 형식(옛 날짜)이면 그 주의 월요일(ISO) 키로 변환
+    const newArchive = {};
+    Object.keys(member.weeklyArchive).forEach(key=>{
+      let weekKey = key;
+      if(/^\d{4}\.\d{2}\.\d{2}$/.test(key)){
+        const iso = dotDateToISO(key);
+        const d = parseISODate(iso);
+        weekKey = getMondayOf(d);
+      }
+      // 이미 같은 주차 키가 있으면 합치지 않고 최신 것 유지 (단순화)
+      if(!newArchive[weekKey]){
+        newArchive[weekKey] = member.weeklyArchive[key];
       }
     });
+    member.weeklyArchive = newArchive;
+
+    Object.keys(member.weeklyArchive).forEach(d=>allWeekKeys.add(d));
+  });
+
+  // 옛 전역 구조(meetingDates/currentMeetingDate) 제거, currentMeetingWeek로 통합
+  if(json.currentMeetingWeek === undefined){
+    if(typeof json.currentMeetingDate === "string"){
+      let key = json.currentMeetingDate;
+      if(/^\d{4}\.\d{2}\.\d{2}$/.test(key)){
+        const iso = dotDateToISO(key);
+        key = getMondayOf(parseISODate(iso));
+      }
+      json.currentMeetingWeek = key;
+    }
+  }
+  delete json.meetingDates;
+  delete json.currentMeetingDate;
+
+  if(!json.currentMeetingWeek){
+    // 가장 최근(가장 큰) 주차 키를 사용, 없으면 시작 주차
+    const sorted = [...allWeekKeys].sort();
+    json.currentMeetingWeek = sorted.length ? sorted[sorted.length-1] : MEETING_WEEK_START;
+  }
+
+  // 모든 멤버에게 현재 주차 키가 없으면 빈 항목 생성
+  json.members.forEach(member=>{
+    if(!member.weeklyArchive[json.currentMeetingWeek]){
+      member.weeklyArchive[json.currentMeetingWeek] = ["", "", "", "", ""];
+    }
   });
 
   // 옛 캘린더 이벤트 구조 (날짜키 객체) -> 범위 이벤트 배열
@@ -807,6 +962,12 @@ function migrateData(json){
   }
   if(!json.calendar) json.calendar = { monthLabel:"2026.06", events: [] };
   if(!json.calendar.events) json.calendar.events = [];
+
+  // 옛 이벤트 종류 'meeting' -> 'issue'로 통합 (휴가/이슈/생일 3종 체계)
+  json.calendar.events.forEach(ev=>{
+    if(ev.type === "meeting") ev.type = "issue";
+    if(!ev.id) ev.id = "ev" + Date.now() + Math.random().toString(16).slice(2);
+  });
 
   return json;
 }
@@ -884,7 +1045,7 @@ function renderNotices(){
     row.className = "notice-line" + (item.text ? "" : " empty");
     const input = document.createElement("input");
     input.type="text";
-    input.placeholder="TEXT TEXT TEXT";
+    input.placeholder="";
     input.value = item.text;
     input.addEventListener("input", ()=>{
       DATA.notices[idx].text = input.value;
@@ -927,6 +1088,8 @@ function renderCalendar(){
 
   const firstDay = new Date(y, m, 1).getDay();
   const lastDate = new Date(y, m+1, 0).getDate();
+  const todayObj = new Date();
+  const todayKey = `${todayObj.getFullYear()}-${String(todayObj.getMonth()+1).padStart(2,'0')}-${String(todayObj.getDate()).padStart(2,'0')}`;
 
   for(let i=0;i<firstDay;i++){
     const el = document.createElement("div");
@@ -938,7 +1101,7 @@ function renderCalendar(){
     const dateKey = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const dow = (firstDay + (d-1)) % 7; // 0=일 ... 6=토, 이 셀의 요일 위치
     const cell = document.createElement("div");
-    cell.className = "cal-day";
+    cell.className = "cal-day" + (dateKey === todayKey ? " today" : "");
     cell.dataset.date = dateKey;
 
     const num = document.createElement("div");
@@ -961,7 +1124,7 @@ function renderCalendar(){
       else if(isRowEnd) posClass = "range-end";
       else posClass = "range-mid";
 
-      tag.className = "tag " + (ev.type === "meeting" ? "meeting" : "vacation") + " " + posClass;
+      tag.className = "tag " + eventTypeClass(ev.type) + " " + posClass;
       // 텍스트는 범위 시작일(또는 그 줄의 첫 칸)에만 표시
       tag.textContent = (isStartOfRange || dow === 0) ? ev.text : "\u00A0";
       cell.appendChild(tag);
@@ -979,16 +1142,41 @@ function getEventsForDate(dateKey){
     .sort((a,b)=> a.start.localeCompare(b.start));
 }
 
+// 이벤트 종류 -> CSS 클래스 / 아이콘+라벨
+function eventTypeClass(type){
+  if(type === "issue") return "issue";
+  if(type === "birthday") return "birthday";
+  return "vacation";
+}
+function eventTypeIconLabel(type){
+  if(type === "issue") return "🟧 이슈";
+  if(type === "birthday") return "🟣 생일";
+  return "🟦 휴가";
+}
+
 // --- Day modal ---
 let modalDateKey = null;
-function openDayModal(dateKey){
-  modalDateKey = dateKey;
-  document.getElementById("modal-date-title").textContent = dateKey + " 일정";
+let editingEventId = null; // null이면 추가 모드, 값이 있으면 해당 이벤트 수정 모드
+
+function resetModalForm(dateKey){
+  editingEventId = null;
   document.getElementById("modal-input-text").value = "";
   document.getElementById("modal-input-type").value = "vacation";
   document.getElementById("modal-input-start").value = dateKey;
   document.getElementById("modal-input-end").value = dateKey;
+  document.getElementById("modal-add").textContent = "추가";
+  document.getElementById("modal-cancel-edit").style.display = "none";
+}
 
+function openDayModal(dateKey){
+  modalDateKey = dateKey;
+  document.getElementById("modal-date-title").textContent = dateKey + " 일정";
+  resetModalForm(dateKey);
+  renderModalExisting(dateKey);
+  document.getElementById("modal-overlay").classList.add("show");
+}
+
+function renderModalExisting(dateKey){
   const existingWrap = document.getElementById("modal-existing");
   existingWrap.innerHTML = "";
   const events = getEventsForDate(dateKey);
@@ -1005,31 +1193,51 @@ function openDayModal(dateKey){
     const row = document.createElement("div");
     row.className = "existing-tag";
     const rangeLabel = ev.start === ev.end ? ev.start : `${ev.start} ~ ${ev.end}`;
-    row.innerHTML = `<span>${ev.type === "meeting" ? "🟧 회의" : "🟦 휴가"} - ${escapeHtml(ev.text)} (${rangeLabel})</span>`;
+
+    const label = document.createElement("span");
+    label.style.flex = "1";
+    label.textContent = `${eventTypeIconLabel(ev.type)} - ${ev.text} (${rangeLabel})`;
+    row.appendChild(label);
+
+    const editBtn = document.createElement("span");
+    editBtn.className = "edit";
+    editBtn.textContent = "✎";
+    editBtn.title = "수정";
+    editBtn.addEventListener("click", ()=>{
+      editingEventId = ev.id;
+      document.getElementById("modal-input-text").value = ev.text;
+      document.getElementById("modal-input-type").value = ev.type;
+      document.getElementById("modal-input-start").value = ev.start;
+      document.getElementById("modal-input-end").value = ev.end;
+      document.getElementById("modal-add").textContent = "수정 완료";
+      document.getElementById("modal-cancel-edit").style.display = "";
+    });
+    row.appendChild(editBtn);
+
     const x = document.createElement("span");
     x.className = "x";
     x.textContent = "✕";
     x.addEventListener("click", ()=>{
-      const realIdx = DATA.calendar.events.indexOf(ev);
+      const realIdx = DATA.calendar.events.findIndex(e=>e.id === ev.id);
       if(realIdx > -1) DATA.calendar.events.splice(realIdx,1);
-      openDayModal(dateKey);
+      if(editingEventId === ev.id) resetModalForm(dateKey);
+      renderModalExisting(dateKey);
       renderCalendar();
       scheduleSave();
     });
     row.appendChild(x);
     existingWrap.appendChild(row);
   });
+}
 
-  document.getElementById("modal-overlay").classList.add("show");
-}
-function escapeHtml(str){
-  const div = document.createElement("div");
-  div.textContent = str;
-  return div.innerHTML;
-}
 document.getElementById("modal-close").addEventListener("click", ()=>{
   document.getElementById("modal-overlay").classList.remove("show");
 });
+
+document.getElementById("modal-cancel-edit").addEventListener("click", ()=>{
+  resetModalForm(modalDateKey);
+});
+
 document.getElementById("modal-add").addEventListener("click", ()=>{
   const text = document.getElementById("modal-input-text").value.trim();
   const type = document.getElementById("modal-input-type").value;
@@ -1040,14 +1248,28 @@ document.getElementById("modal-add").addEventListener("click", ()=>{
   if(!end) end = start;
   if(end < start){ [start, end] = [end, start]; } // 역순 입력 시 자동 보정
 
-  DATA.calendar.events.push({
-    id: "ev" + Date.now(),
-    type,
-    text,
-    start,
-    end
-  });
-  document.getElementById("modal-overlay").classList.remove("show");
+  if(editingEventId){
+    // 수정 모드: 기존 이벤트 갱신
+    const ev = DATA.calendar.events.find(e=>e.id === editingEventId);
+    if(ev){
+      ev.type = type;
+      ev.text = text;
+      ev.start = start;
+      ev.end = end;
+    }
+  }else{
+    // 추가 모드: 새 이벤트 생성
+    DATA.calendar.events.push({
+      id: "ev" + Date.now(),
+      type,
+      text,
+      start,
+      end
+    });
+  }
+
+  resetModalForm(modalDateKey);
+  renderModalExisting(modalDateKey);
   renderCalendar();
   scheduleSave();
 });
@@ -1097,7 +1319,25 @@ function renderMembers(){
     avatarLabel.appendChild(fileInput);
     idRow.appendChild(avatarLabel);
 
-    // name
+    // mini speech bubble (개인 메모, 사진과 Weekly Share 사이)
+    const bubbleWrap = document.createElement("div");
+    bubbleWrap.className = "mini-bubble-wrap";
+    const bubble = document.createElement("div");
+    bubble.className = "mini-bubble";
+    const memoInput = document.createElement("textarea");
+    memoInput.placeholder = "한마디";
+    memoInput.value = member.memo || "";
+    memoInput.addEventListener("input", ()=>{
+      member.memo = memoInput.value;
+      scheduleSave();
+    });
+    bubble.appendChild(memoInput);
+    bubbleWrap.appendChild(bubble);
+    idRow.appendChild(bubbleWrap);
+
+    side.appendChild(idRow);
+
+    // name (사진 아래, 작게)
     const nameInput = document.createElement("input");
     nameInput.className = "member-name";
     nameInput.type = "text";
@@ -1106,9 +1346,7 @@ function renderMembers(){
       member.name = nameInput.value;
       scheduleSave();
     });
-    idRow.appendChild(nameInput);
-
-    side.appendChild(idRow);
+    side.appendChild(nameInput);
 
     // mission block
     const missionBlock = document.createElement("div");
@@ -1162,7 +1400,7 @@ function renderMembers(){
       item.className = "mission-item";
       const input = document.createElement("input");
       input.type = "text";
-      input.placeholder = "TEXT TEXT TEXT";
+      input.placeholder = "";
       input.value = m;
       input.addEventListener("input", ()=>{
         currentMissions[mIdx] = input.value;
@@ -1200,17 +1438,15 @@ function renderMembers(){
     h3.textContent = "Weekly Share";
     header.appendChild(h3);
 
-    // 현재 미팅 기준일에 아카이브가 없으면 생성
-    if(!member.weeklyArchive[DATA.currentMeetingDate]){
-      member.weeklyArchive[DATA.currentMeetingDate] = ["", "", "", "", ""];
+    // 현재 미팅 주차에 아카이브가 없으면 생성
+    if(!member.weeklyArchive[DATA.currentMeetingWeek]){
+      member.weeklyArchive[DATA.currentMeetingWeek] = ["", "", "", "", ""];
     }
-    const currentWeeklyItems = member.weeklyArchive[DATA.currentMeetingDate];
+    const currentWeeklyItems = member.weeklyArchive[DATA.currentMeetingWeek];
 
     const dateLabel = document.createElement("span");
     dateLabel.className = "weekly-date";
-    dateLabel.style.fontSize = "13px";
-    dateLabel.style.fontWeight = "700";
-    dateLabel.textContent = `< ${DATA.currentMeetingDate} >`;
+    dateLabel.textContent = weekLabel(DATA.currentMeetingWeek);
     header.appendChild(dateLabel);
 
     weekly.appendChild(header);
@@ -1220,7 +1456,7 @@ function renderMembers(){
       line.className = "weekly-line" + (wIdx === 0 ? " bold" : "");
       const input = document.createElement("input");
       input.type = "text";
-      input.placeholder = "TEXT TEXT TEXT";
+      input.placeholder = "";
       input.value = w;
       input.addEventListener("input", ()=>{
         currentWeeklyItems[wIdx] = input.value;
@@ -1300,95 +1536,55 @@ document.getElementById("add-member").addEventListener("click", ()=>{
   const now = new Date();
   const curMonth = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}`;
 
-  const weeklyArchive = {};
-  DATA.meetingDates.forEach(d=>{
-    weeklyArchive[d] = ["", "", "", "", ""];
-  });
-
   DATA.members.push({
     id: newId,
     name: "이름 입력",
     avatar: "",
+    memo: "",
     missionCurrentMonth: curMonth,
     missionArchive: { [curMonth]: ["", ""] },
-    weeklyArchive: weeklyArchive
+    weeklyArchive: { [DATA.currentMeetingWeek]: ["", "", "", "", ""] }
   });
   renderMembers();
   scheduleSave();
 });
 
-// --- 미팅 기준일 컨트롤 ---
+// --- 미팅 기준일(주차) 컨트롤 ---
 function renderMeetingDateBar(){
   const display = document.getElementById("meet-date-display");
   const prevBtn = document.getElementById("meet-prev");
   const nextBtn = document.getElementById("meet-next");
-  const delBtn = document.getElementById("meet-del");
 
-  const sorted = getSortedMeetingDates();
-  const curIdx = sorted.indexOf(DATA.currentMeetingDate);
+  display.textContent = weekLabel(DATA.currentMeetingWeek);
 
-  display.textContent = `< ${DATA.currentMeetingDate} >`;
-  prevBtn.disabled = curIdx <= 0;
-  nextBtn.disabled = curIdx >= sorted.length - 1;
-  delBtn.disabled = sorted.length <= 1;
+  // 과거는 운영 시작 주차까지, 미래는 오늘 기준 +3주까지만 이동 가능
+  const maxFuture = getMaxFutureWeek();
+  prevBtn.disabled = DATA.currentMeetingWeek <= MEETING_WEEK_START;
+  nextBtn.disabled = DATA.currentMeetingWeek >= maxFuture;
 }
 
 document.getElementById("meet-prev").addEventListener("click", ()=>{
-  const sorted = getSortedMeetingDates();
-  const curIdx = sorted.indexOf(DATA.currentMeetingDate);
-  if(curIdx > 0){
-    DATA.currentMeetingDate = sorted[curIdx-1];
-    render();
-  }
-});
-
-document.getElementById("meet-next").addEventListener("click", ()=>{
-  const sorted = getSortedMeetingDates();
-  const curIdx = sorted.indexOf(DATA.currentMeetingDate);
-  if(curIdx < sorted.length-1){
-    DATA.currentMeetingDate = sorted[curIdx+1];
-    render();
-  }
-});
-
-document.getElementById("meet-add").addEventListener("click", ()=>{
-  const today = new Date();
-  const defaultDate = `${today.getFullYear()}.${String(today.getMonth()+1).padStart(2,'0')}.${String(today.getDate()).padStart(2,'0')}`;
-  const input = prompt("새 미팅 기준일을 입력하세요 (예: 2026.06.23)", defaultDate);
-  if(!input) return;
-  const trimmed = input.trim();
-  if(!/^\d{4}\.\d{2}\.\d{2}$/.test(trimmed)){
-    alert("형식이 올바르지 않습니다. 예: 2026.06.23");
-    return;
-  }
-  if(!DATA.meetingDates.includes(trimmed)){
-    DATA.meetingDates.push(trimmed);
-  }
-  // 모든 멤버에 해당 날짜의 빈 Weekly Share 항목 생성
+  if(DATA.currentMeetingWeek <= MEETING_WEEK_START) return;
+  DATA.currentMeetingWeek = shiftWeek(DATA.currentMeetingWeek, -1);
+  // 각 멤버에 해당 주차 아카이브가 없으면 생성
   DATA.members.forEach(member=>{
-    if(!member.weeklyArchive[trimmed]){
-      member.weeklyArchive[trimmed] = ["", "", "", "", ""];
+    if(!member.weeklyArchive[DATA.currentMeetingWeek]){
+      member.weeklyArchive[DATA.currentMeetingWeek] = ["", "", "", "", ""];
     }
   });
-  DATA.currentMeetingDate = trimmed;
   render();
   scheduleSave();
 });
 
-document.getElementById("meet-del").addEventListener("click", ()=>{
-  const sorted = getSortedMeetingDates();
-  if(sorted.length <= 1) return;
-  if(!confirm(`미팅 기준일 ${DATA.currentMeetingDate} 을(를) 삭제할까요?\n모든 멤버의 해당 날짜 Weekly Share 내용도 삭제됩니다.`)) return;
-
-  const target = DATA.currentMeetingDate;
-  DATA.meetingDates = DATA.meetingDates.filter(d=>d !== target);
+document.getElementById("meet-next").addEventListener("click", ()=>{
+  const maxFuture = getMaxFutureWeek();
+  if(DATA.currentMeetingWeek >= maxFuture) return;
+  DATA.currentMeetingWeek = shiftWeek(DATA.currentMeetingWeek, 1);
   DATA.members.forEach(member=>{
-    delete member.weeklyArchive[target];
+    if(!member.weeklyArchive[DATA.currentMeetingWeek]){
+      member.weeklyArchive[DATA.currentMeetingWeek] = ["", "", "", "", ""];
+    }
   });
-
-  const newSorted = getSortedMeetingDates();
-  DATA.currentMeetingDate = newSorted[newSorted.length-1];
-
   render();
   scheduleSave();
 });
