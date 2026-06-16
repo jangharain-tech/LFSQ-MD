@@ -13,23 +13,23 @@
     /* ===== 키컬러 ===== */
     --ink:#2b2d3a;        /* 1. 잉크 네이비 - 헤더/이름탭/구조적 요소 */
     --sage:#6fae8c;       /* 2. 세이지 그린 - 추가/확인 등 긍정적 액션 */
-    --cream:#f6f4ef;      /* 3. 웜 크림 - 배경/내부 박스 */
-    --coral:#e0735c;      /* 4. 코랄 - 미팅 기준일/Weekly 날짜 등 "현재 시점" 강조 */
+    --cream:#f3f4f6;      /* 3. 쿨 그레이 - 배경/내부 박스 */
+    --ocean:#3f7cb0;      /* 4. 오션 블루 - 미팅 기준일/Weekly 날짜 등 "현재 시점" 강조 */
     --amber:#d9a44a;      /* 5. 앰버 - Monthly Mission 포인트 */
-    --sky:#5f8fc4;         /* 보조: 오늘 날짜(캘린더) 전용 강조 */
+    --sky:#7fb8d9;         /* 보조: 오늘 날짜(캘린더)·휴가 태그 전용 강조 (오션보다 밝은 톤) */
 
     /* 파생 톤 (키컬러 기반 음영, 색상 추가 아님) */
     --ink-soft:#454858;
     --ink-faint:#9a9ba8;
     --sage-soft:#e3f0e8;
     --sage-deep:#4f8d6c;
-    --coral-soft:#fbe6e1;
-    --coral-deep:#c75a44;
+    --ocean-soft:#e3edf5;
+    --ocean-deep:#2f6391;
     --amber-soft:#faeed7;
     --amber-deep:#b8842f;
     --sky-soft:#e2ecf6;
-    --cream-deep:#ece9e1;
-    --line:#e3e0d8;
+    --cream-deep:#e4e6ea;
+    --line:#dfe2e7;
     --text-dark:#2b2d3a;
     --text-mid:#8b8b93;
     --white:#ffffff;
@@ -47,8 +47,13 @@
     font-family:'Pretendard','Poppins','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
     background:var(--cream-deep);
     color:var(--text-dark);
-    padding:0 16px 80px;
+    padding:0;
     -webkit-font-smoothing:antialiased;
+  }
+  .app-wrap{
+    max-width:1380px;
+    margin:0 auto;
+    padding:0 16px 80px;
   }
 
   /* ===== Header ===== */
@@ -88,7 +93,7 @@
   .meeting-date-bar .date-display{
     font-size:14px;
     font-weight:700;
-    color:#f4a896;
+    color:#9cc6e6;
     min-width:108px;
     text-align:center;
     white-space:nowrap;
@@ -124,12 +129,22 @@
   /* ===== Top section: Year notice + Calendar ===== */
   .top-section{
     display:grid;
-    grid-template-columns: 1.6fr 1fr;
+    grid-template-columns: 1.3fr 1fr 1.1fr;
     gap:16px;
     margin-top:16px;
   }
-  @media (max-width: 900px){
+  @media (max-width: 1100px){
+    .top-section{grid-template-columns: 1fr 1fr;}
+    .top-section .mid-stack{grid-column:1 / -1;}
+  }
+  @media (max-width: 700px){
     .top-section{grid-template-columns: 1fr;}
+  }
+
+  .mid-stack{
+    display:flex;
+    flex-direction:column;
+    gap:16px;
   }
 
   .notice-board{
@@ -162,7 +177,7 @@
     padding:4px 2px;
   }
   .notice-line input::placeholder{
-    color:#c2bfb5;
+    color:#a8acb5;
     font-weight:500;
   }
   .notice-line input:focus{outline:none;}
@@ -181,6 +196,195 @@
     transition:.15s;
   }
   .notice-add:hover{border-color:var(--sage); color:var(--sage-deep); background:var(--sage-soft);}
+
+  /* ===== 공지사항(Announcement) 카드 ===== */
+  .announce-card{
+    background:var(--ink);
+    border-radius:var(--radius-lg);
+    padding:22px 24px;
+    color:#fff;
+  }
+  .announce-card .announce-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:14px;
+  }
+  .announce-card .announce-head h2{
+    margin:0;
+    font-family:'Poppins','Pretendard',sans-serif;
+    font-size:18px;
+    font-weight:600;
+  }
+  .announce-write-btn{
+    background:rgba(255,255,255,0.1);
+    border:none;
+    color:#cfcfd6;
+    padding:6px 12px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:600;
+    cursor:pointer;
+    transition:.15s;
+  }
+  .announce-write-btn:hover{background:var(--ocean); color:#fff;}
+  .announce-list{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+  }
+  .announce-row{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    border-bottom:1px solid rgba(255,255,255,0.12);
+    padding:9px 2px;
+  }
+  .announce-row .announce-date{
+    font-size:11px;
+    color:#9cc6e6;
+    font-weight:700;
+    flex-shrink:0;
+    width:42px;
+  }
+  .announce-row input{
+    flex:1;
+    border:none;
+    background:transparent;
+    font-size:13px;
+    font-family:inherit;
+    color:#fff;
+    padding:2px;
+  }
+  .announce-row input::placeholder{color:#8b8d9c;}
+  .announce-row input:focus{outline:none;}
+  .announce-row .announce-del{
+    flex-shrink:0;
+    border:none;
+    background:transparent;
+    color:#8b8d9c;
+    cursor:pointer;
+    font-size:11px;
+    width:18px;
+    height:18px;
+    border-radius:999px;
+  }
+  .announce-row .announce-del:hover{background:var(--danger); color:#fff;}
+  .announce-more{
+    margin-top:10px;
+    width:100%;
+    background:none;
+    border:none;
+    color:#9fa1ae;
+    font-size:12px;
+    font-weight:600;
+    cursor:pointer;
+    text-align:right;
+    padding:4px;
+  }
+  .announce-more:hover{color:var(--ocean);}
+
+  /* ===== 랜딩 URL 카드 ===== */
+  .link-card{
+    background:var(--white);
+    border-radius:var(--radius-lg);
+    padding:22px 24px;
+  }
+  .link-card h2{
+    margin:0 0 14px 0;
+    font-family:'Poppins','Pretendard',sans-serif;
+    font-size:16px;
+    font-weight:700;
+    color:var(--ink);
+  }
+  .link-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:8px;
+  }
+  .link-row input.link-label{
+    width:64px;
+    flex-shrink:0;
+    border:none;
+    background:var(--cream);
+    border-radius:var(--radius-sm);
+    padding:8px 10px;
+    font-size:12px;
+    font-weight:600;
+    font-family:inherit;
+    color:var(--text-dark);
+  }
+  .link-row input.link-url{
+    flex:1;
+    min-width:0;
+    border:1.5px solid var(--line);
+    border-radius:var(--radius-sm);
+    padding:8px 10px;
+    font-size:12px;
+    font-family:inherit;
+    color:var(--ocean-deep);
+  }
+  .link-row input.link-label:focus, .link-row input.link-url:focus{
+    outline:none; border-color:var(--sage);
+  }
+  .link-row a.link-go{
+    flex-shrink:0;
+    width:30px;
+    height:30px;
+    border-radius:999px;
+    background:var(--cream);
+    color:var(--text-mid);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-decoration:none;
+    font-size:13px;
+    transition:.15s;
+  }
+  .link-row a.link-go:hover{background:var(--sage); color:#fff;}
+  .link-row .link-del{
+    flex-shrink:0;
+    width:22px;
+    height:22px;
+    border:none;
+    background:transparent;
+    color:var(--ink-faint);
+    cursor:pointer;
+    font-size:11px;
+    border-radius:999px;
+  }
+  .link-row .link-del:hover{background:var(--danger); color:#fff;}
+  .link-add{
+    margin-top:6px;
+    flex:1;
+    background:none;
+    border:1.5px dashed var(--line);
+    color:var(--text-mid);
+    padding:8px;
+    cursor:pointer;
+    border-radius:var(--radius-sm);
+    font-size:12px;
+    font-weight:600;
+    transition:.15s;
+  }
+  .link-add:hover{border-color:var(--sage); color:var(--sage-deep); background:var(--sage-soft);}
+  .link-card-actions{
+    display:flex;
+    gap:8px;
+    margin-top:6px;
+  }
+  .link-more{
+    flex-shrink:0;
+    background:none;
+    border:none;
+    color:var(--ocean-deep);
+    font-size:12px;
+    font-weight:600;
+    cursor:pointer;
+    padding:8px 4px;
+  }
+  .link-more:hover{color:var(--ocean);}
 
   .calendar-panel{
     background:var(--ink);
@@ -264,7 +468,7 @@
   .cal-day .tag.range-mid{border-radius:0; margin-left:-5px; margin-right:-5px;}
   .cal-day .tag.range-single{border-radius:6px;}
   .cal-day .tag.vacation{background:var(--sky);}
-  .cal-day .tag.issue{background:var(--coral);}
+  .cal-day .tag.issue{background:var(--ocean-deep);}
   .cal-day .tag.birthday{background:#c97fb0;}
   .cal-legend{
     display:flex;
@@ -278,7 +482,7 @@
   .cal-legend span{display:flex; align-items:center; gap:5px;}
   .legend-dot{width:9px;height:9px;border-radius:3px;display:inline-block;}
   .legend-dot.vacation{background:var(--sky);}
-  .legend-dot.issue{background:var(--coral);}
+  .legend-dot.issue{background:var(--ocean-deep);}
   .legend-dot.birthday{background:#c97fb0;}
 
   /* ===== Member board ===== */
@@ -403,7 +607,7 @@
     height:80px;
     padding:0;
   }
-  .mini-bubble textarea::placeholder{color:#bdb9ae;}
+  .mini-bubble textarea::placeholder{color:#a8acb5;}
   .mini-bubble textarea:focus{outline:none;}
 
   .mission-block{
@@ -499,14 +703,14 @@
   .block-save:hover{background:var(--sage-deep);}
   .block-save.mission{background:var(--amber-deep);}
   .block-save.mission:hover{background:var(--amber);}
-  .block-save.weekly{background:var(--coral-deep);}
-  .block-save.weekly:hover{background:var(--coral);}
+  .block-save.weekly{background:var(--ocean-deep);}
+  .block-save.weekly:hover{background:var(--ocean);}
 
   /* ===== Weekly share box ===== */
   .weekly-box{
     flex:1;
     min-width:240px;
-    background:var(--coral-soft);
+    background:var(--ocean-soft);
     border-radius:var(--radius-md);
     padding:20px 22px;
     position:relative;
@@ -519,7 +723,7 @@
     top:42px;
     width:18px;
     height:18px;
-    background:var(--coral-soft);
+    background:var(--ocean-soft);
     border-radius:4px;
     transform:rotate(45deg);
   }
@@ -543,12 +747,12 @@
     font-weight:700;
     text-align:right;
     color:#fff;
-    background:var(--coral);
+    background:var(--ocean);
     padding:6px 14px;
     border-radius:999px;
     white-space:nowrap;
     letter-spacing:0.2px;
-    box-shadow:0 2px 6px rgba(224,115,92,0.35);
+    box-shadow:0 2px 6px rgba(63,124,176,0.35);
   }
   .weekly-line{
     display:flex;
@@ -705,9 +909,58 @@
   }
   .modal-tag-list .existing-tag .x{cursor:pointer; color:var(--danger); font-weight:700;}
   .modal-tag-list .existing-tag .edit{cursor:pointer; color:var(--amber-deep); font-weight:700;}
+
+  /* ===== 전체보기(More) 팝업 ===== */
+  .list-modal-box{
+    width:420px;
+    max-height:78vh;
+    display:flex;
+    flex-direction:column;
+  }
+  .list-modal-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:14px;
+    flex-shrink:0;
+  }
+  .list-modal-head h3{margin:0;}
+  .list-modal-close-btn{
+    border:none; background:var(--cream); width:26px; height:26px; border-radius:999px;
+    cursor:pointer; font-size:11px; color:var(--text-mid); flex-shrink:0;
+  }
+  .list-modal-close-btn:hover{background:var(--danger); color:#fff;}
+  .list-modal-body{
+    overflow-y:auto;
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    padding-right:4px;
+  }
+  .list-modal-body .announce-row,
+  .list-modal-body .link-row{
+    border-bottom:1px solid var(--line);
+  }
+  .list-modal-body .announce-row input,
+  .list-modal-body .link-row input.link-url{
+    color:var(--text-dark);
+  }
+  .list-modal-body .announce-row input::placeholder{
+    color:#a8acb5;
+  }
+  .list-modal-body .announce-date{
+    color:var(--ocean-deep);
+  }
+  .list-modal-body .announce-del{
+    color:var(--ink-faint);
+  }
+  .list-modal-empty{
+    font-size:12px; color:var(--text-mid); padding:10px 2px;
+  }
 </style>
 </head>
 <body>
+<div class="app-wrap">
 
 <header class="top">
   <h1>MD Team Meeting</h1>
@@ -724,6 +977,28 @@
     <p class="year-label" id="year-label" contenteditable="true">&lt; 2026Y &gt;</p>
     <div id="notice-lines"></div>
     <button class="notice-add" id="add-notice">+ 항목 추가</button>
+  </div>
+
+  <div class="mid-stack">
+    <div class="announce-card">
+      <div class="announce-head">
+        <h2>Notice</h2>
+        <button class="announce-write-btn" id="announce-write">+ 글쓰기</button>
+      </div>
+      <div class="announce-list" id="announce-list"></div>
+      <button class="announce-more" id="announce-more">More &gt;</button>
+    </div>
+
+    <div class="link-card">
+      <div class="link-card-head">
+        <h2>MD URL</h2>
+      </div>
+      <div id="link-list"></div>
+      <div class="link-card-actions">
+        <button class="link-add" id="add-link">+ URL 추가</button>
+        <button class="link-more" id="link-more">More &gt;</button>
+      </div>
+    </div>
   </div>
 
   <div class="calendar-panel">
@@ -744,6 +1019,8 @@
 <div class="add-member-bar" id="add-member">
   <span>(+) ADD MEMBER</span>
 </div>
+
+</div><!-- /.app-wrap -->
 
 <div class="save-status" id="save-status">저장됨</div>
 
@@ -782,6 +1059,17 @@
   </div>
 </div>
 
+<!-- 전체보기(More) 팝업: Notice / MD URL 공용 -->
+<div class="modal-overlay" id="list-modal-overlay">
+  <div class="modal-box list-modal-box">
+    <div class="list-modal-head">
+      <h3 id="list-modal-title">전체보기</h3>
+      <button id="list-modal-close" class="list-modal-close-btn">✕</button>
+    </div>
+    <div id="list-modal-body" class="list-modal-body"></div>
+  </div>
+</div>
+
 <script>
 /* =========================================================
    MD Team Meeting - Frontend logic
@@ -808,6 +1096,13 @@ let DATA = {
   notices: [
     {text:""},
     {text:""}
+  ],
+  // 공지사항(Notice) 보드 - 날짜+내용
+  announcements: [],
+  // {id, date:"06/16", text:"..."}
+  // 랜딩 URL 모음
+  links: [
+    {id:"lk1", label:"", url:""}
   ],
   calendar: {
     monthLabel: "2026.06",
@@ -1010,6 +1305,10 @@ function migrateData(json){
     if(!ev.id) ev.id = "ev" + Date.now() + Math.random().toString(16).slice(2);
   });
 
+  // 공지사항/랜딩 URL 필드 없으면 생성
+  if(!Array.isArray(json.announcements)) json.announcements = [];
+  if(!Array.isArray(json.links)) json.links = [{id:"lk1", label:"", url:""}];
+
   return json;
 }
 async function loadData(){
@@ -1072,6 +1371,8 @@ function scheduleSave(){
 function render(){
   renderMeetingDateBar();
   renderNotices();
+  renderAnnouncements();
+  renderLinks();
   renderCalendar();
   renderMembers();
 }
@@ -1105,6 +1406,212 @@ document.getElementById("add-notice").addEventListener("click", ()=>{
 document.getElementById("year-label").addEventListener("input", (e)=>{
   DATA.year = e.target.textContent;
   scheduleSave();
+});
+
+// --- 공지사항(Notice) 보드 ---
+const PREVIEW_COUNT = 3; // Notice / MD URL 카드에서 기본으로 보여줄 개수
+
+function todayShortLabel(){
+  const d = new Date();
+  return `${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function buildAnnounceRow(item, onChange){
+  const row = document.createElement("div");
+  row.className = "announce-row";
+
+  const dateSpan = document.createElement("span");
+  dateSpan.className = "announce-date";
+  dateSpan.textContent = item.date || "";
+  row.appendChild(dateSpan);
+
+  const input = document.createElement("input");
+  input.type = "text";
+  input.placeholder = "공지 내용을 입력하세요";
+  input.value = item.text;
+  input.addEventListener("input", ()=>{
+    item.text = input.value;
+    scheduleSave();
+  });
+  row.appendChild(input);
+
+  const delBtn = document.createElement("button");
+  delBtn.className = "announce-del";
+  delBtn.textContent = "✕";
+  delBtn.addEventListener("click", ()=>{
+    const realIdx = DATA.announcements.findIndex(a=>a.id === item.id);
+    if(realIdx > -1) DATA.announcements.splice(realIdx,1);
+    renderAnnouncements();
+    if(typeof onChange === "function") onChange();
+    scheduleSave();
+  });
+  row.appendChild(delBtn);
+
+  return row;
+}
+
+function getSortedAnnouncements(){
+  return [...DATA.announcements].sort((a,b)=> (b.date||"").localeCompare(a.date||""));
+}
+
+function renderAnnouncements(){
+  const list = document.getElementById("announce-list");
+  list.innerHTML = "";
+
+  const sorted = getSortedAnnouncements();
+  const visible = sorted.slice(0, PREVIEW_COUNT);
+
+  if(visible.length === 0){
+    const empty = document.createElement("div");
+    empty.className = "list-modal-empty";
+    empty.textContent = "등록된 공지사항이 없습니다.";
+    list.appendChild(empty);
+  }
+
+  visible.forEach((item)=>{
+    list.appendChild(buildAnnounceRow(item));
+  });
+
+  const moreBtn = document.getElementById("announce-more");
+  moreBtn.style.display = sorted.length > PREVIEW_COUNT ? "" : "none";
+}
+
+document.getElementById("announce-write").addEventListener("click", ()=>{
+  DATA.announcements.push({
+    id: "an" + Date.now(),
+    date: todayShortLabel(),
+    text: ""
+  });
+  renderAnnouncements();
+  scheduleSave();
+});
+
+document.getElementById("announce-more").addEventListener("click", ()=>{
+  openListModal("Notice 전체보기", ()=>{
+    const wrap = document.createElement("div");
+    const sorted = getSortedAnnouncements();
+    if(sorted.length === 0){
+      const empty = document.createElement("div");
+      empty.className = "list-modal-empty";
+      empty.textContent = "등록된 공지사항이 없습니다.";
+      wrap.appendChild(empty);
+    }
+    sorted.forEach(item=>{
+      wrap.appendChild(buildAnnounceRow(item, refreshListModalBody));
+    });
+    return wrap;
+  });
+});
+
+// --- MD URL 카드 ---
+function normalizeUrl(url){
+  if(!url) return "";
+  if(/^https?:\/\//i.test(url)) return url;
+  return "https://" + url;
+}
+
+function buildLinkRow(item, onChange){
+  const row = document.createElement("div");
+  row.className = "link-row";
+
+  const labelInput = document.createElement("input");
+  labelInput.className = "link-label";
+  labelInput.type = "text";
+  labelInput.placeholder = "이름";
+  labelInput.value = item.label;
+  labelInput.addEventListener("input", ()=>{
+    item.label = labelInput.value;
+    scheduleSave();
+  });
+  row.appendChild(labelInput);
+
+  const urlInput = document.createElement("input");
+  urlInput.className = "link-url";
+  urlInput.type = "text";
+  urlInput.placeholder = "https://...";
+  urlInput.value = item.url;
+  urlInput.addEventListener("input", ()=>{
+    item.url = urlInput.value;
+    goLink.href = normalizeUrl(item.url) || "#";
+    scheduleSave();
+  });
+  row.appendChild(urlInput);
+
+  const goLink = document.createElement("a");
+  goLink.className = "link-go";
+  goLink.textContent = "→";
+  goLink.target = "_blank";
+  goLink.rel = "noopener noreferrer";
+  goLink.href = normalizeUrl(item.url) || "#";
+  row.appendChild(goLink);
+
+  const delBtn = document.createElement("button");
+  delBtn.className = "link-del";
+  delBtn.textContent = "✕";
+  delBtn.addEventListener("click", ()=>{
+    const realIdx = DATA.links.findIndex(l=>l.id === item.id);
+    if(realIdx > -1) DATA.links.splice(realIdx,1);
+    renderLinks();
+    if(typeof onChange === "function") onChange();
+    scheduleSave();
+  });
+  row.appendChild(delBtn);
+
+  return row;
+}
+
+function renderLinks(){
+  const list = document.getElementById("link-list");
+  list.innerHTML = "";
+
+  const visible = DATA.links.slice(0, PREVIEW_COUNT);
+  visible.forEach((item)=>{
+    list.appendChild(buildLinkRow(item));
+  });
+
+  const moreBtn = document.getElementById("link-more");
+  moreBtn.style.display = DATA.links.length > PREVIEW_COUNT ? "" : "none";
+}
+
+document.getElementById("add-link").addEventListener("click", ()=>{
+  DATA.links.push({id:"lk"+Date.now(), label:"", url:""});
+  renderLinks();
+  scheduleSave();
+});
+
+document.getElementById("link-more").addEventListener("click", ()=>{
+  openListModal("MD URL 전체보기", function buildBody(){
+    const wrap = document.createElement("div");
+    if(DATA.links.length === 0){
+      const empty = document.createElement("div");
+      empty.className = "list-modal-empty";
+      empty.textContent = "등록된 URL이 없습니다.";
+      wrap.appendChild(empty);
+    }
+    DATA.links.forEach(item=>{
+      wrap.appendChild(buildLinkRow(item, refreshListModalBody));
+    });
+    return wrap;
+  });
+});
+
+// --- 전체보기(More) 공용 팝업 ---
+let currentListModalBuilder = null;
+function openListModal(title, buildBodyFn){
+  currentListModalBuilder = buildBodyFn;
+  document.getElementById("list-modal-title").textContent = title;
+  refreshListModalBody();
+  document.getElementById("list-modal-overlay").classList.add("show");
+}
+function refreshListModalBody(){
+  if(!currentListModalBuilder) return;
+  const body = document.getElementById("list-modal-body");
+  body.innerHTML = "";
+  body.appendChild(currentListModalBuilder());
+}
+document.getElementById("list-modal-close").addEventListener("click", ()=>{
+  document.getElementById("list-modal-overlay").classList.remove("show");
+  currentListModalBuilder = null;
 });
 
 // --- Calendar ---
