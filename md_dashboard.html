@@ -269,7 +269,10 @@
   .cal-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: auto repeat(6, minmax(auto, 1fr));
     gap: 4px;
+    flex: 1;
+    min-height: 0;
   }
   .cal-day-header {
     font-size: 11px; font-weight: 600; padding: 2px 0 8px;
@@ -313,10 +316,10 @@
   .cal-event-bar.bar-round-right { border-radius: 3px 8px 8px 3px; }
   .cal-event-bar.bar-round-left.bar-round-right { border-radius: 8px; }
 
-  /* 이슈 리스트 (캘린더 하단) - 다크 테마 */
+  /* 이슈 리스트 (캘린더 하단) - 다크 테마, 최대 2개까지만 보이고 더 있으면 스크롤 */
   .issue-list-below {
     margin-top: 10px; overflow-y: auto;
-    flex: 1; min-height: 0;
+    flex: 0 0 auto; max-height: 58px;
   }
   .issue-list-item {
     display: flex; align-items: baseline; gap: 8px;
@@ -2028,7 +2031,9 @@ async function deleteIssue(id) {
   renderCal();
   renderIssueDateList();
   startIssueBubble();
-  await gasPost({action:'deleteIssue', id});
+  showSync('삭제 중...','');
+  const res = await gasPost({action:'deleteIssue', id});
+  showSync(res?.deleted ? '✓ 삭제 완료' : '⚠ 서버에서 못 찾음', res?.deleted ? 'ok' : 'err');
 }
 
 async function submitIssue() {
@@ -2633,7 +2638,7 @@ function isAnyModalOpen() {
 async function autoRefreshFromGAS() {
   if (!GAS_URL) return;
   if (isAnyModalOpen() || draggedUid) return;
-  if (Date.now() - lastLocalEditAt < 6000) return; // 방금 로컬에서 수정했으면 서버 반영 시간을 기다려줌 (덮어쓰기 방지)
+  if (Date.now() - lastLocalEditAt < 12000) return; // 방금 로컬에서 수정했으면 서버 반영 시간을 기다려줌 (덮어쓰기 방지)
   const data = await gasGet('getAll');
   if (data && !data.error) loadAllFromGAS(data);
 }
