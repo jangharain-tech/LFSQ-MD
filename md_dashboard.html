@@ -141,14 +141,17 @@
   .module-grip:hover span { background: #888; }
   .module-grip:active { cursor: grabbing; }
 
-  /* ── 크기조절 / 삭제 버튼 ── */
-  .module-size-btn {
-    font-size: 11px; padding: 4px 9px; border-radius: 4px;
-    border: 1px solid var(--gray-200); background: var(--white);
-    color: var(--gray-600); cursor: pointer; font-family: 'DM Sans', sans-serif;
-    white-space: nowrap;
+  /* ── 편집 / 삭제 버튼 ── */
+  .module-edit-btn {
+    font-size: 12px; padding: 3px 7px; border-radius: 4px;
+    border: none; background: none; color: var(--gray-400); cursor: pointer; line-height: 1;
   }
-  .module-size-btn:hover { background: var(--gray-100); border-color: var(--gray-400); }
+  .module-edit-btn:hover { color: var(--blue); background: var(--blue-light); }
+  .module-trash-btn {
+    font-size: 12px; padding: 3px 7px; border-radius: 4px;
+    border: none; background: none; color: var(--gray-400); cursor: pointer; line-height: 1;
+  }
+  .module-trash-btn:hover { color: #ef4444; background: #fee2e2; }
   .module-delete-btn {
     font-size: 13px; padding: 3px 7px; border-radius: 4px;
     border: none; background: none; color: #ccc; cursor: pointer; line-height: 1;
@@ -400,7 +403,7 @@
   .share-edit-btn:hover { opacity: 1; }
 
   /* ── TEAM CARD ── */
-  .module[data-type="teamcard"] .cell-header { background: #dbeafe; }
+  /* TEAM CARD 헤더 기본색은 MODULE_DEFS.defaultHeaderColor로 JS에서 처리 (편집 가능하도록) */
 
   .tc-top { display: flex; gap: 10px; margin-bottom: 12px; }
   .tc-photo {
@@ -482,6 +485,7 @@
   .modal {
     background: var(--white); border-radius: 12px;
     padding: 24px 28px; width: 400px; max-width: 95vw;
+    max-height: 90vh; overflow-y: auto;
     box-shadow: var(--shadow-md); position: relative;
   }
   .modal h3 { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
@@ -593,6 +597,34 @@
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal('modalModulePicker')">취소</button>
       <button class="btn-primary" onclick="confirmAddModule()">추가하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 모듈 제목/헤더색상 편집 -->
+<div class="modal-overlay" id="modalModuleEdit">
+  <div class="modal" style="width:380px;">
+    <button class="modal-close" onclick="closeModal('modalModuleEdit')">✕</button>
+    <h3>⚙ 모듈 편집</h3>
+    <label>제목</label>
+    <input type="text" id="moduleEditTitleInput" placeholder="">
+    <label style="margin-top:12px;">헤더 색상</label>
+    <div class="picker-color-row" id="moduleEditColorRow"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modalModuleEdit')">취소</button>
+      <button class="btn-primary" onclick="confirmModuleEdit()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOOL/MEET 삭제된 URL 휴지통 -->
+<div class="modal-overlay" id="modalTrash">
+  <div class="modal" style="width:440px;">
+    <button class="modal-close" onclick="closeModal('modalTrash')">✕</button>
+    <h3>🗑 삭제된 URL 보관함</h3>
+    <div id="trashList" style="margin-top:10px;max-height:360px;overflow-y:auto;"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modalTrash')">닫기</button>
     </div>
   </div>
 </div>
@@ -882,9 +914,11 @@ const state = {
   tools:     JSON.parse(localStorage.getItem('tools')     || JSON.stringify(DEFAULT_TOOLS)),
   shares:    JSON.parse(localStorage.getItem('shares')    || JSON.stringify(DEFAULT_SHARES)),
   teamcards: JSON.parse(localStorage.getItem('teamcards') || '{}'), // { uid: {name, job, comment, photo, missions:{YYYY-MM:text}} }
+  trash:     JSON.parse(localStorage.getItem('trash')     || '[]'), // 삭제된 TOOL/MEET 항목 보관 [{id, type, name, url, deletedAt}]
 };
 
-function save(key) { localStorage.setItem(key, JSON.stringify(state[key])); }
+let lastLocalEditAt = 0;
+function save(key) { localStorage.setItem(key, JSON.stringify(state[key])); lastLocalEditAt = Date.now(); }
 
 // ============================================================
 // 모듈 시스템 (드래그 이동 / 크기조절 / 추가 / 삭제)
@@ -932,14 +966,14 @@ const MODULE_DEFS = {
     title: 'MEET',
     desc: '미팅 바로가기 버튼',
     defaultSize: 1,
-    headerActions: `<button class="btn-sm" onclick="addMeetItem()">+ 추가</button>`,
+    headerActions: `<button class="btn-sm" onclick="addMeetItem()">+ 추가</button><button class="module-trash-btn" onclick="openTrash()" title="삭제된 URL 보관함">🗑</button>`,
     bodyHTML: `<div class="meet-btns" data-role="meetBtns"></div>`,
   },
   tool: {
     title: 'TOOL',
     desc: '업무 툴 바로가기',
     defaultSize: 1,
-    headerActions: `<button class="btn-sm" onclick="addToolItem()">+ 추가</button>`,
+    headerActions: `<button class="btn-sm" onclick="addToolItem()">+ 추가</button><button class="module-trash-btn" onclick="openTrash()" title="삭제된 URL 보관함">🗑</button>`,
     bodyHTML: `<div class="tool-list" data-role="toolList"></div>`,
   },
   shareurl: {
@@ -953,6 +987,7 @@ const MODULE_DEFS = {
     title: 'TEAM CARD',
     desc: '팀원 프로필 카드 (사진/직무/한마디/먼슬리 미션)',
     defaultSize: 1,
+    defaultHeaderColor: '#dbeafe',
     dynamicTitle: (uid) => (state.teamcards[uid]?.name) || '이름 입력',
     headerActions: (uid) => `<button class="btn-sm" onclick="openTcProfileEdit('${uid}')">✏ 편집</button>`,
     bodyHTML: (uid) => `
@@ -1001,12 +1036,12 @@ const BG_COLORS = [
 ];
 
 const DEFAULT_LAYOUT = [
-  { uid: 'm_notice',    type: 'notice',    size: 1, bg: '' },
-  { uid: 'm_billboard', type: 'billboard', size: 2, bg: '' },
-  { uid: 'm_tool',      type: 'tool',      size: 1, bg: '' },
-  { uid: 'm_issue',     type: 'issue',     size: 1, bg: '' },
-  { uid: 'm_meet',      type: 'meet',      size: 1, bg: '' },
-  { uid: 'm_shareurl',  type: 'shareurl',  size: 2, bg: '#f3f4f6' },
+  { uid: 'm_notice',    type: 'notice',    size: 1, bg: '', title: '', headerColor: '' },
+  { uid: 'm_billboard', type: 'billboard', size: 2, bg: '', title: '', headerColor: '' },
+  { uid: 'm_tool',      type: 'tool',      size: 1, bg: '', title: '', headerColor: '' },
+  { uid: 'm_issue',     type: 'issue',     size: 1, bg: '', title: '', headerColor: '' },
+  { uid: 'm_meet',      type: 'meet',      size: 1, bg: '', title: '', headerColor: '' },
+  { uid: 'm_shareurl',  type: 'shareurl',  size: 2, bg: '#f3f4f6', title: '', headerColor: '' },
 ];
 
 state.layout = JSON.parse(localStorage.getItem('layout') || JSON.stringify(DEFAULT_LAYOUT));
@@ -1036,11 +1071,13 @@ function renderLayout() {
     el.style.gridColumn = `span ${mod.size}`;
     el.draggable = false;
 
-    const titleText = def.dynamicTitle ? def.dynamicTitle(mod.uid) : def.title;
+    const titleText = mod.title || (def.dynamicTitle ? def.dynamicTitle(mod.uid) : def.title);
     const headerActionsHTML = typeof def.headerActions === 'function' ? def.headerActions(mod.uid) : (def.headerActions || '');
+    const headerBg = mod.headerColor || def.defaultHeaderColor || '';
 
     const header = document.createElement('div');
     header.className = 'cell-header';
+    if (headerBg) header.style.background = headerBg;
     header.innerHTML = `
       <div class="module-header-left">
         ${buildGripHTML()}
@@ -1048,6 +1085,7 @@ function renderLayout() {
       </div>
       <div class="module-header-right">
         ${headerActionsHTML}
+        <button class="module-edit-btn" onclick="openModuleEdit('${mod.uid}')" title="제목/헤더 색상 편집">⚙</button>
         <button class="module-delete-btn" onclick="removeModule('${mod.uid}')" title="모듈 삭제">✕</button>
       </div>
     `;
@@ -1112,10 +1150,15 @@ let pickerType = null;
 let pickerSize = 1;
 let pickerBg = '';
 
+let pickerTitle = '';
+let pickerHeaderColor = '';
+
 function openModulePicker() {
   pickerType = Object.keys(MODULE_DEFS)[0] || null;
   pickerSize = pickerType ? MODULE_DEFS[pickerType].defaultSize : 1;
   pickerBg = '';
+  pickerTitle = '';
+  pickerHeaderColor = '';
   renderPicker();
   openModal('modalModulePicker');
 }
@@ -1124,21 +1167,26 @@ function renderPicker() {
   const typeListEl = document.getElementById('pickerTypeList');
   const optionsEl = document.getElementById('pickerOptions');
   const types = Object.keys(MODULE_DEFS);
+  const def = pickerType ? MODULE_DEFS[pickerType] : null;
 
   typeListEl.innerHTML = types.map(type => {
-    const def = MODULE_DEFS[type];
+    const d = MODULE_DEFS[type];
     const selected = type === pickerType;
     const countOfType = state.layout.filter(m => m.type === type).length;
     return `<div class="module-picker-item${selected ? ' selected' : ''}" onclick="selectPickerType('${type}')">
       <div>
-        <div class="mp-name">${def.title}${countOfType ? ` <span style="font-size:11px;color:var(--gray-400);font-weight:400;">(${countOfType}개 사용중)</span>` : ''}</div>
-        <div class="mp-desc">${def.desc}</div>
+        <div class="mp-name">${d.title}${countOfType ? ` <span style="font-size:11px;color:var(--gray-400);font-weight:400;">(${countOfType}개 사용중)</span>` : ''}</div>
+        <div class="mp-desc">${d.desc}</div>
       </div>
       <span class="mp-radio">${selected ? '●' : '○'}</span>
     </div>`;
   }).join('');
 
+  const titlePlaceholder = def && def.dynamicTitle ? '비워두면 자동으로 표시됩니다 (예: 이름)' : (def ? def.title : '');
+
   optionsEl.innerHTML = `
+    <label style="margin-top:14px;">제목 <span style="font-size:11px;color:var(--gray-400);font-weight:400;">(비워두면 기본 제목 사용)</span></label>
+    <input type="text" id="pickerTitleInput" placeholder="${titlePlaceholder}" value="${pickerTitle}" oninput="pickerTitle=this.value">
     <label style="margin-top:14px;">크기</label>
     <div class="picker-size-row">
       ${[1, 2, 4].map(n => `<button class="picker-option-btn${pickerSize === n ? ' active' : ''}" onclick="selectPickerSize(${n})">${n}칸</button>`).join('')}
@@ -1149,6 +1197,12 @@ function renderPicker() {
         <button class="picker-color-swatch${pickerBg === c.hex ? ' active' : ''}" style="background:${c.hex || '#ffffff'};" onclick="selectPickerBg('${c.hex}')" title="${c.label}"></button>
       `).join('')}
     </div>
+    <label style="margin-top:14px;">헤더 색상</label>
+    <div class="picker-color-row">
+      ${BG_COLORS.map(c => `
+        <button class="picker-color-swatch${pickerHeaderColor === c.hex ? ' active' : ''}" style="background:${c.hex || '#ffffff'};" onclick="selectPickerHeaderColor('${c.hex}')" title="${c.label}"></button>
+      `).join('')}
+    </div>
   `;
 }
 
@@ -1156,6 +1210,8 @@ function selectPickerType(type) {
   pickerType = type;
   pickerSize = MODULE_DEFS[type].defaultSize;
   pickerBg = '';
+  pickerTitle = '';
+  pickerHeaderColor = '';
   renderPicker();
 }
 
@@ -1169,12 +1225,19 @@ function selectPickerBg(hex) {
   renderPicker();
 }
 
+function selectPickerHeaderColor(hex) {
+  pickerHeaderColor = hex;
+  renderPicker();
+}
+
 function confirmAddModule() {
   if (!pickerType) return alert('추가할 모듈 종류를 선택하세요.');
   const def = MODULE_DEFS[pickerType];
   if (!def) return;
   const uid = 'm_' + pickerType + '_' + Date.now();
-  state.layout.push({ uid, type: pickerType, size: pickerSize, bg: pickerBg });
+  const titleInput = document.getElementById('pickerTitleInput');
+  const titleVal = titleInput ? titleInput.value.trim() : '';
+  state.layout.push({ uid, type: pickerType, size: pickerSize, bg: pickerBg, title: titleVal, headerColor: pickerHeaderColor });
   saveLayout();
 
   if (pickerType === 'teamcard') {
@@ -1187,6 +1250,49 @@ function confirmAddModule() {
   renderLayout();
   renderAll();
   if (pickerType === 'issue') startIssueBubble();
+  syncLayoutToGAS();
+}
+
+// ── 모듈 편집 (제목 / 헤더 색상) — 추가 후에도 언제든 변경 가능 ──
+let editingModuleUid = null;
+let moduleEditHeaderColor = '';
+
+function openModuleEdit(uid) {
+  const mod = state.layout.find(m => m.uid === uid);
+  if (!mod) return;
+  editingModuleUid = uid;
+  moduleEditHeaderColor = mod.headerColor || '';
+
+  const def = MODULE_DEFS[mod.type];
+  const titleInput = document.getElementById('moduleEditTitleInput');
+  titleInput.value = mod.title || '';
+  titleInput.placeholder = def && def.dynamicTitle ? '비워두면 자동으로 표시됩니다 (예: 이름)' : (def ? def.title : '');
+
+  renderModuleEditColors();
+  openModal('modalModuleEdit');
+}
+
+function renderModuleEditColors() {
+  const el = document.getElementById('moduleEditColorRow');
+  el.innerHTML = BG_COLORS.map(c => `
+    <button class="picker-color-swatch${moduleEditHeaderColor === c.hex ? ' active' : ''}" style="background:${c.hex || '#ffffff'};" onclick="selectModuleEditColor('${c.hex}')" title="${c.label}"></button>
+  `).join('');
+}
+
+function selectModuleEditColor(hex) {
+  moduleEditHeaderColor = hex;
+  renderModuleEditColors();
+}
+
+function confirmModuleEdit() {
+  const mod = state.layout.find(m => m.uid === editingModuleUid);
+  if (!mod) return;
+  mod.title = document.getElementById('moduleEditTitleInput').value.trim();
+  mod.headerColor = moduleEditHeaderColor;
+  saveLayout();
+  closeModal('modalModuleEdit');
+  renderLayout();
+  renderAll();
   syncLayoutToGAS();
 }
 
@@ -1282,6 +1388,7 @@ function loadAllFromGAS(data) {
   if (data.meet     && data.meet.length)     { state.meet     = data.meet.map(m => ({...m, idx: Number(m.idx)}));  save('meet'); }
   if (data.tools    && data.tools.length)    { state.tools    = data.tools.map(t => ({...t, idx: Number(t.idx)})); save('tools'); }
   if (data.shares   && data.shares.length)   { state.shares   = data.shares.map(s => ({...s, idx: Number(s.idx)}));save('shares'); }
+  if (data.trash    && data.trash.length)    { state.trash    = data.trash.map(t => ({...t, id: Number(t.id)})); save('trash'); }
 
   // TEAM CARD — uid 기준 객체로 병합
   if (data.teamcards && data.teamcards.length) {
@@ -1306,7 +1413,7 @@ function loadAllFromGAS(data) {
   if (data.layout && data.layout.length) {
     const newLayout = [...data.layout]
       .sort((a, b) => Number(a.order) - Number(b.order))
-      .map(l => ({ uid: String(l.uid), type: String(l.type), size: Number(l.size), bg: String(l.bg || '') }))
+      .map(l => ({ uid: String(l.uid), type: String(l.type), size: Number(l.size), bg: String(l.bg || ''), title: String(l.title || ''), headerColor: String(l.headerColor || '') }))
       .filter(l => MODULE_DEFS[l.type]); // 알 수 없는 타입은 무시
     if (JSON.stringify(newLayout) !== JSON.stringify(state.layout)) {
       state.layout = newLayout;
@@ -2098,9 +2205,12 @@ function addMeetItem(){
 
 async function deleteMeet(i){
   if(!confirm(`"${state.meet[i].label}" 을 삭제하시겠습니까?`)) return;
+  const item = state.meet[i];
+  addToTrash('meet', item.label, item.url);
   state.meet.splice(i, 1);
   save('meet');
   renderMeet();
+  if(item.idx) await gasPost({action:'deleteMeet', id: item.idx});
 }
 
 function openMeetUrl(i){
@@ -2151,9 +2261,12 @@ function addToolItem(){
 
 async function deleteTool(i){
   if(!confirm(`"${state.tools[i].name}" 을 삭제하시겠습니까?`)) return;
+  const item = state.tools[i];
+  addToTrash('tool', item.name, item.url);
   state.tools.splice(i, 1);
   save('tools');
   renderTool();
+  if(item.idx) await gasPost({action:'deleteTool', id: item.idx});
 }
 
 function openToolEdit(i){
@@ -2170,6 +2283,78 @@ async function saveTool(){
   showSync('저장 중...','');
   const res=await gasPost({action:'updateTool',data:state.tools[editToolIdx]});
   showSync(res?.success?'✓ 저장됨':'⚠ 로컬만 저장',res?.success?'ok':'err');
+}
+
+// ============================================================
+// TOOL / MEET 삭제된 URL 휴지통
+// ============================================================
+function addToTrash(type, title, url) {
+  const entry = { id: Date.now(), type, title: title || '', url: url || '', deletedAt: new Date().toISOString() };
+  state.trash.push(entry);
+  save('trash');
+  gasPost({ action: 'addTrash', data: entry });
+}
+
+function openTrash() {
+  renderTrashList();
+  openModal('modalTrash');
+}
+
+function renderTrashList() {
+  const el = document.getElementById('trashList');
+  if (!el) return;
+  if (!state.trash.length) {
+    el.innerHTML = '<div style="font-size:13px;color:var(--gray-400);padding:14px 2px;">삭제된 항목이 없습니다.</div>';
+    return;
+  }
+  const sorted = [...state.trash].sort((a, b) => b.id - a.id); // 최근 삭제된 것부터
+  el.innerHTML = sorted.map(item => {
+    const typeLabel = item.type === 'tool' ? 'TOOL' : 'MEET';
+    const typeColor = item.type === 'tool' ? '#1e3a8a' : '#111';
+    return `
+    <div style="display:flex;align-items:center;gap:8px;padding:9px 10px;background:var(--gray-100);border-radius:7px;margin-bottom:6px;">
+      <span style="font-size:10px;font-weight:700;color:white;background:${typeColor};padding:2px 7px;border-radius:4px;flex-shrink:0;">${typeLabel}</span>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13px;font-weight:600;color:var(--black);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.title}</div>
+        <div style="font-size:11px;color:var(--gray-400);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.url || '(URL 없음)'}</div>
+      </div>
+      <button class="btn-sm" style="flex-shrink:0;" onclick="restoreTrashItem(${item.id})">복원</button>
+      <button class="module-delete-btn" style="flex-shrink:0;" title="완전 삭제" onclick="permanentlyDeleteTrash(${item.id})">✕</button>
+    </div>`;
+  }).join('');
+}
+
+async function restoreTrashItem(id) {
+  const idx = state.trash.findIndex(t => t.id === id);
+  if (idx === -1) return;
+  const item = state.trash[idx];
+  state.trash.splice(idx, 1);
+  save('trash');
+
+  if (item.type === 'tool') {
+    const newItem = { idx: Date.now(), name: item.title, url: item.url };
+    state.tools.push(newItem);
+    save('tools');
+    renderTool();
+    await gasPost({ action: 'updateTool', data: newItem });
+  } else if (item.type === 'meet') {
+    const newItem = { idx: Date.now(), label: item.title, url: item.url, color: 'meet-btn-tbd' };
+    state.meet.push(newItem);
+    save('meet');
+    renderMeet();
+    await gasPost({ action: 'updateMeet', data: newItem });
+  }
+
+  await gasPost({ action: 'deleteTrash', id: item.id });
+  renderTrashList();
+}
+
+async function permanentlyDeleteTrash(id) {
+  if (!confirm('완전히 삭제하시겠습니까? 복구할 수 없습니다.')) return;
+  state.trash = state.trash.filter(t => t.id !== id);
+  save('trash');
+  renderTrashList();
+  await gasPost({ action: 'deleteTrash', id });
 }
 
 // ============================================================
@@ -2276,9 +2461,10 @@ function renderTeamcards() {
     const data = ensureTcEntry(uid);
     const view = tcGetViewMonth(uid);
 
-    // 헤더 이름
+    // 헤더 이름 (모듈에 커스텀 제목이 설정돼있으면 그 값을 우선)
+    const layoutEntry = state.layout.find(m => m.uid === uid);
     const titleEl = mod.querySelector('[data-role="moduleTitle"]');
-    if (titleEl) titleEl.textContent = data.name || '이름 입력';
+    if (titleEl && !(layoutEntry && layoutEntry.title)) titleEl.textContent = data.name || '이름 입력';
 
     // 사진
     const photoImg = mod.querySelector('[data-role="tcPhotoImg"]');
@@ -2435,6 +2621,7 @@ function isAnyModalOpen() {
 async function autoRefreshFromGAS() {
   if (!GAS_URL) return;
   if (isAnyModalOpen() || draggedUid) return;
+  if (Date.now() - lastLocalEditAt < 6000) return; // 방금 로컬에서 수정했으면 서버 반영 시간을 기다려줌 (덮어쓰기 방지)
   const data = await gasGet('getAll');
   if (data && !data.error) loadAllFromGAS(data);
 }
