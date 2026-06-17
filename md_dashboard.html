@@ -2210,7 +2210,12 @@ async function deleteMeet(i){
   state.meet.splice(i, 1);
   save('meet');
   renderMeet();
-  if(item.idx) await gasPost({action:'deleteMeet', id: item.idx});
+  if(item.idx) {
+    showSync('서버에서 삭제 중...','');
+    const res = await gasPost({action:'deleteMeet', id: item.idx});
+    if (res && res.deleted) showSync('✓ 삭제 완료','ok');
+    else showSync('⚠ 서버에서 못 찾음 (id 불일치 가능)','err');
+  }
 }
 
 function openMeetUrl(i){
@@ -2266,7 +2271,12 @@ async function deleteTool(i){
   state.tools.splice(i, 1);
   save('tools');
   renderTool();
-  if(item.idx) await gasPost({action:'deleteTool', id: item.idx});
+  if(item.idx) {
+    showSync('서버에서 삭제 중...','');
+    const res = await gasPost({action:'deleteTool', id: item.idx});
+    if (res && res.deleted) showSync('✓ 삭제 완료','ok');
+    else showSync('⚠ 서버에서 못 찾음 (id 불일치 가능)','err');
+  }
 }
 
 function openToolEdit(i){
