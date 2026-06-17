@@ -253,54 +253,62 @@
 
   /* ── ISSUE Calendar ── */
   .cal-nav {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 10px; font-size: 17px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 12px; font-size: 16px; font-weight: 700;
+    color: #ffffff; gap: 14px;
   }
-  .cal-nav button { background: none; border: none; cursor: pointer; font-size: 20px; color: var(--gray-600); padding: 0 6px; }
+  .cal-nav button { background: none; border: none; cursor: pointer; font-size: 17px; color: #9aa1c0; padding: 0 4px; }
+  .cal-nav button:hover { color: #ffffff; }
 
-  /* 선 그리드 캘린더 */
+  /* 다크 네이비 + 둥근 타일 캘린더 */
   .cal-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    border-top: 1.5px solid #d1d5db;
-    border-left: 1.5px solid #d1d5db;
+    gap: 4px;
   }
   .cal-day-header {
-    font-size: 12px; font-weight: 600; padding: 6px 0;
+    font-size: 11px; font-weight: 600; padding: 2px 0 8px;
     text-align: center;
-    border-right: 1.5px solid #d1d5db;
-    border-bottom: 1.5px solid #d1d5db;
-    color: var(--gray-400);
-    background: #fafafa;
+    color: #9aa1c0;
   }
-  .cal-day-header.sun { color: #ef4444; }
-  .cal-day-header.sat { color: #ef4444; opacity: 0.7; }
+  .cal-day-header.sun, .cal-day-header.sat { color: #9aa1c0; }
   .cal-day {
-    font-size: 14px; padding: 6px 4px;
+    font-size: 13px; font-weight: 500; padding: 6px 4px 4px;
     cursor: pointer; position: relative;
     min-height: 36px; display: flex; flex-direction: column;
     align-items: center; justify-content: flex-start;
-    line-height: 1;
-    border-right: 1.5px solid #d1d5db;
-    border-bottom: 1.5px solid #d1d5db;
-    transition: background 0.1s;
+    line-height: 1; color: #e6e8f3;
+    background: #454d74; border-radius: 8px;
+    transition: background 0.12s;
   }
-  .cal-day:hover { background: #f0f4ff; }
+  .cal-day:hover { background: #525b89; }
   .cal-day.today {
-    background: var(--blue); color: white; font-weight: 700; border-radius: 0;
+    background: #8fd0f0; color: #1c2540; font-weight: 700;
   }
-  .cal-day.today:hover { background: var(--blue-mid); }
-  .cal-day.other-month { color: #d1d5db; }
-  .cal-day.weekend { color: #ef4444; opacity: 0.75; }
-  .cal-day.holiday { color: #ef4444; opacity: 0.75; }
-  .cal-day.today.weekend, .cal-day.today.holiday { color: white; opacity: 1; }
+  .cal-day.today:hover { background: #7ec3e8; }
+  .cal-day.other-month { background: transparent; color: #454d74; cursor: default; }
+  .cal-day.weekend, .cal-day.holiday { color: #f0a3a3; }
+  .cal-day.today.weekend, .cal-day.today.holiday { color: #1c2540; opacity: 1; }
   .cal-day.has-issue::after {
-    content: ''; display: block; width: 5px; height: 5px;
-    border-radius: 50%; background: var(--red); margin-top: 3px;
+    content: ''; display: block; width: 4px; height: 4px;
+    border-radius: 50%; background: #8fd0f0; margin-top: 3px;
   }
-  .cal-day.today.has-issue::after { background: white; }
+  .cal-day.today.has-issue::after { background: #1c2540; }
 
-  /* 이슈 리스트 (캘린더 하단) */
+  /* 기간(여러 날)짜리 이슈 - 셀 위에 겹쳐서 그리는 막대바 (이어진 모양) */
+  .cal-event-bar {
+    position: absolute; height: 17px;
+    background: #8fd0f0; color: #1c2540;
+    border-radius: 3px; font-size: 10.5px; font-weight: 700;
+    display: flex; align-items: center; padding-left: 6px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    pointer-events: none; z-index: 5;
+  }
+  .cal-event-bar.bar-round-left { border-radius: 8px 3px 3px 8px; padding-left: 8px; }
+  .cal-event-bar.bar-round-right { border-radius: 3px 8px 8px 3px; }
+  .cal-event-bar.bar-round-left.bar-round-right { border-radius: 8px; }
+
+  /* 이슈 리스트 (캘린더 하단) - 다크 테마 */
   .issue-list-below {
     margin-top: 10px; overflow-y: auto;
     flex: 1; min-height: 0;
@@ -308,22 +316,25 @@
   .issue-list-item {
     display: flex; align-items: baseline; gap: 8px;
     padding: 5px 2px; font-size: 13px;
-    border-bottom: 1px solid #f0f0ee;
+    border-bottom: 1px solid #454d74;
   }
   .issue-list-item:last-child { border-bottom: none; }
   .issue-list-item .dot {
     width: 6px; height: 6px; border-radius: 50%;
-    background: #aaa; flex-shrink: 0; margin-top: 4px;
+    background: #8fd0f0; flex-shrink: 0; margin-top: 4px;
   }
-  .issue-list-item.is-holiday .dot { background: #ef4444; }
+  .issue-list-item.is-holiday .dot { background: #f0a3a3; }
   .issue-list-item .iss-label {
     font-family: 'DM Mono', monospace; font-size: 12px;
-    color: #555; flex-shrink: 0; white-space: nowrap;
+    color: #cfd2e6; flex-shrink: 0; white-space: nowrap;
   }
-  .issue-list-item.is-holiday .iss-label { color: #ef4444; }
-  .issue-list-item .iss-text { color: #111; flex: 1; }
-  .issue-list-item.is-holiday .iss-text { color: #ef4444; }
-  .issue-list-item .iss-d { font-size: 11px; color: #aaa; flex-shrink: 0; }
+  .issue-list-item.is-holiday .iss-label { color: #f0a3a3; }
+  .issue-list-item .iss-text { color: #ffffff; flex: 1; }
+  .issue-list-item.is-holiday .iss-text { color: #f0a3a3; }
+  .issue-list-item .iss-d { font-size: 11px; color: #8389ab; flex-shrink: 0; }
+
+  /* Calendar 모듈 전체 바디를 다크 네이비로 */
+  .module[data-type="issue"] .cell-body { background: #363d5c; }
 
   .issue-tooltip {
     display: none; position: fixed; background: var(--black); color: white;
@@ -682,11 +693,19 @@
   <div class="modal" style="width:420px;">
     <button class="modal-close" onclick="closeModal('modalIssueWrite')">✕</button>
     <h3>📅 이슈 관리</h3>
-    <label>날짜</label>
-    <input type="date" id="issueDate" onchange="renderIssueDateList()">
+    <div style="display:flex;gap:8px;">
+      <div style="flex:1;">
+        <label>시작일</label>
+        <input type="date" id="issueStartDate" onchange="onIssueStartDateChange()">
+      </div>
+      <div style="flex:1;">
+        <label>종료일</label>
+        <input type="date" id="issueEndDate" onchange="renderIssueDateList()">
+      </div>
+    </div>
     <!-- 해당 날짜 기존 이슈 목록 -->
     <div id="issueDateList" style="margin-top:10px;max-height:140px;overflow-y:auto;"></div>
-    <label style="margin-top:12px;">새 이슈 추가</label>
+    <label style="margin-top:12px;">새 이슈 추가 <span style="font-size:11px;color:var(--gray-400);font-weight:400;">(예: 6/17~6/19 휴가는 시작일 6/17, 종료일 6/19로 설정)</span></label>
     <div style="display:flex;gap:6px;">
       <input type="text" id="issueContent" placeholder="예: 김팀장 생일 🎂" style="flex:1;">
       <button class="btn-primary" style="padding:7px 14px;white-space:nowrap;" onclick="submitIssue()">추가</button>
@@ -852,7 +871,12 @@ const DEFAULT_SHARES = Array.from({length:5}, (_,i) => ({idx:i, name:'내용', d
 
 const state = {
   notices:   JSON.parse(localStorage.getItem('notices')   || '[]'),
-  issues:    JSON.parse(localStorage.getItem('issues')    || '[]'),
+  issues:    JSON.parse(localStorage.getItem('issues')    || '[]').map(iss => ({
+    id: iss.id,
+    startDate: iss.startDate || iss.date,
+    endDate: iss.endDate || iss.startDate || iss.date,
+    content: iss.content
+  })),
   billboard: JSON.parse(localStorage.getItem('billboard') || '[]'),
   meet:      JSON.parse(localStorage.getItem('meet')      || JSON.stringify(DEFAULT_MEET)),
   tools:     JSON.parse(localStorage.getItem('tools')     || JSON.stringify(DEFAULT_TOOLS)),
@@ -882,8 +906,8 @@ const MODULE_DEFS = {
     bodyHTML: `<div class="billboard-inner" data-role="billboardInner"><div class="billboard-empty" data-role="bbEmpty">이미지/영상을 업로드하거나 URL을 추가하세요</div><div class="billboard-dots" data-role="bbDots"></div><button class="bb-settings-btn" onclick="openBBSettings()">⚙ 설정</button></div>`,
   },
   issue: {
-    title: 'ISSUE',
-    desc: '팀 캘린더 & 이슈 등록',
+    title: 'Calendar',
+    desc: '팀 캘린더 & 이슈 등록 (기간 설정 가능)',
     defaultSize: 1,
     headerActions: `<button class="btn-sm" onclick="openIssueWrite()">+ 추가</button>`,
     bodyStyle: 'display:flex;flex-direction:column;gap:0;padding-bottom:10px;',
@@ -1246,8 +1270,12 @@ function normalizeDate(raw) {
 function loadAllFromGAS(data) {
   if (data.notices  && data.notices.length)  { state.notices  = data.notices;  save('notices'); }
   if (data.issues   && data.issues.length)   {
-    // 날짜 정규화 적용
-    state.issues = data.issues.map(iss => ({...iss, date: normalizeDate(iss.date)}));
+    // 날짜 정규화 + 기간(startDate/endDate) 정규화 — 구버전 단일 date 필드 호환 포함
+    state.issues = data.issues.map(iss => {
+      const startDate = normalizeDate(iss.startDate || iss.date);
+      const endDate = normalizeDate(iss.endDate || iss.startDate || iss.date);
+      return { id: iss.id, startDate, endDate: endDate || startDate, content: iss.content };
+    });
     save('issues');
   }
   if (data.billboard&& data.billboard.length){ state.billboard= data.billboard; save('billboard'); }
@@ -1620,8 +1648,14 @@ function renderCal() {
   renderIssueListBelow();
 }
 
+// 셀 사이즈 상수 (다크 캘린더 - 막대바를 위한 여유 공간 계산용)
+const CAL_BASE_CELL_H = 36;  // 숫자만 있을 때 기본 셀 높이
+const CAL_LANE_STEP = 19;    // 막대바 한 줄(높이+간격)
+const CAL_BAR_TOP_OFFSET = 30; // 첫 막대바가 시작되는 top 위치(숫자 아래)
+
 function buildCalGridInto(grid) {
   grid.innerHTML = '';
+  grid.style.position = 'relative';
 
   // 요일 헤더
   ['일','월','화','수','목','금','토'].forEach((d, i) => {
@@ -1635,12 +1669,20 @@ function buildCalGridInto(grid) {
   const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
   const prevDays = new Date(calYear, calMonth, 0).getDate();
 
-  // 이전달 빈칸
+  // 1) 이번달에 걸치는 기간(여러 날) 이슈 → 행(주) 단위로 분할 + lane 배정
+  const { segments, rowMaxLane } = computeEventLanes(firstDay, daysInMonth);
+
+  const cellEls = {}; // flatIndex(row*7+col) -> day cell element (오버레이 위치 계산용)
+  const getRowMinH = (row) => CAL_BASE_CELL_H + ((rowMaxLane[row] ?? -1) + 1) * CAL_LANE_STEP;
+
+  // 이전달 빈칸 (항상 row 0)
   for (let i = 0; i < firstDay; i++) {
     const el = document.createElement('div');
     el.className = 'cal-day other-month';
     el.textContent = prevDays - firstDay + 1 + i;
+    el.style.minHeight = getRowMinH(0) + 'px';
     grid.appendChild(el);
+    cellEls[i] = el;
   }
 
   // 이번달 날짜
@@ -1651,18 +1693,27 @@ function buildCalGridInto(grid) {
     const dow = new Date(calYear, calMonth, d).getDay();
     const isWeekend = (dow === 0 || dow === 6);
     const isHoliday = !!HOLIDAYS[ds];
+    const flatIdx = firstDay + (d - 1);
+    const row = Math.floor(flatIdx / 7);
 
     if (d === today.getDate() && calMonth === today.getMonth() && calYear === today.getFullYear())
       el.classList.add('today');
     if (isWeekend) el.classList.add('weekend');
     if (isHoliday) el.classList.add('holiday');
 
-    const issues = state.issues.filter(iss => String(iss.date) === ds);
+    const issues = state.issues.filter(iss => ds >= iss.startDate && ds <= iss.endDate);
+    const hasSingleDay = issues.some(iss => iss.startDate === iss.endDate);
+    if (hasSingleDay) el.classList.add('has-issue');
+
     if (issues.length) {
-      el.classList.add('has-issue');
       el.addEventListener('mouseenter', ev => {
         const tt = document.getElementById('issueTooltip');
-        tt.innerHTML = issues.map(i => `• ${i.content}`).join('<br>');
+        tt.innerHTML = issues.map(i => {
+          const rangeLabel = i.startDate === i.endDate
+            ? ''
+            : `${i.startDate.slice(5).replace('-','/')}~${i.endDate.slice(5).replace('-','/')} `;
+          return `• ${rangeLabel}${i.content}`;
+        }).join('<br>');
         tt.style.display = 'block';
         tt.style.left = (ev.clientX + 10) + 'px';
         tt.style.top = (ev.clientY + 10) + 'px';
@@ -1678,8 +1729,10 @@ function buildCalGridInto(grid) {
     }
 
     el.textContent = d;
-    el.onclick = () => { document.getElementById('issueDate').value = ds; renderIssueDateList(); openModal('modalIssueWrite'); };
+    el.style.minHeight = getRowMinH(row) + 'px';
+    el.onclick = () => { document.getElementById('issueStartDate').value = ds; document.getElementById('issueEndDate').value = ds; renderIssueDateList(); openModal('modalIssueWrite'); };
     grid.appendChild(el);
+    cellEls[flatIdx] = el;
   }
 
   // 다음달 빈칸 채우기 (6줄 고정)
@@ -1689,8 +1742,88 @@ function buildCalGridInto(grid) {
     const el = document.createElement('div');
     el.className = 'cal-day other-month';
     el.textContent = i;
+    const flatIdx = total + i - 1;
+    const row = Math.floor(flatIdx / 7);
+    el.style.minHeight = getRowMinH(row) + 'px';
     grid.appendChild(el);
+    cellEls[flatIdx] = el;
   }
+
+  // 2) 막대바 오버레이 렌더링 (셀이 모두 배치된 뒤, 실제 좌표 기준으로 계산)
+  const gridRect = grid.getBoundingClientRect();
+  segments.forEach(seg => {
+    const startEl = cellEls[seg.row * 7 + seg.colStart];
+    const endEl = cellEls[seg.row * 7 + seg.colEnd];
+    if (!startEl || !endEl) return;
+    const startRect = startEl.getBoundingClientRect();
+    const endRect = endEl.getBoundingClientRect();
+
+    const bar = document.createElement('div');
+    bar.className = 'cal-event-bar' + (seg.roundLeft ? ' bar-round-left' : '') + (seg.roundRight ? ' bar-round-right' : '');
+    bar.style.left = (startRect.left - gridRect.left) + 'px';
+    bar.style.width = (endRect.right - startRect.left) + 'px';
+    bar.style.top = (startRect.top - gridRect.top + CAL_BAR_TOP_OFFSET + seg.lane * CAL_LANE_STEP) + 'px';
+    if (seg.showLabel) bar.textContent = seg.content;
+    bar.title = seg.content;
+    grid.appendChild(bar);
+  });
+}
+
+// 기간(여러 날)짜리 이슈를 주(row) 단위로 분할하고, 겹치는 기간은 다른 lane(줄)에 배치
+function computeEventLanes(firstDay, daysInMonth) {
+  const monthStart = `${calYear}-${String(calMonth+1).padStart(2,'0')}-01`;
+  const monthEnd = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(daysInMonth).padStart(2,'0')}`;
+
+  const ranges = state.issues
+    .filter(iss => iss.startDate !== iss.endDate)
+    .filter(iss => iss.endDate >= monthStart && iss.startDate <= monthEnd)
+    .map(iss => {
+      const clipStart = iss.startDate < monthStart ? monthStart : iss.startDate;
+      const clipEnd = iss.endDate > monthEnd ? monthEnd : iss.endDate;
+      return { content: iss.content, clipStart, clipEnd, isTrueStart: iss.startDate === clipStart, isTrueEnd: iss.endDate === clipEnd };
+    });
+
+  // 각 range를 주(row) 경계에서 분할
+  const segments = [];
+  ranges.forEach(r => {
+    const dStart = parseInt(r.clipStart.slice(8, 10), 10);
+    const dEnd = parseInt(r.clipEnd.slice(8, 10), 10);
+    let curDay = dStart;
+    let first = true;
+    while (curDay <= dEnd) {
+      const idx = firstDay + (curDay - 1);
+      const row = Math.floor(idx / 7);
+      const col = idx % 7;
+      const rowEndDay = Math.min(dEnd, curDay + (6 - col));
+      const rowEndIdx = firstDay + (rowEndDay - 1);
+      segments.push({
+        row, colStart: col, colEnd: rowEndIdx % 7,
+        content: r.content,
+        roundLeft: r.isTrueStart && first,
+        roundRight: r.isTrueEnd && rowEndDay === dEnd,
+        showLabel: first,
+      });
+      curDay = rowEndDay + 1;
+      first = false;
+    }
+  });
+
+  // 행별 lane 배정 (그리디: 겹치지 않으면 같은 lane 재사용)
+  const rowMaxLane = {};
+  const laneOccupancy = {};
+  segments.sort((a, b) => a.row - b.row || a.colStart - b.colStart);
+  segments.forEach(seg => {
+    if (!laneOccupancy[seg.row]) laneOccupancy[seg.row] = [];
+    let lane = 0;
+    while (laneOccupancy[seg.row].some(o => o.lane === lane && !(seg.colEnd < o.colStart || seg.colStart > o.colEnd))) {
+      lane++;
+    }
+    seg.lane = lane;
+    laneOccupancy[seg.row].push({ lane, colStart: seg.colStart, colEnd: seg.colEnd });
+    rowMaxLane[seg.row] = Math.max(rowMaxLane[seg.row] ?? -1, lane);
+  });
+
+  return { segments, rowMaxLane };
 }
 
 function renderIssueListBelow() {
@@ -1698,13 +1831,13 @@ function renderIssueListBelow() {
   if (!els.length) return;
   const todayStr = new Date().toISOString().slice(0, 10);
 
-  // 오늘 이후 이슈 + 공휴일 합쳐서 날짜순 정렬
+  // 오늘 이후 이슈(기간이 아직 끝나지 않은 것 포함) + 공휴일 합쳐서 날짜순 정렬
   const items = [];
 
-  // 이슈
+  // 이슈 — endDate가 아직 지나지 않았으면 (진행 중이거나 예정인 경우) 포함
   state.issues
-    .filter(iss => iss.date >= todayStr)
-    .forEach(iss => items.push({ date: iss.date, text: iss.content, isHoliday: false }));
+    .filter(iss => iss.endDate >= todayStr)
+    .forEach(iss => items.push({ date: iss.startDate, endDate: iss.endDate, text: iss.content, isHoliday: false }));
 
   // 이번달+다음달 공휴일
   [0, 1, 2].forEach(offset => {
@@ -1714,7 +1847,7 @@ function renderIssueListBelow() {
       const [hy, hm] = ds.split('-').map(Number);
       if (hy === y && hm === m && ds >= todayStr) {
         if (!items.find(it => it.date === ds && it.isHoliday))
-          items.push({ date: ds, text: name, isHoliday: true });
+          items.push({ date: ds, endDate: ds, text: name, isHoliday: true });
       }
     });
   });
@@ -1728,8 +1861,10 @@ function renderIssueListBelow() {
         return items.slice(0, 8).map(item => {
           const d = new Date(item.date + 'T00:00:00');
           const diff = Math.round((d - todayMid) / 86400000);
-          const dLabel = diff === 0 ? 'D-00' : `D-${String(diff).padStart(2,'0')}`;
-          const dateLabel = item.date.slice(5).replace('-', '/');
+          const dLabel = diff === 0 ? 'D-00' : diff > 0 ? `D-${String(diff).padStart(2,'0')}` : `D+${String(Math.abs(diff)).padStart(2,'0')}`;
+          const dateLabel = item.date === item.endDate
+            ? item.date.slice(5).replace('-', '/')
+            : `${item.date.slice(5).replace('-', '/')}~${item.endDate.slice(5).replace('-', '/')}`;
           return `<div class="issue-list-item ${item.isHoliday ? 'is-holiday' : ''}">
             <div class="dot"></div>
             <span class="iss-label">${dateLabel} ${item.text}</span>
@@ -1743,22 +1878,39 @@ function renderIssueListBelow() {
 
 function openIssueWrite() {
   const now=new Date();
-  document.getElementById('issueDate').value=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+  document.getElementById('issueStartDate').value = todayStr;
+  document.getElementById('issueEndDate').value = todayStr;
   document.getElementById('issueContent').value='';
   renderIssueDateList();
   openModal('modalIssueWrite');
 }
 
+// 시작일을 바꾸면 종료일이 시작일보다 이전일 때만 자동으로 맞춰줌 (기존에 늘려둔 기간은 유지)
+function onIssueStartDateChange() {
+  const startEl = document.getElementById('issueStartDate');
+  const endEl = document.getElementById('issueEndDate');
+  if (!endEl.value || endEl.value < startEl.value) endEl.value = startEl.value;
+  renderIssueDateList();
+}
+
 function renderIssueDateList() {
-  const date = document.getElementById('issueDate').value;
+  const date = document.getElementById('issueStartDate').value;
   const el = document.getElementById('issueDateList');
-  const dayIssues = state.issues.filter(iss => iss.date === date);
+  if (!date) { el.innerHTML = ''; return; }
+  // 시작일이 이 날짜를 포함하는 모든 이슈 (기간이 겹치는 것 포함)
+  const dayIssues = state.issues.filter(iss => date >= iss.startDate && date <= iss.endDate);
   if (!dayIssues.length) { el.innerHTML = '<div style="font-size:12px;color:var(--gray-400);padding:4px 0;">이 날짜에 등록된 이슈가 없습니다.</div>'; return; }
-  el.innerHTML = dayIssues.map((iss, i) => `
+  el.innerHTML = dayIssues.map((iss) => {
+    const rangeLabel = iss.startDate === iss.endDate
+      ? ''
+      : `<span style="color:var(--gray-400);font-size:11px;margin-right:5px;">${iss.startDate.slice(5).replace('-','/')}~${iss.endDate.slice(5).replace('-','/')}</span>`;
+    return `
     <div style="display:flex;align-items:center;gap:8px;padding:6px 8px;background:var(--gray-100);border-radius:5px;margin-bottom:5px;font-size:13px;">
-      <span style="flex:1;">• ${iss.content}</span>
+      <span style="flex:1;">• ${rangeLabel}${iss.content}</span>
       <button onclick="deleteIssue('${iss.id}')" style="font-size:11px;color:var(--red);background:none;border:none;cursor:pointer;flex-shrink:0;">✕ 삭제</button>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 async function deleteIssue(id) {
@@ -1771,10 +1923,12 @@ async function deleteIssue(id) {
 }
 
 async function submitIssue() {
-  const date=document.getElementById('issueDate').value;
+  const startDate=document.getElementById('issueStartDate').value;
+  let endDate=document.getElementById('issueEndDate').value;
   const content=document.getElementById('issueContent').value.trim();
-  if(!date||!content) return alert('날짜와 내용을 모두 입력하세요.');
-  const issue={id:Date.now(), date, content};
+  if(!startDate||!content) return alert('시작일과 내용을 모두 입력하세요.');
+  if(!endDate || endDate < startDate) endDate = startDate;
+  const issue={id:Date.now(), startDate, endDate, content};
   state.issues.push(issue); save('issues'); renderCal(); renderIssueListBelow();
   document.getElementById('issueContent').value='';
   renderIssueDateList();
@@ -1791,8 +1945,8 @@ let bubbleIdx = 0;
 function getUpcomingIssues() {
   const todayStr = new Date().toISOString().slice(0,10);
   return [...state.issues]
-    .filter(iss => iss.date >= todayStr)
-    .sort((a,b) => a.date.localeCompare(b.date));
+    .filter(iss => iss.endDate >= todayStr) // 아직 끝나지 않은(진행 중 또는 예정) 이슈
+    .sort((a,b) => a.startDate.localeCompare(b.startDate));
 }
 
 function startIssueBubble() {
@@ -1802,12 +1956,12 @@ function startIssueBubble() {
   const upcoming = getUpcomingIssues();
   if (!upcoming.length) { bubbles.forEach(b => b.style.display='none'); return; }
 
-  // 날짜 그룹 수 계산
+  // 날짜 그룹 수 계산 (같은 시작일끼리 묶음)
   const dateGroups = [];
   upcoming.forEach(iss => {
     const last = dateGroups[dateGroups.length - 1];
-    if (last && last.date === iss.date) last.items.push(iss.content);
-    else dateGroups.push({ date: iss.date, items: [iss.content] });
+    if (last && last.date === iss.startDate) last.items.push(iss);
+    else dateGroups.push({ date: iss.startDate, items: [iss] });
   });
 
   bubbleIdx = 0;
@@ -1831,12 +1985,12 @@ function showBubble(upcoming) {
   if (!bubbles.length) return; // ISSUE 모듈이 없는 경우
   if (!upcoming.length) { bubbles.forEach(b => b.style.display = 'none'); return; }
 
-  // 같은 날짜 이슈 묶기 — bubbleIdx는 날짜 기준으로 순환
+  // 같은 시작일 이슈 묶기 — bubbleIdx는 날짜 기준으로 순환
   const dateGroups = [];
   upcoming.forEach(iss => {
     const last = dateGroups[dateGroups.length - 1];
-    if (last && last.date === iss.date) last.items.push(iss.content);
-    else dateGroups.push({ date: iss.date, items: [iss.content] });
+    if (last && last.date === iss.startDate) last.items.push(iss);
+    else dateGroups.push({ date: iss.startDate, items: [iss] });
   });
   const group = dateGroups[bubbleIdx % dateGroups.length];
 
@@ -1845,10 +1999,12 @@ function showBubble(upcoming) {
   const todayMid = new Date(); todayMid.setHours(0,0,0,0);
   const diff = Math.round((d - todayMid) / 86400000);
   const dLabel = diff === 0 ? 'D-00' : diff > 0 ? `D-${String(diff).padStart(2,'0')}` : `D+${String(Math.abs(diff)).padStart(2,'0')}`;
-  const dateLabel = group.date.slice(5).replace('-', '/');
-  const contentHTML = group.items.map(item =>
-    `<div><span style="color:#888;font-family:'DM Mono',monospace;margin-right:6px;font-size:11px;">${dateLabel}</span>${item}<span style="color:#aaa;font-size:11px;margin-left:7px;">(${dLabel})</span></div>`
-  ).join('');
+  const contentHTML = group.items.map(iss => {
+    const dateLabel = iss.startDate === iss.endDate
+      ? iss.startDate.slice(5).replace('-', '/')
+      : `${iss.startDate.slice(5).replace('-', '/')}~${iss.endDate.slice(5).replace('-', '/')}`;
+    return `<div><span style="color:#888;font-family:'DM Mono',monospace;margin-right:6px;font-size:11px;">${dateLabel}</span>${iss.content}<span style="color:#aaa;font-size:11px;margin-left:7px;">(${dLabel})</span></div>`;
+  }).join('');
 
   const [y, m, dayNum] = group.date.split('-').map(Number);
   const isCurrentMonth = (y === calYear && m === calMonth + 1);
