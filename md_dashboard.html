@@ -388,6 +388,75 @@
   }
   .share-edit-btn:hover { opacity: 1; }
 
+  /* ── TEAM CARD ── */
+  .module[data-type="teamcard"] .cell-header { background: #dbeafe; }
+
+  .tc-top { display: flex; gap: 10px; margin-bottom: 12px; }
+  .tc-photo {
+    width: 96px; height: 96px; flex-shrink: 0;
+    border: 1.5px dashed var(--gray-400); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; overflow: hidden; background: var(--gray-100);
+    transition: border-color 0.15s;
+  }
+  .tc-photo:hover { border-color: var(--blue); }
+  .tc-photo-placeholder { font-size: 12px; color: var(--gray-400); }
+  .tc-photo img { width: 100%; height: 100%; object-fit: cover; }
+  .tc-bubbles { flex: 1; display: flex; flex-direction: column; gap: 8px; justify-content: center; min-width: 0; }
+  .tc-bubble {
+    position: relative; background: var(--gray-100); border-radius: 8px;
+    padding: 6px 12px; font-size: 12.5px; line-height: 1.4; color: var(--black);
+    cursor: pointer; box-sizing: border-box;
+  }
+  /* 직무: 한 줄 고정, 넘치면 ... 처리 */
+  .tc-bubble-job {
+    height: 29px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    display: flex; align-items: center;
+  }
+  /* 한마디: 두 줄 고정, 넘치면 잘라서 표시 */
+  .tc-bubble-comment {
+    height: 50px;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    overflow: hidden; overflow-wrap: break-word;
+  }
+  .tc-bubble-tail {
+    position: absolute; left: -5px; top: 50%; transform: translateY(-50%);
+    width: 0; height: 0;
+    border-top: 6px solid transparent; border-bottom: 6px solid transparent;
+    border-right: 6px solid var(--gray-100);
+  }
+  .tc-mission { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+  .tc-mission-nav {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    background: var(--blue-light); border-radius: 6px;
+    padding: 7px 10px; font-size: 12.5px; font-weight: 600; color: var(--blue);
+    margin-bottom: 8px; flex-shrink: 0;
+  }
+  .tc-mission-nav button { background: none; border: none; cursor: pointer; font-size: 14px; color: var(--blue); padding: 0 4px; }
+  .tc-mission-nav button:disabled { color: var(--gray-400); cursor: default; opacity: 0.4; }
+  .tc-mission-box {
+    flex: 1; min-height: 0; position: relative;
+    border: 1px solid var(--gray-200); border-radius: 8px;
+    padding: 10px 10px 36px 10px; display: flex;
+  }
+  .tc-mission-text {
+    flex: 1; width: 100%; border: none; outline: none; resize: none;
+    font-family: 'DM Sans', sans-serif; font-size: 12.5px; color: var(--black);
+    background: transparent; line-height: 1.6;
+  }
+  .tc-mission-text::placeholder { color: var(--gray-400); }
+  .tc-mission-text[readonly] { cursor: default; }
+  .tc-mission-actions { position: absolute; bottom: 8px; right: 10px; display: flex; gap: 5px; }
+  .tc-mission-btn {
+    font-size: 10.5px; padding: 3px 9px; border-radius: 4px;
+    border: 1px solid var(--gray-200); background: var(--white); color: var(--gray-600);
+    cursor: pointer; font-family: 'DM Sans', sans-serif;
+  }
+  .tc-mission-btn:hover { background: var(--gray-100); }
+  .tc-mission-btn.tc-mission-save { background: var(--blue); color: white; border-color: var(--blue); }
+  .tc-mission-btn.tc-mission-save:hover { opacity: 0.85; }
+
   /* ── TBD ── */
   
   
@@ -678,6 +747,25 @@
   </div>
 </div>
 
+<!-- TEAM CARD 프로필 편집 -->
+<div class="modal-overlay" id="modalTcProfileEdit">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modalTcProfileEdit')">✕</button>
+    <h3>🙂 팀원 프로필 편집</h3>
+    <label>이름</label>
+    <input type="text" id="tcNameInput" placeholder="이름">
+    <label>직무 <span style="font-size:10px;color:var(--gray-400);">(최대 16자, 한 줄)</span></label>
+    <input type="text" id="tcJobInput" placeholder="예: MD팀 / 디자이너" maxlength="16">
+    <label>한마디 <span style="font-size:10px;color:var(--gray-400);">(최대 32자, 두 줄)</span></label>
+    <input type="text" id="tcCommentInput" placeholder="짧은 한마디를 남겨보세요" maxlength="32">
+    <div class="gas-setup-note">💡 사진은 카드의 사진 영역을 클릭해서 직접 업로드하세요.</div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modalTcProfileEdit')">취소</button>
+      <button class="btn-primary" onclick="saveTcProfile()">저장</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ============================================================
 // CONFIG
@@ -769,6 +857,7 @@ const state = {
   meet:      JSON.parse(localStorage.getItem('meet')      || JSON.stringify(DEFAULT_MEET)),
   tools:     JSON.parse(localStorage.getItem('tools')     || JSON.stringify(DEFAULT_TOOLS)),
   shares:    JSON.parse(localStorage.getItem('shares')    || JSON.stringify(DEFAULT_SHARES)),
+  teamcards: JSON.parse(localStorage.getItem('teamcards') || '{}'), // { uid: {name, job, comment, photo, missions:{YYYY-MM:text}} }
 };
 
 function save(key) { localStorage.setItem(key, JSON.stringify(state[key])); }
@@ -836,6 +925,46 @@ const MODULE_DEFS = {
     headerActions: `<button class="btn-sm" onclick="addShareItem()">+ 추가</button>`,
     bodyHTML: `<div class="share-list" data-role="shareList"></div>`,
   },
+  teamcard: {
+    title: 'TEAM CARD',
+    desc: '팀원 프로필 카드 (사진/직무/한마디/먼슬리 미션)',
+    defaultSize: 1,
+    dynamicTitle: (uid) => (state.teamcards[uid]?.name) || '이름 입력',
+    headerActions: (uid) => `<button class="btn-sm" onclick="openTcProfileEdit('${uid}')">✏ 편집</button>`,
+    bodyHTML: (uid) => `
+      <div class="tc-top">
+        <div class="tc-photo" data-role="tcPhoto" onclick="document.getElementById('tcPhotoInput_${uid}').click()">
+          <span class="tc-photo-placeholder" data-role="tcPhotoPlaceholder">사진</span>
+          <img data-role="tcPhotoImg" style="display:none;">
+        </div>
+        <input type="file" id="tcPhotoInput_${uid}" accept="image/*" style="display:none" onchange="handleTcPhotoUpload(event, '${uid}')">
+        <div class="tc-bubbles">
+          <div class="tc-bubble tc-bubble-job">
+            <span class="tc-bubble-tail"></span>
+            <span data-role="tcJob">직무</span>
+          </div>
+          <div class="tc-bubble tc-bubble-comment">
+            <span class="tc-bubble-tail"></span>
+            <span data-role="tcComment">한마디</span>
+          </div>
+        </div>
+      </div>
+      <div class="tc-mission">
+        <div class="tc-mission-nav">
+          <button onclick="tcMonthNav('${uid}', -1)">‹</button>
+          <span class="tc-mission-title" data-role="tcMissionTitle"></span>
+          <button onclick="tcMonthNav('${uid}', 1)">›</button>
+        </div>
+        <div class="tc-mission-box">
+          <textarea class="tc-mission-text" data-role="tcMissionText" placeholder="이번 달 미션을 입력해보세요" readonly></textarea>
+          <div class="tc-mission-actions">
+            <button class="tc-mission-btn" data-role="tcMissionEditBtn" onclick="tcMissionToggleEdit('${uid}')">수정</button>
+            <button class="tc-mission-btn tc-mission-save" data-role="tcMissionSaveBtn" style="display:none;" onclick="tcMissionSave('${uid}')">저장</button>
+          </div>
+        </div>
+      </div>
+    `,
+  },
 };
 
 // 모듈 배경색 팔레트 (추가 시에만 선택)
@@ -883,29 +1012,34 @@ function renderLayout() {
     el.style.gridColumn = `span ${mod.size}`;
     el.draggable = false;
 
+    const titleText = def.dynamicTitle ? def.dynamicTitle(mod.uid) : def.title;
+    const headerActionsHTML = typeof def.headerActions === 'function' ? def.headerActions(mod.uid) : (def.headerActions || '');
+
     const header = document.createElement('div');
     header.className = 'cell-header';
     header.innerHTML = `
       <div class="module-header-left">
         ${buildGripHTML()}
-        <span class="module-title">${def.title}</span>
+        <span class="module-title" data-role="moduleTitle">${titleText}</span>
       </div>
       <div class="module-header-right">
-        ${def.headerActions || ''}
+        ${headerActionsHTML}
         <button class="module-delete-btn" onclick="removeModule('${mod.uid}')" title="모듈 삭제">✕</button>
       </div>
     `;
     el.appendChild(header);
 
+    const bodyHTML = typeof def.bodyHTML === 'function' ? def.bodyHTML(mod.uid) : def.bodyHTML;
+
     if (def.rawBody) {
       const tmp = document.createElement('div');
-      tmp.innerHTML = def.bodyHTML;
+      tmp.innerHTML = bodyHTML;
       while (tmp.firstChild) el.appendChild(tmp.firstChild);
     } else {
       const body = document.createElement('div');
       body.className = 'cell-body';
       if (def.bodyStyle) body.style.cssText = def.bodyStyle;
-      body.innerHTML = def.bodyHTML;
+      body.innerHTML = bodyHTML;
       el.appendChild(body);
     }
 
@@ -932,6 +1066,13 @@ function removeModule(uid) {
   if (remainingOfType === 0) {
     if (mod.type === 'issue') clearInterval(bubbleTimer);
     if (mod.type === 'billboard') clearInterval(bbInterval);
+  }
+
+  // TEAM CARD는 인스턴스별 고유 데이터라서 모듈 삭제 시 데이터도 함께 삭제
+  if (mod.type === 'teamcard') {
+    delete state.teamcards[uid];
+    save('teamcards');
+    gasPost({ action: 'deleteTeamcard', id: uid });
   }
 
   state.layout = state.layout.filter(m => m.uid !== uid);
@@ -1011,6 +1152,13 @@ function confirmAddModule() {
   const uid = 'm_' + pickerType + '_' + Date.now();
   state.layout.push({ uid, type: pickerType, size: pickerSize, bg: pickerBg });
   saveLayout();
+
+  if (pickerType === 'teamcard') {
+    state.teamcards[uid] = { name: '', job: '', comment: '', photo: '', missions: {} };
+    save('teamcards');
+    gasPost({ action: 'updateTeamcard', data: { uid, name:'', job:'', comment:'', photo:'', missions: '{}' } });
+  }
+
   closeModal('modalModulePicker');
   renderLayout();
   renderAll();
@@ -1107,6 +1255,24 @@ function loadAllFromGAS(data) {
   if (data.tools    && data.tools.length)    { state.tools    = data.tools.map(t => ({...t, idx: Number(t.idx)})); save('tools'); }
   if (data.shares   && data.shares.length)   { state.shares   = data.shares.map(s => ({...s, idx: Number(s.idx)}));save('shares'); }
 
+  // TEAM CARD — uid 기준 객체로 병합
+  if (data.teamcards && data.teamcards.length) {
+    const merged = {};
+    data.teamcards.forEach(tc => {
+      let missions = {};
+      try { missions = JSON.parse(tc.missions || '{}'); } catch(e) { missions = {}; }
+      merged[String(tc.uid)] = {
+        name: tc.name || '',
+        job: tc.job || '',
+        comment: tc.comment || '',
+        photo: tc.photo || '',
+        missions
+      };
+    });
+    state.teamcards = merged;
+    save('teamcards');
+  }
+
   // 레이아웃 — 팀 전체 공유 (GAS에 있으면 그게 우선, 구조가 바뀌었으면 모듈 그리드 재생성)
   let layoutChanged = false;
   if (data.layout && data.layout.length) {
@@ -1151,6 +1317,7 @@ function renderAll() {
   renderMeet();
   renderTool();
   renderShare();
+  renderTeamcards();
 }
 
 // ============================================================
@@ -1908,6 +2075,197 @@ async function saveShare(){
   showSync('저장 중...','');
   const res=await gasPost({action:'updateShare',data:state.shares[editShareIdx]});
   showSync(res?.success?'✓ 저장됨':'⚠ 로컬만 저장',res?.success?'ok':'err');
+}
+
+// ============================================================
+// 7. TEAM CARD (팀원 프로필 카드 - 인스턴스별 독립 데이터)
+// ============================================================
+let tcViewMonth = {};      // { uid: {year, month} } - 현재 보고 있는 월 (개인 화면별, 동기화 안 함)
+let editTcUid = null;      // 프로필 편집 모달에서 현재 편집 중인 uid
+
+// 미션 네비게이션 가능 범위: 시작 2026-06 ~ (오늘 기준 다음달)까지
+function tcGetBounds() {
+  const now = new Date();
+  let maxYear = now.getFullYear();
+  let maxMonth = now.getMonth() + 1 + 1; // 1-based + 다음달
+  if (maxMonth > 12) { maxMonth -= 12; maxYear += 1; }
+  return { minYear: 2026, minMonth: 6, maxYear, maxMonth };
+}
+
+function tcMonthKey(y, m) { return `${y}-${String(m).padStart(2,'0')}`; }
+
+function tcGetViewMonth(uid) {
+  if (!tcViewMonth[uid]) {
+    const now = new Date();
+    tcViewMonth[uid] = { year: now.getFullYear(), month: now.getMonth() + 1 };
+  }
+  return tcViewMonth[uid];
+}
+
+function ensureTcEntry(uid) {
+  if (!state.teamcards[uid]) {
+    state.teamcards[uid] = { name: '', job: '', comment: '', photo: '', missions: {} };
+  }
+  return state.teamcards[uid];
+}
+
+function renderTeamcards() {
+  const modules = document.querySelectorAll('.module[data-type="teamcard"]');
+  if (!modules.length) return;
+
+  const bounds = tcGetBounds();
+
+  modules.forEach(mod => {
+    const uid = mod.dataset.uid;
+    const data = ensureTcEntry(uid);
+    const view = tcGetViewMonth(uid);
+
+    // 헤더 이름
+    const titleEl = mod.querySelector('[data-role="moduleTitle"]');
+    if (titleEl) titleEl.textContent = data.name || '이름 입력';
+
+    // 사진
+    const photoImg = mod.querySelector('[data-role="tcPhotoImg"]');
+    const photoPlaceholder = mod.querySelector('[data-role="tcPhotoPlaceholder"]');
+    if (photoImg && photoPlaceholder) {
+      if (data.photo) {
+        photoImg.src = data.photo;
+        photoImg.style.display = 'block';
+        photoPlaceholder.style.display = 'none';
+      } else {
+        photoImg.style.display = 'none';
+        photoPlaceholder.style.display = 'block';
+      }
+    }
+
+    // 직무 / 한마디
+    const jobEl = mod.querySelector('[data-role="tcJob"]');
+    const commentEl = mod.querySelector('[data-role="tcComment"]');
+    if (jobEl) jobEl.textContent = data.job || '직무';
+    if (commentEl) commentEl.textContent = data.comment || '한마디';
+
+    // Monthly Mission 타이틀 + 네비 화살표 활성/비활성
+    const titleSpan = mod.querySelector('[data-role="tcMissionTitle"]');
+    if (titleSpan) {
+      titleSpan.textContent = `${String(view.year).slice(2)}.${String(view.month).padStart(2,'0')} Monthly Mission`;
+    }
+    const navBtns = mod.querySelectorAll('.tc-mission-nav button');
+    if (navBtns.length === 2) {
+      const atMin = (view.year === bounds.minYear && view.month === bounds.minMonth);
+      const atMax = (view.year === bounds.maxYear && view.month === bounds.maxMonth);
+      navBtns[0].disabled = atMin;
+      navBtns[1].disabled = atMax;
+    }
+
+    // 미션 내용
+    const textEl = mod.querySelector('[data-role="tcMissionText"]');
+    if (textEl) {
+      const key = tcMonthKey(view.year, view.month);
+      textEl.value = (data.missions && data.missions[key]) || '';
+    }
+  });
+}
+
+function tcMonthNav(uid, delta) {
+  const bounds = tcGetBounds();
+  const view = tcGetViewMonth(uid);
+  let { year, month } = view;
+  month += delta;
+  if (month > 12) { month = 1; year += 1; }
+  if (month < 1) { month = 12; year -= 1; }
+
+  // 범위 제한
+  const beforeMin = (year < bounds.minYear) || (year === bounds.minYear && month < bounds.minMonth);
+  const afterMax  = (year > bounds.maxYear) || (year === bounds.maxYear && month > bounds.maxMonth);
+  if (beforeMin || afterMax) return;
+
+  tcViewMonth[uid] = { year, month };
+  renderTeamcards();
+}
+
+function tcMissionToggleEdit(uid) {
+  const mod = document.querySelector(`.module[data-uid="${uid}"]`);
+  if (!mod) return;
+  const textEl = mod.querySelector('[data-role="tcMissionText"]');
+  const editBtn = mod.querySelector('[data-role="tcMissionEditBtn"]');
+  const saveBtn = mod.querySelector('[data-role="tcMissionSaveBtn"]');
+  if (textEl) { textEl.readOnly = false; textEl.focus(); }
+  if (editBtn) editBtn.style.display = 'none';
+  if (saveBtn) saveBtn.style.display = 'inline-block';
+}
+
+async function tcMissionSave(uid) {
+  const mod = document.querySelector(`.module[data-uid="${uid}"]`);
+  if (!mod) return;
+  const textEl = mod.querySelector('[data-role="tcMissionText"]');
+  const editBtn = mod.querySelector('[data-role="tcMissionEditBtn"]');
+  const saveBtn = mod.querySelector('[data-role="tcMissionSaveBtn"]');
+  const view = tcGetViewMonth(uid);
+  const key = tcMonthKey(view.year, view.month);
+
+  const data = ensureTcEntry(uid);
+  data.missions[key] = textEl ? textEl.value : '';
+  save('teamcards');
+
+  if (textEl) textEl.readOnly = true;
+  if (editBtn) editBtn.style.display = 'inline-block';
+  if (saveBtn) saveBtn.style.display = 'none';
+
+  showSync('미션 저장 중...', '');
+  const res = await gasPost({ action: 'updateTeamcard', data: { uid, ...data, missions: JSON.stringify(data.missions) } });
+  showSync(res?.success ? '✓ 저장됨 (팀 전체 반영)' : '⚠ 로컬만 저장', res?.success ? 'ok' : 'err');
+}
+
+function openTcProfileEdit(uid) {
+  editTcUid = uid;
+  const data = ensureTcEntry(uid);
+  document.getElementById('tcNameInput').value = data.name || '';
+  document.getElementById('tcJobInput').value = data.job || '';
+  document.getElementById('tcCommentInput').value = data.comment || '';
+  openModal('modalTcProfileEdit');
+}
+
+async function saveTcProfile() {
+  if (!editTcUid) return;
+  const data = ensureTcEntry(editTcUid);
+  data.name = document.getElementById('tcNameInput').value.trim();
+  data.job = document.getElementById('tcJobInput').value.trim();
+  data.comment = document.getElementById('tcCommentInput').value.trim();
+  save('teamcards');
+  closeModal('modalTcProfileEdit');
+  renderTeamcards();
+
+  showSync('프로필 저장 중...', '');
+  const res = await gasPost({ action: 'updateTeamcard', data: { uid: editTcUid, ...data, missions: JSON.stringify(data.missions || {}) } });
+  showSync(res?.success ? '✓ 저장됨 (팀 전체 반영)' : '⚠ 로컬만 저장', res?.success ? 'ok' : 'err');
+}
+
+async function handleTcPhotoUpload(event, uid) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const data = ensureTcEntry(uid);
+
+  const reader = new FileReader();
+  const dataUrl = await new Promise(res => { reader.onload = ev => res(ev.target.result); reader.readAsDataURL(file); });
+  data.photo = dataUrl; // 즉시 로컬 미리보기
+  save('teamcards');
+  renderTeamcards();
+
+  if (GAS_URL) {
+    showSync('사진 업로드 중...', '');
+    const b64 = dataUrl.split(',')[1];
+    const res = await gasPost({ action: 'uploadFile', fileName: file.name, mimeType: file.type, fileData: b64 });
+    if (res?.success && res.url) {
+      data.photo = res.url;
+      save('teamcards');
+      renderTeamcards();
+      showSync('✓ 사진 업로드 완료', 'ok');
+    } else {
+      showSync('⚠ 업로드 실패, 로컬 미리보기만 표시', 'err');
+    }
+    await gasPost({ action: 'updateTeamcard', data: { uid, ...data, missions: JSON.stringify(data.missions || {}) } });
+  }
+  event.target.value = '';
 }
 
 // ============================================================
