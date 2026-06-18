@@ -129,6 +129,7 @@
   .module-header-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
   .module-header-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
   .module-title { white-space: nowrap; }
+  .cell-header-dark .module-title { color: #ffffff; }
 
   /* ── 9-dot 드래그 핸들 ── */
   .module-grip {
@@ -1038,7 +1039,23 @@ const BG_COLORS = [
   { key: 'sky',     label: '하늘색', hex: '#dbeafe' },
   { key: 'green',   label: '연두색', hex: '#dcfce7' },
   { key: 'beige',   label: '베이지', hex: '#f5ebdc' },
+  { key: 'black',   label: '검정', hex: '#18181b' },
+  { key: 'red',     label: '빨강', hex: '#b91c1c' },
+  { key: 'darkgreen', label: '초록', hex: '#15803d' },
+  { key: 'darkblue', label: '파랑', hex: '#1d4ed8' },
 ];
+
+// 헤더/배경색으로 어두운 색이 선택되면 글자색을 자동으로 흰색 계열로 바꿔주기 위한 명도 판별
+function isDarkColor(hex) {
+  if (!hex) return false;
+  const h = hex.replace('#', '');
+  const r = parseInt(h.substring(0, 2), 16);
+  const g = parseInt(h.substring(2, 4), 16);
+  const b = parseInt(h.substring(4, 6), 16);
+  // 상대 휘도 계산 (간단 버전)
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance < 0.55;
+}
 
 const DEFAULT_LAYOUT = [
   { uid: 'm_notice',    type: 'notice',    size: 1, bg: '', title: '', headerColor: '' },
@@ -1082,7 +1099,10 @@ function renderLayout() {
 
     const header = document.createElement('div');
     header.className = 'cell-header';
-    if (headerBg) header.style.background = headerBg;
+    if (headerBg) {
+      header.style.background = headerBg;
+      if (isDarkColor(headerBg)) header.classList.add('cell-header-dark');
+    }
     header.innerHTML = `
       <div class="module-header-left">
         ${buildGripHTML()}
