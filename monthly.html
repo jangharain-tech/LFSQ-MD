@@ -4,13 +4,81 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LFSQ MD Monthly Meet — 2026.04</title>
+<script>
+  // 저장된 컬러 테마를 즉시 적용 (깜빡임 방지)
+  (function() {
+    try {
+      var saved = localStorage.getItem('lfsq_theme');
+      if (saved) document.documentElement.setAttribute('data-theme', saved);
+    } catch (e) {}
+  })();
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
+  /* ============================================================
+     컬러 테마 시스템
+     --mint       : 키 컬러(포인트 컬러)
+     --black      : 메인 배경색
+     --white      : 기본 텍스트(제목) 색상
+     --gray-dark  : 보조 배경색 / 로딩 플레이스홀더
+     --text-muted : 보조 텍스트 색상
+     --card-*     : 01~04번 카드(밝은 카드) 색상
+     --card-alt-* : 05·06번 카드(대비 카드) 색상
+     ============================================================ */
   :root {
-    --mint: #C8E832; --mint-light: #DCFA50; --mint-dark: #A8C41A;
-    --black: #111214; --gray-dark: #1E2124; --gray-mid: #2D3035;
+    --mint: #C8E832; --mint-light: #DCFA50; --mint-dark: #A8C41A; --mint-rgb: 200,232,50;
+    --black: #111214; --black-rgb: 17,18,20; --bg2: #13151a;
+    --gray-dark: #1E2124; --gray-mid: #2D3035;
     --white: #F5FAFA; --text-muted: #8899AA;
+    --divider-rgb: 255,255,255;
+    --on-accent: #1a1f0a;
+
+    --card-bg: #c8cac8; --card-bg-hover: #d4d6d4;
+    --card-border: #b0b2b0; --card-border-hover: #b8bab8;
+    --card-haslink-bg: #ffffff; --card-haslink-hover-bg: #f4fca0;
+    --card-text: #0e1200; --card-desc: #3a4a10;
+
+    --card-alt-bg: #2a2d31; --card-alt-bg-hover: #34383d;
+    --card-alt-border: #ffffff; --card-alt-text: #ffffff; --card-alt-desc: #c0c4c0;
   }
+
+  /* 테마 2: 화이트 & 블루 */
+  html[data-theme="blue"] {
+    --mint: #2563EB; --mint-light: #4C82F0; --mint-dark: #1D4ED8; --mint-rgb: 37,99,235;
+    --black: #F7FAFF; --black-rgb: 247,250,255; --bg2: #EEF3FB;
+    --gray-dark: #DCE6F5; --gray-mid: #C7D6EA;
+    --white: #101828; --text-muted: #5B6B84;
+    --divider-rgb: 16,24,40;
+    --on-accent: #ffffff;
+
+    --card-bg: #EAF1FC; --card-bg-hover: #DCE9FB;
+    --card-border: #C7DBF5; --card-border-hover: #AFCBF0;
+    --card-haslink-bg: #ffffff; --card-haslink-hover-bg: #DCEBFF;
+    --card-text: #12233F; --card-desc: #45566E;
+
+    --card-alt-bg: #0F1D33; --card-alt-bg-hover: #16294A;
+    --card-alt-border: #EAF2FF; --card-alt-text: #ffffff; --card-alt-desc: #B7C6DE;
+  }
+
+  /* 테마 3: 베이지 & 브라운 */
+  html[data-theme="brown"] {
+    --mint: #8B5E34; --mint-light: #A9764A; --mint-dark: #6E4A29; --mint-rgb: 139,94,52;
+    --black: #F4E9D8; --black-rgb: 244,233,216; --bg2: #EFE0C9;
+    --gray-dark: #E7D8BE; --gray-mid: #D8C1A0;
+    --white: #3B2A1A; --text-muted: #8A7358;
+    --divider-rgb: 59,42,26;
+    --on-accent: #FBF3E6;
+
+    --card-bg: #E9DAC0; --card-bg-hover: #E1CDA9;
+    --card-border: #D4BE99; --card-border-hover: #C7AE85;
+    --card-haslink-bg: #FBF5EA; --card-haslink-hover-bg: #E7D6B4;
+    --card-text: #3B2A1A; --card-desc: #6B5540;
+
+    --card-alt-bg: #2A1D12; --card-alt-bg-hover: #39281A;
+    --card-alt-border: #FBF3E6; --card-alt-text: #FBF3E6; --card-alt-desc: #C9B497;
+  }
+  html { transition: background 0.3s; }
+  body, .agenda-card, .bg-config-btn, nav.topnav { transition: background 0.3s, color 0.3s, border-color 0.3s; }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { width: 100%; height: 100%; overflow: hidden; background: var(--black); color: var(--white); font-family: 'Noto Sans KR', sans-serif; }
 
@@ -18,17 +86,17 @@
   nav.topnav {
     position: fixed; top: 0; left: 0; right: 0; z-index: 500;
     display: flex; align-items: center; justify-content: space-between;
-    padding: 7px 48px; background: rgba(17,18,20,0.85); backdrop-filter: blur(16px);
-    border-bottom: 1px solid rgba(62,207,207,0.12);
+    padding: 7px 48px; background: rgba(var(--black-rgb),0.85); backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(var(--mint-rgb),0.12);
   }
-  .nav-logo { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 12px; letter-spacing: 0.18em; color: #ffffff; text-transform: uppercase; }
+  .nav-logo { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 12px; letter-spacing: 0.18em; color: var(--white); text-transform: uppercase; }
   .nav-links { display: flex; gap: 32px; list-style: none; }
   .nav-links a { font-size: 13px; color: var(--text-muted); text-decoration: none; cursor: pointer; transition: color 0.2s; }
   .nav-links a:hover { color: var(--mint); }
 
   /* 도트 네비 */
   .dot-nav { position: fixed; right: 20px; top: 50%; transform: translateY(-50%); z-index: 500; display: flex; flex-direction: column; gap: 8px; }
-  .dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(62,207,207,0.25); border: 1px solid rgba(62,207,207,0.45); cursor: pointer; transition: 0.3s; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(var(--mint-rgb),0.25); border: 1px solid rgba(var(--mint-rgb),0.45); cursor: pointer; transition: 0.3s; }
   .dot.active { background: var(--mint); transform: scale(1.5); }
 
   /* 슬라이드 구조 */
@@ -40,29 +108,41 @@
   #slide1 { background: var(--black); display: flex; align-items: flex-end; padding-bottom: 32vh; }
   .hero-bg { position: absolute; inset: 0; background-size: cover; background-position: center; background-repeat: no-repeat; opacity: 0.85; transition: opacity 0.5s ease; }
   .hero-bg.loading { background: var(--gray-dark); }
-  .bg-config-btn { position: absolute; bottom: 24px; right: 32px; z-index: 10; background: rgba(62,207,207,0.12); border: 1px solid rgba(62,207,207,0.4); color: var(--mint); border-radius: 8px; padding: 8px 16px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; backdrop-filter: blur(8px); font-family: 'Space Grotesk', sans-serif; letter-spacing: 0.08em; }
-  .bg-config-btn:hover { background: rgba(62,207,207,0.25); }
+  .bg-config-btn { position: absolute; bottom: 24px; right: 32px; z-index: 10; background: rgba(var(--mint-rgb),0.12); border: 1px solid rgba(var(--mint-rgb),0.4); color: var(--mint); border-radius: 8px; padding: 8px 16px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; backdrop-filter: blur(8px); font-family: 'Space Grotesk', sans-serif; letter-spacing: 0.08em; }
+  .bg-config-btn:hover { background: rgba(var(--mint-rgb),0.25); }
+
+  /* 컬러 테마 설정 버튼 & 패널 (1페이지 우측상단) */
+  .theme-config-btn { position: absolute; top: 70px; right: 32px; z-index: 20; background: rgba(var(--mint-rgb),0.12); border: 1px solid rgba(var(--mint-rgb),0.4); color: var(--mint); border-radius: 8px; padding: 10px 16px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; backdrop-filter: blur(8px); font-family: 'Space Grotesk', sans-serif; letter-spacing: 0.08em; }
+  .theme-config-btn:hover { background: rgba(var(--mint-rgb),0.25); }
+  .theme-panel { display: none; position: absolute; top: 116px; right: 32px; z-index: 21; background: #1a1c1f; border: 1px solid var(--mint); border-radius: 12px; padding: 14px; width: 210px; box-shadow: 0 12px 34px rgba(0,0,0,0.5); }
+  .theme-panel.open { display: block; }
+  .theme-panel .theme-panel-title { font-family: 'Space Grotesk', sans-serif; font-size: 11px; letter-spacing: 0.12em; color: #8899AA; margin-bottom: 10px; text-transform: uppercase; }
+  .theme-option { display: flex; align-items: center; gap: 10px; padding: 8px 8px; border-radius: 8px; cursor: pointer; transition: background 0.15s; font-size: 13px; color: #F5FAFA; font-weight: 500; }
+  .theme-option:hover { background: rgba(255,255,255,0.06); }
+  .theme-option.active { background: rgba(255,255,255,0.1); }
+  .theme-swatch { width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.25); background: conic-gradient(var(--swatch-accent) 0deg 180deg, var(--swatch-bg) 180deg 360deg); }
+  .theme-option.active::after { content: '✓'; margin-left: auto; color: #fff; font-weight: 900; }
   .bg-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
   .bg-modal-overlay.open { display: flex; }
-  .bg-modal { background: #1a1c1f; border: 1px solid rgba(62,207,207,0.3); border-radius: 16px; padding: 32px; width: 480px; max-width: 90vw; }
+  .bg-modal { background: #1a1c1f; border: 1px solid rgba(var(--mint-rgb),0.3); border-radius: 16px; padding: 32px; width: 480px; max-width: 90vw; }
   .bg-modal h3 { font-family: 'Space Grotesk', sans-serif; color: var(--mint); margin-bottom: 6px; font-size: 16px; letter-spacing: 0.1em; }
   .bg-modal p { color: var(--text-muted); font-size: 12px; margin-bottom: 20px; line-height: 1.6; }
   .bg-modal input { width: 100%; padding: 10px 14px; background: #0d0e10; border: 1px solid #3a3d42; color: #fff; border-radius: 8px; font-size: 13px; margin-bottom: 10px; outline: none; }
   .bg-modal input:focus { border-color: var(--mint); }
   .bg-modal .modal-actions { display: flex; gap: 10px; margin-top: 6px; }
-  .bg-modal .btn-save { flex: 1; padding: 10px; background: var(--mint); border: none; border-radius: 8px; font-weight: 700; color: #000; cursor: pointer; font-size: 13px; }
+  .bg-modal .btn-save { flex: 1; padding: 10px; background: var(--mint); border: none; border-radius: 8px; font-weight: 700; color: var(--on-accent); cursor: pointer; font-size: 13px; }
   .bg-modal .btn-cancel { padding: 10px 20px; background: transparent; border: 1px solid #3a3d42; border-radius: 8px; color: var(--text-muted); cursor: pointer; font-size: 13px; }
   .bg-modal .preview-box { width: 100%; height: 100px; border-radius: 8px; background: #0d0e10; border: 1px solid #2a2d30; margin-bottom: 12px; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; color: #444; font-size: 12px; transition: 0.4s; }
-  .bg-modal .hint { background: rgba(62,207,207,0.06); border: 1px solid rgba(62,207,207,0.15); border-radius: 8px; padding: 12px; margin-bottom: 16px; }
+  .bg-modal .hint { background: rgba(var(--mint-rgb),0.06); border: 1px solid rgba(var(--mint-rgb),0.15); border-radius: 8px; padding: 12px; margin-bottom: 16px; }
   .bg-modal .hint code { color: var(--mint); font-size: 11px; display: block; margin-top: 4px; word-break: break-all; }
-  .hero-overlay { position: absolute; inset: 0; background: linear-gradient(135deg, rgba(17,18,20,0.97) 0%, rgba(17,18,20,0.80) 50%, rgba(17,18,20,0.4) 100%); }
+  .hero-overlay { position: absolute; inset: 0; background: linear-gradient(135deg, rgba(var(--black-rgb),0.97) 0%, rgba(var(--black-rgb),0.80) 50%, rgba(var(--black-rgb),0.4) 100%); }
   .hero-content { position: relative; z-index: 2; padding: 0 96px; max-width: 900px; animation: fadeUp 0.9s ease both; }
   .hero-title { font-family: 'Space Grotesk', sans-serif; font-size: clamp(80px, 14vw, 180px); line-height: 0.95; font-weight: 700; text-transform: uppercase; white-space: nowrap; }
   .hero-title span { color: var(--mint); display: block; font-size: 0.65em; }
 
   /* 슬라이드 2: AGENDA */
-  #slide2 { background: #13151a; display: flex; flex-direction: column; padding: 0; position: relative; }
-  .agenda-header { display: flex; align-items: flex-end; justify-content: space-between; padding: 14px 72px; border-bottom: 1px solid rgba(255,255,255,0.07); margin-top: 50px; }
+  #slide2 { background: var(--bg2); display: flex; flex-direction: column; padding: 0; position: relative; }
+  .agenda-header { display: flex; align-items: flex-end; justify-content: space-between; padding: 14px 72px; border-bottom: 1px solid rgba(var(--divider-rgb),0.07); margin-top: 50px; }
   .agenda-supertitle { font-family: 'Space Grotesk', sans-serif; color: var(--mint); font-weight: 700; letter-spacing: 0.22em; }
 
   /* 메인 바디: 좌측 콘텐츠 영역 */
@@ -70,7 +150,7 @@
 
   /* 대제목 영역 */
   .agenda-title-area { padding-top: 0; margin-bottom: 12px; }
-  .agenda-main-title { font-family: 'Space Grotesk', sans-serif; font-size: clamp(48px, 7vw, 96px); font-weight: 900; color: #fff; letter-spacing: -0.02em; line-height: 1.05; cursor: pointer; display: block; transition: opacity 0.2s; }
+  .agenda-main-title { font-family: 'Space Grotesk', sans-serif; font-size: clamp(48px, 7vw, 96px); font-weight: 900; color: var(--white); letter-spacing: -0.02em; line-height: 1.05; cursor: pointer; display: block; transition: opacity 0.2s; }
   .agenda-main-title:hover { opacity: 0.7; }
   .agenda-sub-title { font-size: 18px; color: var(--mint); margin-top: 16px; letter-spacing: 0.04em; cursor: pointer; display: block; transition: opacity 0.2s; opacity: 0.9; font-weight: 500; }
   .agenda-sub-title:hover { opacity: 0.5; }
@@ -79,8 +159,8 @@
   .agenda-grid { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr); gap: 10px; padding-right: 20px; }
   .agenda-card { 
     position: relative; 
-    background: #c8cac8;
-    border: 1.5px solid #b0b2b0;
+    background: var(--card-bg);
+    border: 1.5px solid var(--card-border);
     border-radius: 10px;
     padding: 24px 26px; 
     cursor: pointer; 
@@ -93,32 +173,32 @@
     max-height: 340px;
   }
 
-  .agenda-card:hover { background: #d4d6d4; border-color: #b8bab8; transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,0.18); }
-  .agenda-card.has-link { background: #ffffff; border-color: #e0e0e0; }
-  .agenda-card.has-link:hover { background: #f4fca0; border-color: #c8e832; transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,0.18); }
+  .agenda-card:hover { background: var(--card-bg-hover); border-color: var(--card-border-hover); transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,0.18); }
+  .agenda-card.has-link { background: var(--card-haslink-bg); border-color: var(--card-border); }
+  .agenda-card.has-link:hover { background: var(--card-haslink-hover-bg); border-color: var(--mint); transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,0.18); }
 
   /* 어두운 회색 고정 카드 (05, 06번) */
   .agenda-card.lime-card,
-  .agenda-card.lime-card.has-link { background: #2a2d31 !important; border: 5px solid #ffffff !important; }
+  .agenda-card.lime-card.has-link { background: var(--card-alt-bg) !important; border: 5px solid var(--card-alt-border) !important; }
   .agenda-card.lime-card:hover,
-  .agenda-card.lime-card.has-link:hover { background: #34383d !important; border: 5px solid #ffffff !important; transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,0.3); }
+  .agenda-card.lime-card.has-link:hover { background: var(--card-alt-bg-hover) !important; border: 5px solid var(--card-alt-border) !important; transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,0.3); }
   /* 어두운 배경 위 가시성: 밝은 텍스트 */
-  .lime-card .card-number { color: #C8E832 !important; text-shadow: none !important; }
-  .lime-card .card-label { color: #ffffff !important; }
-  .lime-card .card-desc { color: #c0c4c0 !important; }
+  .lime-card .card-number { color: var(--mint) !important; text-shadow: none !important; }
+  .lime-card .card-label { color: var(--card-alt-text) !important; }
+  .lime-card .card-desc { color: var(--card-alt-desc) !important; }
 
-  .card-number { font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 900; color: #c8e832; line-height: 1; text-shadow: 0 1px 0 rgba(0,0,0,0.15); }
-  .card-label { font-size: 38px; font-weight: 900; color: #0e1200; text-transform: uppercase; margin-top: 6px; letter-spacing: -0.01em; }
-  .card-desc { font-size: 14px; color: #3a4a10; margin-top: 8px; line-height: 1.4; font-weight: 500; }
+  .card-number { font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 900; color: var(--mint); line-height: 1; text-shadow: 0 1px 0 rgba(0,0,0,0.15); }
+  .card-label { font-size: 38px; font-weight: 900; color: var(--card-text); text-transform: uppercase; margin-top: 6px; letter-spacing: -0.01em; }
+  .card-desc { font-size: 14px; color: var(--card-desc); margin-top: 8px; line-height: 1.4; font-weight: 500; }
 
   /* 설정 패널 */
-  .config-toggle { position: absolute; top: 15px; right: 15px; background: rgba(150,180,20,0.1); border: 1px solid rgba(150,180,20,0.3); border-radius: 4px; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #7a9a00; z-index: 10; opacity: 0.4; transition: 0.2s; }
+  .config-toggle { position: absolute; top: 15px; right: 15px; background: rgba(var(--mint-rgb),0.1); border: 1px solid rgba(var(--mint-rgb),0.3); border-radius: 4px; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--mint-dark); z-index: 10; opacity: 0.4; transition: 0.2s; }
   .agenda-card:hover .config-toggle { opacity: 1; }
   .config-panel { display: none; position: absolute; top: 8px; right: 50px; background: #1a1c1f; border: 1px solid var(--mint); border-radius: 8px; padding: 12px; width: 220px; z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.5); max-height: calc(100% - 16px); overflow-y: auto; }
   .config-panel.open { display: block; }
   .config-panel label { font-size: 11px; color: #888; display: block; margin-bottom: 3px; margin-top: 4px; }
   .config-panel input { width: 100%; padding: 6px 8px; margin-bottom: 4px; background: #000; border: 1px solid #444; color: #fff; border-radius: 4px; font-size: 12px; }
-  .config-panel button { width: 100%; padding: 7px; margin-top: 6px; background: var(--mint); border: none; border-radius: 4px; font-weight: bold; cursor: pointer; color: #1a1f0a; }
+  .config-panel button { width: 100%; padding: 7px; margin-top: 6px; background: var(--mint); border: none; border-radius: 4px; font-weight: bold; cursor: pointer; color: var(--on-accent); }
 
   /* 카드 누끼 이미지 레이어 (04,05번) */
   .card-img-layer {
@@ -133,6 +213,9 @@
     pointer-events: none;
     z-index: 0;
   }
+
+  .accent-chip-btn { transition: filter 0.15s; }
+  .accent-chip-btn:hover { filter: brightness(1.12); }
 
   @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 </style>
@@ -159,7 +242,7 @@
     <p>구글 드라이브에 이미지를 올린 후, 공유 링크에서 파일 ID를 복사하세요.</p>
     <div class="hint">
       <span style="color:#aaa;font-size:11px;">드라이브 공유 링크 예시:</span>
-      <code>https://drive.google.com/file/d/<span style="color:#fff;background:rgba(62,207,207,0.2);padding:0 4px;border-radius:3px;">여기가 파일 ID</span>/view</code>
+      <code>https://drive.google.com/file/d/<span style="color:#fff;background:rgba(var(--mint-rgb),0.3);padding:0 4px;border-radius:3px;">여기가 파일 ID</span>/view</code>
     </div>
     <div class="preview-box" id="previewBox">미리보기</div>
     <input type="text" id="bgFileId" placeholder="파일 ID를 붙여넣으세요 (예: 1aBcDeFgHiJk...)" oninput="previewBg(this.value)" />
@@ -174,7 +257,7 @@
 <div id="ownipPopup" onclick="closeOwnipPopup()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
   <div onclick="event.stopPropagation()" style="position:relative;max-width:90vw;max-height:90vh;">
     <img id="ownipPopupImg" src="" style="max-width:90vw;max-height:85vh;object-fit:contain;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.6);" />
-    <button onclick="closeOwnipPopup()" style="position:absolute;top:-16px;right:-16px;width:36px;height:36px;border-radius:50%;background:#c8e832;border:none;font-size:18px;font-weight:900;cursor:pointer;color:#1a1f0a;line-height:1;">×</button>
+    <button class="accent-chip-btn" onclick="closeOwnipPopup()" style="position:absolute;top:-16px;right:-16px;width:36px;height:36px;border-radius:50%;background:var(--mint);border:none;font-size:18px;font-weight:900;cursor:pointer;color:var(--on-accent);line-height:1;">×</button>
   </div>
 </div>
 
@@ -183,9 +266,9 @@
 <!-- 06번 카드 URL 팝업 (iframe) -->
 <div id="brandPopup" onclick="closeBrandPopup()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
   <div onclick="event.stopPropagation()" style="position:relative;width:90vw;height:88vh;max-width:1400px;background:#fff;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.6);overflow:hidden;">
-    <div style="position:absolute;top:0;left:0;right:0;height:42px;background:#1a1f0a;display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:0 12px;z-index:2;">
-      <a id="brandPopupOpen" href="#" target="_blank" style="color:#c8e832;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;text-decoration:none;padding:5px 10px;border:1px solid #c8e832;border-radius:5px;">새 탭에서 열기 ↗</a>
-      <button onclick="closeBrandPopup()" style="width:28px;height:28px;border-radius:50%;background:#c8e832;border:none;font-size:16px;font-weight:900;cursor:pointer;color:#1a1f0a;line-height:1;">×</button>
+    <div style="position:absolute;top:0;left:0;right:0;height:42px;background:var(--card-alt-bg);display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:0 12px;z-index:2;">
+      <a id="brandPopupOpen" href="#" target="_blank" class="accent-chip-btn" style="color:var(--mint);font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;text-decoration:none;padding:5px 10px;border:1px solid var(--mint);border-radius:5px;">새 탭에서 열기 ↗</a>
+      <button class="accent-chip-btn" onclick="closeBrandPopup()" style="width:28px;height:28px;border-radius:50%;background:var(--mint);border:none;font-size:16px;font-weight:900;cursor:pointer;color:var(--on-accent);line-height:1;">×</button>
     </div>
     <iframe id="brandPopupFrame" src="" style="position:absolute;top:42px;left:0;width:100%;height:calc(100% - 42px);border:none;" referrerpolicy="no-referrer"></iframe>
   </div>
@@ -199,19 +282,32 @@
       <div class="hero-bg" id="heroBg"></div>
       <div class="hero-overlay"></div>
       <button class="bg-config-btn" onclick="document.getElementById('bgModal').classList.add('open')">⚙ 배경 이미지 변경</button>
+      <button class="theme-config-btn" onclick="toggleThemePanel(event)">🎨 컬러 테마</button>
+      <div class="theme-panel" id="themePanel" onclick="event.stopPropagation()">
+        <div class="theme-panel-title">컬러 테마 선택</div>
+        <div class="theme-option" data-theme="lime" onclick="setTheme('lime')">
+          <span class="theme-swatch" style="--swatch-accent:#C8E832; --swatch-bg:#111214;"></span> 블랙 &amp; 라임
+        </div>
+        <div class="theme-option" data-theme="blue" onclick="setTheme('blue')">
+          <span class="theme-swatch" style="--swatch-accent:#2563EB; --swatch-bg:#F7FAFF;"></span> 화이트 &amp; 블루
+        </div>
+        <div class="theme-option" data-theme="brown" onclick="setTheme('brown')">
+          <span class="theme-swatch" style="--swatch-accent:#8B5E34; --swatch-bg:#F4E9D8;"></span> 베이지 &amp; 브라운
+        </div>
+      </div>
       <a href="https://jangharain-tech.github.io/2026_MD/LFSQ_MD_2026_Plan_with_images.html" target="_blank" style="position:absolute;top:70px;left:96px;z-index:10;padding:10px 18px;background:rgba(120,120,120,0.6);border:1px solid rgba(255,255,255,0.15);border-radius:8px;text-decoration:none;backdrop-filter:blur(12px);transition:all 0.2s;cursor:pointer;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;color:#fff;letter-spacing:0.08em;white-space:nowrap;" onmouseover="this.style.background='rgba(150,150,150,0.7)'" onmouseout="this.style.background='rgba(120,120,120,0.6)'">(참고) MD 2026 PLAN</a>
       <div class="hero-content">
         <div class="hero-eyebrow" style="margin-bottom:12px;">LINEFRIENDS SQUARE</div>
         <h1 class="hero-title">LFSQ MD<span>Monthly Meet</span></h1>
-        <div style="width:220px; height:1px; background:rgba(255,255,255,0.4); margin:20px 0;"></div>
-        <div id="heroDate" onclick="editHeroDate()" title="클릭하여 수정" style="margin-top:0; background:var(--mint); color:#000; display:inline-block; padding:10px 28px; border-radius:100px; font-weight:800; font-size:22px; font-family:'Space Grotesk',sans-serif; letter-spacing:0.08em; cursor:pointer; transition:opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">2026 · 04</div>
+        <div style="width:220px; height:1px; background:rgba(var(--divider-rgb),0.4); margin:20px 0;"></div>
+        <div id="heroDate" onclick="editHeroDate()" title="클릭하여 수정" style="margin-top:0; background:var(--mint); color:var(--on-accent); display:inline-block; padding:10px 28px; border-radius:100px; font-weight:800; font-size:22px; font-family:'Space Grotesk',sans-serif; letter-spacing:0.08em; cursor:pointer; transition:opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">2026 · 04</div>
       </div>
     </section>
 
     <section id="slide2">
       <div class="agenda-header">
         <div class="agenda-supertitle">MD Monthly Agenda</div>
-        <div id="heroDate2" style="color:#555">2026 · 04</div>
+        <div id="heroDate2" style="color:var(--text-muted)">2026 · 04</div>
       </div>
 
       <div class="agenda-body">
@@ -225,7 +321,7 @@
         </div>
 
         <div style="margin-bottom:4px; margin-left:2px;">
-          <span style="font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;letter-spacing:0.08em;color:#ffffff;">📋 각 사업 / 파트별 아젠다</span>
+          <span style="font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;letter-spacing:0.08em;color:var(--white);">📋 각 사업 / 파트별 아젠다</span>
         </div>
         <div class="agenda-grid">
         <div class="agenda-card" id="card-review" onclick="handleCardClick('review')">
@@ -246,7 +342,7 @@
             <div class="card-number">03</div>
             <div style="display:flex; justify-content:space-between; align-items:flex-end;">
               <div><div class="card-label" id="label-buying">Buying</div><div class="card-desc" id="cdesc-buying">사입계획 및 현황</div></div>
-              <a id="btn-buying" href="https://jangharain-tech.github.io/LFSQ-MD/product-dashboard.html" target="_blank" onclick="event.stopPropagation()" style="flex-shrink:0;padding:6px 12px;background:#b8d016;border-radius:6px;font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:700;color:#1a1f0a;text-decoration:none;letter-spacing:0.05em;white-space:nowrap;transition:background 0.2s;" onmouseover="this.style.background='#cae820'" onmouseout="this.style.background='#b8d016'">출시계획</a>
+              <a id="btn-buying" href="https://jangharain-tech.github.io/LFSQ-MD/product-dashboard.html" target="_blank" onclick="event.stopPropagation()" class="accent-chip-btn" style="flex-shrink:0;padding:6px 12px;background:var(--mint);border-radius:6px;font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:700;color:var(--on-accent);text-decoration:none;letter-spacing:0.05em;white-space:nowrap;">출시계획</a>
             </div>
         </div>
         <div class="agenda-card" id="card-ip" onclick="handleCardClick('ip')" style="background-image:none; background-size:35%; background-position:85% bottom; background-repeat:no-repeat; overflow:hidden;">
@@ -268,7 +364,7 @@
             </div>
             <div style="position:relative;z-index:1;">
               <div class="card-number">05</div>
-              <a id="btn-nugasa" href="https://doeun-ai.github.io/nugasapopup" target="_blank" onclick="event.stopPropagation(); event.stopImmediatePropagation();" style="display:inline-block;margin-top:8px;padding:6px 14px;background:#C8E832;color:#1a1f0a;border-radius:6px;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;text-decoration:none;letter-spacing:0.06em;transition:background 0.2s;" onmouseover="this.style.background='#d8f24a'" onmouseout="this.style.background='#C8E832'">누가사</a>
+              <a id="btn-nugasa" href="https://doeun-ai.github.io/nugasapopup" target="_blank" onclick="event.stopPropagation(); event.stopImmediatePropagation();" class="accent-chip-btn" style="display:inline-block;margin-top:8px;padding:6px 14px;background:var(--mint);color:var(--on-accent);border-radius:6px;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;text-decoration:none;letter-spacing:0.06em;">누가사</a>
             </div>
             <div style="position:relative;z-index:1;"><div class="card-label" id="label-ownip">LFSQ IP</div><div class="card-desc" id="cdesc-ownip">전략IP 전개현황</div></div>
             <img class="card-img-layer" src="https://lh3.googleusercontent.com/d/11_TpOv5oVJjqSvSxQWWhUluulR9O22ql" alt="" />
@@ -292,6 +388,36 @@
 
 <script>
   // 대제목 / 서브타이틀 인라인 편집
+  /** 0. 컬러 테마 전환 **/
+  function toggleThemePanel(e) {
+    e.stopPropagation();
+    document.getElementById('themePanel').classList.toggle('open');
+  }
+  // 화면에만 테마 적용 (서버 저장 X) - 초기 로드/서버값 반영 시 사용
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    try { localStorage.setItem('lfsq_theme', theme); } catch (e) {}
+    document.querySelectorAll('.theme-option').forEach(el => {
+      el.classList.toggle('active', el.dataset.theme === theme);
+    });
+  }
+  // 사용자가 직접 선택 시: 화면 적용 + 구글시트 서버 저장 (팀 전체 공유)
+  function setTheme(theme) {
+    applyTheme(theme);
+    document.getElementById('themePanel').classList.remove('open');
+    links['theme'] = theme;
+    fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ id: 'theme', url: theme }) }).catch(() => {});
+  }
+  document.addEventListener('click', () => {
+    const panel = document.getElementById('themePanel');
+    if (panel) panel.classList.remove('open');
+  });
+  (function initThemeUI() {
+    let saved = 'lime';
+    try { saved = localStorage.getItem('lfsq_theme') || 'lime'; } catch (e) {}
+    applyTheme(saved);
+  })();
+
   function editHeroDate() {
     const el = document.getElementById('heroDate');
     const val = prompt('날짜 수정:', el.textContent);
@@ -633,6 +759,8 @@
       if (links['agenda_subtitle']) document.getElementById('subTitle').textContent = links['agenda_subtitle'];
       // 배경 이미지 적용
       applyBg(links['hero_bg'] || '');
+      // 컬러 테마 서버값 적용 (팀 전체 공유)
+      if (links['theme']) applyTheme(links['theme']);
       // 누가사 버튼 URL 적용
       if (links['ownip_nugasa']) {
         const btn = document.getElementById('btn-nugasa');
@@ -655,6 +783,7 @@
         if (el2) el2.textContent = links['hero_date'];
       }
       applyBg(links['hero_bg'] || '');
+      if (links['theme']) applyTheme(links['theme']);
       if (links['ownip_nugasa']) {
         const btn = document.getElementById('btn-nugasa');
         if (btn) btn.href = links['ownip_nugasa'];
