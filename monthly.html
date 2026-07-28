@@ -379,7 +379,11 @@
       </div><!-- end agenda-body -->
 
       <!-- 우측 하단 배경 이미지 -->
-      <img src="https://lh3.googleusercontent.com/d/1wu-CohyGti8YIK5IS9qmL6vPFP0AXES0" alt="" style="position:absolute; bottom:0; right:0; width:24%; max-height:50vh; object-fit:contain; object-position:right bottom; pointer-events:none; z-index:0; opacity:0.3;" />
+      <img id="slide2DecoImg" src="https://lh3.googleusercontent.com/d/1wu-CohyGti8YIK5IS9qmL6vPFP0AXES0" alt="" style="position:absolute; bottom:0; right:0; width:24%; max-height:50vh; object-fit:contain; object-position:right bottom; pointer-events:none; z-index:0; opacity:0.3;" />
+
+      <button class="bg-config-btn" style="bottom:16px; right:16px; z-index:15;" onclick="document.getElementById('slide2ImgInput').click()">⚙ 이미지 변경</button>
+      <input type="file" id="slide2ImgInput" accept="image/png,image/*" style="display:none;" onchange="uploadSlide2Image(event)" />
+      <div id="slide2ImgStatus" style="position:absolute; bottom:54px; right:16px; font-size:10px; z-index:15; min-height:12px;"></div>
 
     </section>
 
@@ -608,6 +612,66 @@
     tryUrl(0);
   }
 
+  // 2페이지 우측하단 고정 이미지 교체
+  function applySlide2Image(fileId) {
+    const img = document.getElementById('slide2DecoImg');
+    if (!img || !fileId) return;
+    const candidates = [
+      'https://lh3.googleusercontent.com/d/' + fileId,
+      'https://drive.google.com/thumbnail?id=' + fileId + '&sz=w1000'
+    ];
+    function tryUrl(idx) {
+      if (idx >= candidates.length) return;
+      const url = candidates[idx];
+      const test = new Image();
+      test.onload = () => { img.src = url; };
+      test.onerror = () => tryUrl(idx + 1);
+      test.src = url;
+    }
+    tryUrl(0);
+  }
+
+  async function uploadSlide2Image(e) {
+    e.stopPropagation();
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const statusEl = document.getElementById('slide2ImgStatus');
+    if (statusEl) { statusEl.style.color = 'var(--mint-dark)'; statusEl.textContent = '업로드 중...'; }
+    try {
+      const base64 = await fileToBase64(file);
+      const prevId = links['slide2_deco_img'] || '';
+
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({ id: 'slide2_deco_img', image: base64, mimeType: file.type || 'image/png' })
+      }).catch(() => {});
+
+      let newId = '';
+      for (let i = 0; i < 12; i++) {
+        await sleep(2000);
+        try {
+          const res = await fetch(SCRIPT_URL + '?t=' + Date.now());
+          const data = await res.json();
+          const v = data && data['slide2_deco_img'];
+          if (v && v !== prevId) { newId = v; break; }
+        } catch (err) {}
+        if (statusEl) statusEl.textContent = '업로드 중...' + ((i + 1) * 2) + 's';
+      }
+
+      if (newId) {
+        links['slide2_deco_img'] = newId;
+        try { localStorage.setItem('lfsq_links', JSON.stringify(links)); } catch (err) {}
+        applySlide2Image(newId);
+        if (statusEl) { statusEl.style.color = '#7a9a00'; statusEl.textContent = '✓ 업로드 완료'; }
+      } else {
+        if (statusEl) { statusEl.style.color = '#d66'; statusEl.textContent = '실패: 잠시 후 새로고침 해보세요'; }
+      }
+    } catch (err) {
+      if (statusEl) { statusEl.style.color = '#d66'; statusEl.textContent = '업로드 실패'; }
+    }
+    e.target.value = '';
+  }
+
   // 파일 선택 → base64 변환 → Apps Script로 업로드 → 시트에서 fileId 폴링 후 적용
   async function uploadCardImage(e, id) {
     e.stopPropagation();
@@ -761,6 +825,8 @@
       applyBg(links['hero_bg'] || '');
       // 컬러 테마 서버값 적용 (팀 전체 공유)
       if (links['theme']) applyTheme(links['theme']);
+      // 2페이지 우측하단 이미지 적용
+      if (links['slide2_deco_img']) applySlide2Image(links['slide2_deco_img']);
       // 누가사 버튼 URL 적용
       if (links['ownip_nugasa']) {
         const btn = document.getElementById('btn-nugasa');
@@ -784,6 +850,7 @@
       }
       applyBg(links['hero_bg'] || '');
       if (links['theme']) applyTheme(links['theme']);
+      if (links['slide2_deco_img']) applySlide2Image(links['slide2_deco_img']);
       if (links['ownip_nugasa']) {
         const btn = document.getElementById('btn-nugasa');
         if (btn) btn.href = links['ownip_nugasa'];
