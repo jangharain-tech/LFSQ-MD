@@ -250,9 +250,17 @@
     <section id="slide1">
       <div class="hero-bg" id="heroBg"></div>
       <div class="hero-overlay"></div>
-      <button class="bg-config-btn" onclick="document.getElementById('heroBgInput').click()">⚙ 배경 이미지 변경</button>
-      <input type="file" id="heroBgInput" accept="image/png,image/*" style="display:none;" onchange="uploadHeroBgImage(event)" />
-      <div id="heroBgStatus" style="position:absolute; bottom:60px; right:32px; z-index:10; font-size:10px; min-height:12px;"></div>
+      <button class="bg-config-btn" onclick="toggleHeroImgPanel(event)">⚙ 배경 이미지 설정</button>
+      <div class="theme-panel" id="heroImgPanel" onclick="event.stopPropagation()" style="top:auto; bottom:64px; right:32px; width:230px;">
+        <div class="theme-panel-title">배경 이미지 설정</div>
+        <button class="accent-chip-btn" onclick="document.getElementById('heroBgInput').click()" style="width:100%; padding:9px; margin-bottom:6px; background:var(--mint); color:var(--on-accent); border:none; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer; font-family:'Space Grotesk',sans-serif; letter-spacing:0.04em;">이미지 업로드</button>
+        <input type="file" id="heroBgInput" accept="image/png,image/*" style="display:none;" onchange="uploadHeroBgImage(event)" />
+        <div id="heroBgStatus" style="font-size:10px; min-height:14px; margin-bottom:8px; color:#8899AA;"></div>
+        <label style="font-size:11px; color:#8899AA; display:flex; justify-content:space-between; margin-bottom:2px;">투명도 <span id="heroOpacityVal">55%</span></label>
+        <input type="range" id="heroOpacitySlider" min="0" max="100" value="55" oninput="onHeroOpacityInput(this.value)" onchange="saveHeroImgSettings()" style="width:100%; margin-bottom:10px; accent-color:var(--mint);" />
+        <label style="font-size:11px; color:#8899AA; display:flex; justify-content:space-between; margin-bottom:2px;">흐림 <span id="heroBlurVal">0px</span></label>
+        <input type="range" id="heroBlurSlider" min="0" max="20" value="0" oninput="onHeroBlurInput(this.value)" onchange="saveHeroImgSettings()" style="width:100%; accent-color:var(--mint);" />
+      </div>
       <button class="theme-config-btn" onclick="toggleThemePanel(event)">🎨 컬러 테마</button>
       <div class="theme-panel" id="themePanel" onclick="event.stopPropagation()">
         <div class="theme-panel-title">컬러 테마 선택</div>
@@ -460,6 +468,8 @@
   /** 1. 구글 시트 연동 설정 **/
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwhIpItxYWqvUpKrDx-TtsdzYAIt6JZ9Ib11TKP64i-s1hJpahr3wcJqDIc11yPAs7K/exec";
   const links = {};
+  let heroOpacity = 0.55; // 0~1
+  let heroBlur = 0;       // px
 
   // 구글 드라이브 파일 ID → 직접 이미지 URL 변환
   function driveImgUrl(fileId) {
@@ -469,9 +479,12 @@
   // 배경 적용
   function applyBg(fileId) {
     const el = document.getElementById('heroBg');
+    const filterVal = heroBlur > 0 ? `blur(${heroBlur}px)` : 'none';
     if (!fileId) {
       // fallback: unsplash 기본 이미지
       el.style.backgroundImage = "url('https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=2069')";
+      el.style.opacity = heroOpacity;
+      el.style.filter = filterVal;
       return;
     }
     const url = driveImgUrl(fileId);
@@ -479,15 +492,56 @@
     const img = new Image();
     img.onload = () => {
       el.style.backgroundImage = `url('${url}')`;
-      el.style.opacity = '0.55';
+      el.style.opacity = heroOpacity;
+      el.style.filter = filterVal;
     };
     img.onerror = () => {
       // 로드 실패 시 fallback
       el.style.backgroundImage = "url('https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=2069')";
-      el.style.opacity = '0.55';
+      el.style.opacity = heroOpacity;
+      el.style.filter = filterVal;
     };
     img.src = url;
   }
+
+  // 투명도/흐림 슬라이더 값 적용 (UI + 실제 배경 스타일)
+  function applyHeroImgSettings(opacityPct, blurPx) {
+    heroOpacity = Math.max(0, Math.min(100, Number(opacityPct))) / 100;
+    heroBlur = Math.max(0, Number(blurPx));
+    const el = document.getElementById('heroBg');
+    if (el) {
+      el.style.opacity = heroOpacity;
+      el.style.filter = heroBlur > 0 ? `blur(${heroBlur}px)` : 'none';
+    }
+    const os = document.getElementById('heroOpacitySlider');
+    if (os) os.value = Math.round(heroOpacity * 100);
+    const ov = document.getElementById('heroOpacityVal');
+    if (ov) ov.textContent = Math.round(heroOpacity * 100) + '%';
+    const bs = document.getElementById('heroBlurSlider');
+    if (bs) bs.value = heroBlur;
+    const bv = document.getElementById('heroBlurVal');
+    if (bv) bv.textContent = heroBlur + 'px';
+  }
+  function onHeroOpacityInput(v) { applyHeroImgSettings(v, heroBlur); }
+  function onHeroBlurInput(v) { applyHeroImgSettings(heroOpacity * 100, v); }
+
+  // 슬라이더 조작을 마쳤을 때(release) 시트에 저장 → 팀 전체 공유
+  function saveHeroImgSettings() {
+    links['hero_bg_opacity'] = String(Math.round(heroOpacity * 100));
+    links['hero_bg_blur'] = String(heroBlur);
+    try { localStorage.setItem('lfsq_links', JSON.stringify(links)); } catch (e) {}
+    fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ id: 'hero_bg_opacity', url: links['hero_bg_opacity'] }) }).catch(() => {});
+    fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ id: 'hero_bg_blur', url: links['hero_bg_blur'] }) }).catch(() => {});
+  }
+
+  function toggleHeroImgPanel(e) {
+    e.stopPropagation();
+    document.getElementById('heroImgPanel').classList.toggle('open');
+  }
+  document.addEventListener('click', () => {
+    const p = document.getElementById('heroImgPanel');
+    if (p) p.classList.remove('open');
+  });
 
   // 배경 이미지 업로드 (파일 선택 → base64 → Apps Script 업로드 → 시트 폴링 → 적용)
   async function uploadHeroBgImage(e) {
@@ -801,6 +855,8 @@
       // 기존 단일 키 호환
       if (links['agenda_title'] && !links['agenda_title1']) document.getElementById('mainTitle1').textContent = links['agenda_title'];
       if (links['agenda_subtitle']) document.getElementById('subTitle').textContent = links['agenda_subtitle'];
+      // 배경 이미지 투명도/흐림 설정 적용
+      applyHeroImgSettings(links['hero_bg_opacity'] != null ? links['hero_bg_opacity'] : 55, links['hero_bg_blur'] != null ? links['hero_bg_blur'] : 0);
       // 배경 이미지 적용
       applyBg(links['hero_bg'] || '');
       // 컬러 테마 서버값 적용 (팀 전체 공유)
@@ -828,6 +884,7 @@
         const el2 = document.getElementById('heroDate2');
         if (el2) el2.textContent = links['hero_date'];
       }
+      applyHeroImgSettings(links['hero_bg_opacity'] != null ? links['hero_bg_opacity'] : 55, links['hero_bg_blur'] != null ? links['hero_bg_blur'] : 0);
       applyBg(links['hero_bg'] || '');
       if (links['theme']) applyTheme(links['theme']);
       if (links['slide2_deco_img']) applySlide2Image(links['slide2_deco_img']);
